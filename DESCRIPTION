@@ -1,0 +1,22 @@
+Package: canregtools
+Title: Analysis Data from PBCR (Population-Based Cancer Registration,PBCR)
+Version: 0.0.0.9000
+Authors@R: 
+    person(
+    given = "Qiong", 
+    family = "Chen", 
+    email = "chenqiong@hnccr.org.cn", 
+    role = c("aut", "cre"),
+    comment = c(ORCID = "https://orcid.org/0000-0003-2401-0046"))
+Description: PBCRtools package mainly includes functions for analyzing PBCR data, such as ICD-10 classification, logic check of registration, data cleaning, generating cancer registration reports, data visualization, etc.
+License: MIT + file LICENSE
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.2.3
+Suggests: 
+    covr,
+    renv,
+    testthat (>= 3.0.0)
+Config/testthat/edition: 3
+Depends: 
+    R (>= 2.10)
