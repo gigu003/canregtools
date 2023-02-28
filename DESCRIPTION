@@ -9,6 +9,7 @@ Description: PBCRtools package mainly includes functions for analyzing
     data cleaning, generating cancer registration reports, data
     visualization, etc.
 License: MIT + file LICENSE
+URL: https://gigu003.github.io/canregtools/
 Depends: 
     R (>= 2.10)
 Suggests: 
