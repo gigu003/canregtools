@@ -7,6 +7,7 @@
 
 [![Codecov test
 coverage](https://codecov.io/gh/gigu003/canregtools/branch/main/graph/badge.svg)](https://app.codecov.io/gh/gigu003/canregtools?branch=main)
+[![R-CMD-check](https://github.com/gigu003/canregtools/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/gigu003/canregtools/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
 
 canregtools
@@ -19,6 +20,8 @@ canregtools
 ``` r
 # install.packages("devtools")
 devtools::install_github("gigu003/canregtools")
+#> Skipping install of 'canregtools' from a github remote, the SHA1 (bdb29fba) has not changed since last install.
+#>   Use `force = TRUE` to force installation
 ```
 
 ## 例子
@@ -30,11 +33,16 @@ devtools::install_github("gigu003/canregtools")
 
 ``` r
 ## 加载canregtools包
-#library(canregtools)
+library(canregtools)
 icd10 <- c("C15.1","C16.0","C33.4","D32","C22.0")
 ## 按照默认选项把icd10编码转化为癌症分类
 classify_icd10(icd10, type = "big", lang = "cn")
+#> [1] 食管 胃   肺   脑   肝  
+#> 26 Levels: 口腔 鼻咽 食管 胃 结直肠 肝 胆囊 胰腺 喉 肺 其他胸腔器官 ... 其他
 
 ## 把icd10编码转化为59分类，并用英语显示
 classify_icd10(icd10, type = "small", lang = "en")
+#> [1] Esophagus                Stomach                  Trachea, bronchus & lung
+#> [4] Brain,nervous system     Liver                   
+#> 59 Levels: Lip Tongue Mouth Salivary glands Tonsil ... Other and unspecified
 ```

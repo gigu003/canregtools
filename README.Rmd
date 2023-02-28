@@ -17,6 +17,7 @@ knitr::opts_chunk$set(
 
 <!-- badges: start -->
 [![Codecov test coverage](https://codecov.io/gh/gigu003/canregtools/branch/main/graph/badge.svg)](https://app.codecov.io/gh/gigu003/canregtools?branch=main)
+[![R-CMD-check](https://github.com/gigu003/canregtools/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/gigu003/canregtools/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
 
 canregtools 包的主要目的是为肿瘤登记工作者提供数据核查、数据准备、数据分析和可视化常用的功能和函数，包括icd10编码分类功能(classify_icd10)、记录逻辑核查功能(check)等，目前只实现了classify_icd10这个功能，后续将尽快更新。
@@ -25,7 +26,7 @@ canregtools 包的主要目的是为肿瘤登记工作者提供数据核查、�
 
 目前这个包还没有放到CRAN上，但是可以通过[GitHub](https://github.com/)来安装开发版本的canregtools，具体方法如下：
 
-``` r
+```{r, warning=FALSE}
 # install.packages("devtools")
 devtools::install_github("gigu003/canregtools")
 ```
@@ -36,9 +37,9 @@ devtools::install_github("gigu003/canregtools")
 
 - classify_icd10  该函数把人群肿瘤登记数据的icd10编码转化为肿瘤分类的因子。
 
-```r
+```{r example}
 ## 加载canregtools包
-#library(canregtools)
+library(canregtools)
 icd10 <- c("C15.1","C16.0","C33.4","D32","C22.0")
 ## 按照默认选项把icd10编码转化为癌症分类
 classify_icd10(icd10, type = "big", lang = "cn")
