@@ -20,8 +20,6 @@ canregtools
 ``` r
 # install.packages("devtools")
 devtools::install_github("gigu003/canregtools")
-#> Skipping install of 'canregtools' from a github remote, the SHA1 (bdb29fba) has not changed since last install.
-#>   Use `force = TRUE` to force installation
 ```
 
 ## 例子
@@ -34,7 +32,7 @@ devtools::install_github("gigu003/canregtools")
 ``` r
 ## 加载canregtools包
 library(canregtools)
-icd10 <- c("C15.1","C16.0","C33.4","D32","C22.0")
+icd10 <- c("C15.1", "C16.0", "C33.4", "D32", "C22.0")
 ## 按照默认选项把icd10编码转化为癌症分类
 classify_icd10(icd10, type = "big", lang = "cn")
 #> [1] 食管 胃   肺   脑   肝  

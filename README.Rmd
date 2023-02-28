@@ -26,7 +26,7 @@ canregtools 包的主要目的是为肿瘤登记工作者提供数据核查、�
 
 目前这个包还没有放到CRAN上，但是可以通过[GitHub](https://github.com/)来安装开发版本的canregtools，具体方法如下：
 
-```{r, warning=FALSE}
+```r
 # install.packages("devtools")
 devtools::install_github("gigu003/canregtools")
 ```
@@ -40,12 +40,11 @@ devtools::install_github("gigu003/canregtools")
 ```{r example}
 ## 加载canregtools包
 library(canregtools)
-icd10 <- c("C15.1","C16.0","C33.4","D32","C22.0")
+icd10 <- c("C15.1", "C16.0", "C33.4", "D32", "C22.0")
 ## 按照默认选项把icd10编码转化为癌症分类
 classify_icd10(icd10, type = "big", lang = "cn")
 
 ## 把icd10编码转化为59分类，并用英语显示
 classify_icd10(icd10, type = "small", lang = "en")
-
 ```
 
