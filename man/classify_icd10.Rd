@@ -2,32 +2,39 @@
 % Please edit documentation in R/classify_icd10.R
 \name{classify_icd10}
 \alias{classify_icd10}
-\title{Convert ICD10 Codes to Cancer Categories.
-Return Cancer categories based on convert type.}
+\title{Convert ICD10 Codes to Cancer Categories.}
 \usage{
 classify_icd10(icd10, type = "big", lang = "cn")
 }
 \arguments{
-\item{icd10}{The icd10 codes collected by the Population-Based Cancer
-Registration (PBCR).}
+\item{icd10}{The ICD10 codes of cancer part (C00-C98 and D00-D48) collected
+by the Population-Based Cancer Registration (PBCR).}
 
-\item{type}{character, type of cancer category ("system","big","small"), by
-default, the "big" category was choosed which will categorize the icd10 code
-25 cancer categories.}
+\item{type}{Character, type of cancer category ("system","big","small"), by
+default, the "big" category was choosed which will categorize the
+icd10 code 25 cancer categories.}
 
-\item{lang}{character, two options ("cn","en"), by default, lang="cn" was
-choosed, which will output the categories in Chinese, otherwise, in English.}
+\item{lang}{Character, two options ("cn","en"), by default, lang="cn" was
+choosed, which will output the categories in Chinese, otherwise, in
+English.}
 }
 \value{
 a vector that contain the cancer categories.
 }
 \description{
-Convert ICD10 Codes to Cancer Categories.
-Return Cancer categories based on convert type.
+Convert ICD10 codes to Cancer Categories according to the specified
+category type and language.
 }
 \examples{
 library(canregtools)
 icd10 <- c("C16.1", "C15.1", "C34.1", "C34.2", "C15.0")
 category <- classify_icd10(icd10, type = "system", lang = "en")
 
+}
+\references{
+National Cancer Center. Guidelines for Cancer Registration in
+China (2016) [M]. Beijing: People's Medical Publishing House, 2016.
+}
+\author{
+\href{https://www.chenq.site}{Qiong Chen}, Email: chenqiong@hnccr.org.cn
 }
