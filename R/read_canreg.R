@@ -65,5 +65,3 @@ read_canreg <- function(x, pop.type = "long"){
       get_file(x)
     }
 }
-
-
