@@ -63,10 +63,10 @@ asr_rate <- function(
     sig = 0.95) {
   groups <- quos(...)
   output <- data %>%
-    group_by(!!!groups,agegrp) %>%
-    mutate(across(c({{event}},{{pop}}), ~ sum(.x))) %>%
-    distinct(!!!groups,.keep_all = TRUE) %>%
-    left_join(std_pop,by=c("agegrp")) %>%
+    group_by(!!!groups, agegrp) %>%
+    mutate(across(c({{event}}, {{pop}}), ~ sum(.x))) %>%
+    distinct(!!!groups, .keep_all = TRUE) %>%
+    left_join(std_pop, by = c("agegrp")) %>%
     group_by(!!!groups) %>%
     summarise(
       across({{event}},
