@@ -7,8 +7,10 @@ read_canreg2 <- function(x, pop.type = "long"){
   get_file <- function(x, type = pop.type){
     tryCatch({
     fb <- read_excel(x, sheet = "FB")
+    cat(nrow(fb)," cases were read from FB sheet.")
     names(fb) <- tolower(names(fb))
     sw <- read_excel(x, sheet = "SW")
+    cat(nrow(sw)," cases were read from SW sheet.")
     names(sw) <- tolower(names(sw))
     # Extract year information
       fyear <- table(format(as.Date(fb$inciden), "%Y"))
@@ -38,14 +40,14 @@ read_canreg2 <- function(x, pop.type = "long"){
       pop$sex <- as.integer(pop$sex)
       pop$agegrp <- factor(pop$agegrp)
     }
-    attr(fb, "class") <- c("FBcases", "tibble", "data.frame")
-    attr(sw, "class") <- c("SWcases", "tibble", "data.frame")
-    attr(pop, "class") <- c("population", "tibble", "data.frame")
+    attr(fb, "class") <- c("FBcases", "tbl_df", "tbl", "data.frame")
+    attr(sw, "class") <- c("SWcases", "tbl_df", "tbl", "data.frame")
+    attr(pop, "class") <- c("population", "tbl_df", "tbl", "data.frame")
     bsname <- tools::file_path_sans_ext(basename(x))
     areacode <- gsub("\\D", "", bsname)
-    name <- gsub("\\d", "", bsname)
+    county <- gsub("\\d", "", bsname)
     res <- list(areacode = areacode,
-                name = name,
+                county = county,
                 year = year,
                 FBcases = fb,
                 SWcases = sw,

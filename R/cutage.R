@@ -23,9 +23,9 @@
 #' @examples
 #' library(canregtools)
 #' age <- sample(0:101, 200, replace = TRUE)
-#' agegrp <- cutage(age, method = "distance", length = 10, maxage = 60, sep_zero = T)
+#' agegrp <- cutage(age, method = "distance", length = 5, maxage = 60, sep_zero = T)
 cutage <- function(x,
-                   method = "interval",
+                   method = "distance",
                    length = 5,
                    maxage = 85,
                    sep_zero = TRUE,

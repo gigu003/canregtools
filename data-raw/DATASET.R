@@ -2,11 +2,11 @@
 
 label_system <- data.frame(
   cn = c(
-    "排除值", "唇口咽", "消化系统", "呼吸系统", "骨、软骨、皮肤", "乳腺癌", "女性生殖系统",
+    "排除", "唇口咽", "消化系统", "呼吸系统", "骨、软骨、皮肤", "乳腺癌", "女性生殖系统",
     "男性生殖系统", "泌尿系统", "眼、脑、甲状腺", "造血系统", "其他"
   ),
   en = c(
-    "排除值", "Lip,mouth and pharynx", "Digestive system", "Respiratory system",
+    "Excluded", "Lip,mouth and pharynx", "Digestive system", "Respiratory system",
     "Bone,cartilage,skin", "Breast cancer", "Female reproductive system",
     "Male reproductive system", "Urinary system", "Eyes,brain,thyroid",
     "Hemopoietic system", "Other"
@@ -15,13 +15,13 @@ label_system <- data.frame(
 
 label_big <- data.frame(
   cn = c(
-    "排除值", "口腔", "鼻咽", "食管", "胃", "结直肠", "肝", "胆囊", "胰腺", "喉",
+    "排除", "口腔", "鼻咽", "食管", "胃", "结直肠", "肝", "胆囊", "胰腺", "喉",
     "肺", "其他胸腔器官", "骨", "皮肤黑色素瘤", "乳房", "子宫颈",
     "子宫体", "卵巢", "前列腺", "睾丸", "肾", "膀胱", "脑", "甲状腺",
     "淋巴瘤", "白血病", "其他"
   ),
   en = c(
-    "排除值", "Oral cavity & pharynx", "Nasopharynx", "Esophagus", "Stomach",
+    "Excluded", "Oral cavity & pharynx", "Nasopharynx", "Esophagus", "Stomach",
     "Colon-rectum", "Liver", "Gallbladder", "Pancreas", "Larynx",
     "Lung", "Other thoracic organs", "Bone", "Melanoma of skin",
     "Breast", "Cervix", "Uterus", "Ovary", "Prostate", "Testis",
@@ -32,7 +32,7 @@ label_big <- data.frame(
 
 label_small <- data.frame(
   cn = c(
-    "排除值", "唇", "舌", "口", "唾液腺", "扁桃腺", "其他口咽", "鼻咽",
+    "排除", "唇", "舌", "口", "唾液腺", "扁桃腺", "其他口咽", "鼻咽",
     "下咽", "咽,部位不明", "食管", "胃", "小肠", "结肠", "直肠",
     "肛门", "肝脏", "胆囊及其他", "胰腺", "鼻,鼻窦及其他", "喉",
     "气管、支气管、肺", "其他胸腔器官", "骨", "皮肤黑色素瘤",
@@ -45,7 +45,7 @@ label_small <- data.frame(
     "白血病,未特指", "其他或未指明部位"
   ),
   en = c(
-    "排除值", "Lip", "Tongue", "Mouth", "Salivary glands", "Tonsil",
+    "Excluded", "Lip", "Tongue", "Mouth", "Salivary glands", "Tonsil",
     "Other oropharynx", "Nasopharynx", "Hypopharynx", "Pharynx unspecified",
     "Esophagus", "Stomach", "Small intestine", "Colon", "Rectum", "Anus",
     "Liver", "Gallbladder etc.", "Pancreas", "Nose,sinses etc.", "Larynx",
@@ -112,7 +112,7 @@ behas <- c("3", "6", "2", "0", "1", "mela_3", "mela_2", "meso_3", "kaposi_3")
 #去除第一列和第七列，形成topo和behaviour编码与ICD10编码对应表
 topo_to_icd10 <- topo_to_icd10[,-c(1,7)]
 topo_to_icd10 <- as.matrix(topo_to_icd10)
-rownames(topo_to_icd10) <- topos
+rownames(topo_to_icd10) <- topo_dict
 colnames(topo_to_icd10) <- behas
 
 
