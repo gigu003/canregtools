@@ -12,11 +12,11 @@ coverage](https://codecov.io/gh/gigu003/canregtools/branch/main/graph/badge.svg)
 experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
 <!-- badges: end -->
 
-canregtools包的主要目的是为肿瘤登记工作者提供数据核查、数据准备、数据分析和可视化常用的功能和函数，包括icd10编码分类功能(classify_icd10)、记录逻辑核查功能(check)等，目前只实现了classify_icd10这个功能，后续将尽快更新。
+canregtools包的主要目的是为中国肿瘤登记工作者提供数据核查、数据准备、数据分析和可视化常用的功能和函数。
 
 ## 安装
 
-目前这个包还没有放到CRAN上，但是可以通过[GitHub](https://github.com/)来安装开发版本的canregtools，具体方法如下：
+目前该包还没有放到CRAN上，但是可以通过[GitHub](https://github.com/)来安装开发版本的canregtools，具体方法如下：
 
 ``` r
 ## 安装devtools包
@@ -26,32 +26,19 @@ install.packages("devtools")
 devtools::install_github("gigu003/canregtools")
 ```
 
-## 例子
-
-目前该canregtools包实现了如下功能:
-
-- classify_icd10
-  该函数把人群肿瘤登记数据的icd10编码转化为肿瘤分类的因子。
+或者
 
 ``` r
-## 加载canregtools包
-library(canregtools)
-icd10 <- c("C15.1", "C16.0", "C33.4", "D32", "C22.0")
-## 按照默认选项把icd10编码转化为癌症分类
-classify_icd10(icd10, type = "big", lang = "cn")
-#> [1] 食管 胃   肺   脑   肝  
-#> 26 Levels: 口腔 鼻咽 食管 胃 结直肠 肝 胆囊 胰腺 喉 肺 其他胸腔器官 ... 其他
+## 安装remotes包
+install.packages("remotes")
 
-## 把icd10编码转化为59分类，并用英语显示
-classify_icd10(icd10, type = "small", lang = "en")
-#> [1] Esophagus                Stomach                  Trachea, bronchus & lung
-#> [4] Brain,nervous system     Liver                   
-#> 59 Levels: Lip Tongue Mouth Salivary glands Tonsil ... Other and unspecified
+library(remotes)
+install_github("gigu003/canregtools")
 ```
 
-## 待实现功能
+## 开发计划
 
-- 标准化率，包括标准化发病率、死亡率、死亡发病比、病理诊断比例
-- 统计报告
-- 人口金字塔图
-- 质量控制报告
+1.  登记处数据分类合并统计
+2.  自动报告
+3.  ICDO3编码转换
+4.  儿童肿瘤分类

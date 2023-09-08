@@ -6,25 +6,21 @@
 \usage{
 pyramid(
   data,
-  Show.Values = TRUE,
-  Show.Proportion = TRUE,
-  Laxis = NULL,
-  Raxis = NULL,
-  AxisFM = "g",
-  AxisBM = "",
-  AxisBI = 3,
-  Cgap = 0.3,
-  Cstep = 1,
-  Csize = 1,
-  Llab = "Males",
-  Rlab = "Females",
-  Clab = "Ages",
-  GL = TRUE,
-  Cadj = 0,
-  Lcol = "lightblue",
-  Rcol = "pink",
-  Ldens = -1,
-  Rdens = -1,
+  show_value = TRUE,
+  show_prop = TRUE,
+  left_axis = NULL,
+  right_axis = NULL,
+  axis_fm = "g",
+  axis_bm = "",
+  axis_bi = 3,
+  cgap = 0.3,
+  cstep = 1,
+  csize = 1,
+  labs = c("Males", "Ages", "Females"),
+  gl = TRUE,
+  cadj = 0,
+  cols = c("#006400", "#b32134"),
+  dens = c(-1, -1),
   main = "",
   ...
 )
@@ -33,59 +29,53 @@ pyramid(
 \item{data}{A data.frame including left pyramid numbers in the 1st column
 and and right pyramid numbers in the 2nd column, where the numbers
 of males in each age-class are usually given to left numbers and
-those of females are to right numbers. If the data.frame includes 3rd column,
-it is used as age-class labels, otherwise the row.names(data) is used as
-age-class labels.}
+those of females are to right numbers. If the data.frame includes 3rd
+column, it is used as age-class labels, otherwise the row.names(data)
+is used as age-class labels.}
 
-\item{Show.Values}{Logical value to draw the population numbers. Default is
+\item{show_value}{Logical value to draw the population numbers. Default is
 TRUE.}
 
-\item{Show.Proportion}{Logical value to draw the pyramid using proportion.
+\item{show_prop}{Logical value to draw the pyramid using proportion.
 Default is TRUE.}
 
-\item{Laxis}{A vector of axis for left pyramid. If missing, automatically
+\item{left_axis}{A vector of axis for left pyramid. If missing, automatically
 given using pretty().}
 
-\item{Raxis}{A vector of axis for right pyramid. If missing, Laxis is used.}
+\item{right_axis}{A vector of axis for right pyramid.
+If missing, left_axis is used.}
 
-\item{AxisFM}{A format code of formatC for plotting axis.
+\item{axis_fm}{A format code of formatC for plotting axis.
 If missing, "g" is used.}
 
-\item{AxisBM}{A big.mark of formatC for plotting axis.
+\item{axis_bm}{A big.mark of formatC for plotting axis.
 If missing, none.}
 
-\item{AxisBI}{A big.interval number of formatC for plotting axis.
+\item{axis_bi}{A big.interval number of formatC for plotting axis.
 Default is 3.}
 
-\item{Cgap}{The width of center gap (as ratio to each panel) to draw
+\item{cgap}{The width of center gap (as ratio to each panel) to draw
 age-class. Default is 0.3.}
 
-\item{Cstep}{The interval to write the labels of age classes.
+\item{cstep}{The interval to write the labels of age classes.
 Default is 1.}
 
-\item{Csize}{The font size factor to write the labels of age classes.
+\item{csize}{The font size factor to write the labels of age classes.
 Default is 1.}
 
-\item{Llab}{The label of the left pyramid. Default is "Males".}
+\item{labs}{The label of the left, center, and right pyramid.
+Default is c("Males", "Ages", "Females").}
 
-\item{Rlab}{The label of the right pyramid. Default is "Females".}
+\item{gl}{Logical value to draw the vertical dotted lines. Default is TRUE.}
 
-\item{Clab}{The label of the center age-class. Default is "Ages".}
-
-\item{GL}{Logical value to draw the vertical dotted lines. Default is TRUE.}
-
-\item{Cadj}{The vertical adjustment factor for the labels of age classes.
+\item{cadj}{The vertical adjustment factor for the labels of age classes.
 Default is -0.03.}
 
-\item{Lcol}{The color of the left pyramid. Default is "Cyan".}
+\item{cols}{The color of the left and right pyramid.
+Default is c("lightblue", "pink").}
 
-\item{Rcol}{The color of the right pyramid. Default is "Pink".}
-
-\item{Ldens}{The density of hatching lines (/inch) for left pyramid.
-Default is -1, when the pyramid will be filled.}
-
-\item{Rdens}{The density of hatching lines (/inch) for right pyramid.
-Default is -1, when the pyramid will be filled.}
+\item{dens}{The density of hatching lines (/inch) for left and right pyramid.
+Default is c(-1, -1), when the pyramid will be filled.}
 
 \item{main}{The main title of the pyramid.}
 
@@ -98,6 +88,20 @@ A population pyramid plot.
 Plot population pyramid
 }
 \examples{
-library(canregtools)
-library(readxl)
+left <- c(
+  5053, 17743, 25541, 32509, 30530, 34806, 36846, 38691, 40056,
+  39252, 37349, 30507, 26363, 21684, 15362, 11725, 7461, 3260, 915
+)
+right <- c(
+  4728, 15330, 22633, 27784, 28082, 32605, 32964, 35732, 36234,
+  37123, 34242, 29152, 24667, 18940, 15406, 12355, 10206, 5634,
+  2547
+)
+agegrp <- c(
+  "0", "1-4", "5-9", "10-14", "15-19", "20-24", "25-29", "30-34",
+  "35-39", "40-44", "45-49", "50-54", "55-59", "60-64", "65-69",
+  "70-74", "75-79", "80-84", "85+"
+)
+pop <- data.frame(left = left, right = right, row.names = agegrp)
+pyramid(pop, main = "Population pyramid in China.", csize = 0.8)
 }

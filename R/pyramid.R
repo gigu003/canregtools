@@ -3,133 +3,191 @@
 #' @param data A data.frame including left pyramid numbers in the 1st column
 #'  and and right pyramid numbers in the 2nd column, where the numbers
 #'  of males in each age-class are usually given to left numbers and
-#'  those of females are to right numbers. If the data.frame includes 3rd column,
-#'  it is used as age-class labels, otherwise the row.names(data) is used as
-#'  age-class labels.
-#' @param Show.Values Logical value to draw the population numbers. Default is
+#'  those of females are to right numbers. If the data.frame includes 3rd
+#'  column, it is used as age-class labels, otherwise the row.names(data)
+#'  is used as age-class labels.
+#' @param show_value Logical value to draw the population numbers. Default is
 #'  TRUE.
-#' @param Show.Proportion Logical value to draw the pyramid using proportion.
+#' @param show_prop Logical value to draw the pyramid using proportion.
 #'  Default is TRUE.
-#' @param Laxis A vector of axis for left pyramid. If missing, automatically
+#' @param left_axis A vector of axis for left pyramid. If missing, automatically
 #'  given using pretty().
-#' @param Raxis A vector of axis for right pyramid. If missing, Laxis is used.
-#' @param AxisFM A format code of formatC for plotting axis.
+#' @param right_axis A vector of axis for right pyramid.
+#'        If missing, left_axis is used.
+#' @param axis_fm A format code of formatC for plotting axis.
 #'  If missing, "g" is used.
-#' @param AxisBM A big.mark of formatC for plotting axis.
+#' @param axis_bm A big.mark of formatC for plotting axis.
 #'  If missing, none.
-#' @param AxisBI A big.interval number of formatC for plotting axis.
+#' @param axis_bi A big.interval number of formatC for plotting axis.
 #'  Default is 3.
-#' @param Cgap The width of center gap (as ratio to each panel) to draw
+#' @param cgap The width of center gap (as ratio to each panel) to draw
 #'  age-class. Default is 0.3.
-#' @param Cstep The interval to write the labels of age classes.
+#' @param cstep The interval to write the labels of age classes.
 #'  Default is 1.
-#' @param Csize The font size factor to write the labels of age classes.
+#' @param csize The font size factor to write the labels of age classes.
 #'  Default is 1.
-#' @param Llab The label of the left pyramid. Default is "Males".
-#' @param Rlab The label of the right pyramid. Default is "Females".
-#' @param Clab The label of the center age-class. Default is "Ages".
-#' @param GL Logical value to draw the vertical dotted lines. Default is TRUE.
-#' @param Cadj The vertical adjustment factor for the labels of age classes.
+#' @param labs The label of the left, center, and right pyramid.
+#'        Default is c("Males", "Ages", "Females").
+#' @param gl Logical value to draw the vertical dotted lines. Default is TRUE.
+#' @param cadj The vertical adjustment factor for the labels of age classes.
 #'  Default is -0.03.
-#' @param Lcol The color of the left pyramid. Default is "Cyan".
-#' @param Rcol The color of the right pyramid. Default is "Pink".
-#' @param Ldens The density of hatching lines (/inch) for left pyramid.
-#'  Default is -1, when the pyramid will be filled.
-#' @param Rdens The density of hatching lines (/inch) for right pyramid.
-#'  Default is -1, when the pyramid will be filled.
+#' @param cols The color of the left and right pyramid.
+#'        Default is c("lightblue", "pink").
+#' @param dens The density of hatching lines (/inch) for left and right pyramid.
+#'        Default is c(-1, -1), when the pyramid will be filled.
 #' @param main The main title of the pyramid.
 #' @param ... Other options.
 #'
 #' @importFrom graphics lines rect segments text
 #' @return A population pyramid plot.
 #' @export
-#'
 #' @examples
-#' library(canregtools)
-#' library(readxl)
-pyramid <- function (data, Show.Values = TRUE, Show.Proportion = TRUE,
-                     Laxis = NULL, Raxis = NULL, AxisFM = "g",
-                     AxisBM = "", AxisBI = 3, Cgap = 0.3, Cstep = 1, Csize = 1,
-                     Llab = "Males", Rlab = "Females", Clab = "Ages", GL = TRUE,
-                     Cadj = 0, Lcol = "lightblue", Rcol = "pink", Ldens = -1,
-                     Rdens = -1, main = "",  ...) {
+#' left <- c(
+#'   5053, 17743, 25541, 32509, 30530, 34806, 36846, 38691, 40056,
+#'   39252, 37349, 30507, 26363, 21684, 15362, 11725, 7461, 3260, 915
+#' )
+#' right <- c(
+#'   4728, 15330, 22633, 27784, 28082, 32605, 32964, 35732, 36234,
+#'   37123, 34242, 29152, 24667, 18940, 15406, 12355, 10206, 5634,
+#'   2547
+#' )
+#' agegrp <- c(
+#'   "0", "1-4", "5-9", "10-14", "15-19", "20-24", "25-29", "30-34",
+#'   "35-39", "40-44", "45-49", "50-54", "55-59", "60-64", "65-69",
+#'   "70-74", "75-79", "80-84", "85+"
+#' )
+#' pop <- data.frame(left = left, right = right, row.names = agegrp)
+#' pyramid(pop, main = "Population pyramid in China.", csize = 0.8)
+pyramid <- function(data, show_value = TRUE, show_prop = TRUE,
+                    left_axis = NULL, right_axis = NULL, axis_fm = "g",
+                    axis_bm = "", axis_bi = 3, cgap = 0.3, cstep = 1, csize = 1,
+                    labs = c("Males", "Ages", "Females"), gl = TRUE,
+                    cadj = 0, cols = c("#006400", "#b32134"), dens = c(-1, -1),
+                    main = "", ...) {
+  opar <- par(no.readonly = TRUE)
+  par(mar = c(0, 0, 4, 0))
+
   data <- as.data.frame(data)
-  if (Show.Proportion == TRUE){
+  if (show_prop == TRUE) {
     ll <- data[, 1]
     rr <- data[, 2]
-    Left <- ll/(sum(ll)+sum(rr))*100
-    Right <- rr/(sum(ll)+sum(rr))*100
+    Left <- ll / (sum(ll) + sum(rr)) * 100
+    Right <- rr / (sum(ll) + sum(rr)) * 100
   } else {
     Left <- data[, 1]
     ll <- Left
     Right <- data[, 2]
-    rr <- Right}
-  
+    rr <- Right
+  }
+
   if (length(data) == 2) {
     Center <- row.names(data)
   } else {
     Center <- data[, 3]
   }
-  if (is.null(Laxis)) {
-    Laxis <- pretty(c(0, max(c(Left, Right))))
+  if (is.null(left_axis)) {
+    left_axis <- pretty(c(0, max(c(Left, Right))))
   }
-  if (is.null(Raxis)) {
-    Raxis <- Laxis
+  if (is.null(right_axis)) {
+    right_axis <- left_axis
   }
-  side <- ifelse(Show.Values == TRUE, 1.2, 1)
-  BX <- c(-side - Cgap/2, side + Cgap/2)
-  BY <- c(-0.1, 1.1)
+  side <- ifelse(show_value == TRUE, 1.2, 1)
+  BX <- c(-side - cgap / 2, side + cgap / 2)
+  BY <- c(-0.2, 1.1)
   plot(BX, BY, type = "n", axes = FALSE, xlab = "", ylab = "", main = main)
-  LL <- max(Laxis)
-  LR <- min(Laxis)
+  LL <- max(left_axis)
+  LR <- min(left_axis)
   LS <- LL - LR
-  LI <- length(Laxis)
-  RL <- min(Raxis)
-  RR <- max(Raxis)
+  LI <- length(left_axis)
+  RL <- min(right_axis)
+  RR <- max(right_axis)
   RS <- RR - RL
-  RI <- length(Raxis)
-  segments(-(Laxis - LR)/LS - Cgap/2, -0.01, -(Laxis - LR)/LS - Cgap/2, 0.01)
-  segments((Raxis - RL)/RS + Cgap/2, -0.01, (Raxis - RL)/RS + Cgap/2, 0.01)
+  RI <- length(right_axis)
+  segments(
+    -(left_axis - LR) / LS - cgap / 2,
+    -0.1,
+    -(left_axis - LR) / LS - cgap / 2,
+    -0.08
+  )
+  segments(
+    (right_axis - RL) / RS + cgap / 2,
+    -0.1,
+    (right_axis - RL) / RS + cgap / 2,
+    -0.08
+  )
 
-  if (GL) {
-    segments(-(Laxis - LR)/LS - Cgap/2, 0, -(Laxis - LR)/LS - 
-               Cgap/2, 1, lty = 3, col = "blue")
-    segments((Raxis - RL)/RS + Cgap/2, 0, (Raxis - RL)/RS + 
-               Cgap/2, 1, lty = 3, col = "blue")
+  if (gl) {
+    segments(-(left_axis - LR) / LS - cgap / 2, 0, -(left_axis - LR) / LS -
+      cgap / 2, 1, lty = 3, col = "blue")
+    segments((right_axis - RL) / RS + cgap / 2, 0, (right_axis - RL) / RS +
+      cgap / 2, 1, lty = 3, col = "blue")
   }
-  lines(c(-1 - Cgap/2, -Cgap/2), c(0, 0), lty = 1)
-  lines(c(-Cgap/2, -Cgap/2), c(0, 1.3), lty = 1)
-  lines(c(1 + Cgap/2, Cgap/2), c(0, 0), lty = 1)
-  lines(c(Cgap/2, Cgap/2), c(0, 1.3), lty = 1)
-  sign <- ifelse(Show.Proportion == TRUE, "(%)", "")
-  text(-0.5 - Cgap/2, -0.14, paste(Llab, sign), pos = 3)
-  text(0.5 + Cgap/2, -0.14, paste(Rlab, sign), pos = 3)
-  text(0, 1.05, Clab, pos = 3)
+  lines(c(-1 - cgap / 2, -cgap / 2), c(-0.09, -0.09), lty = 1)
+  lines(c(-cgap / 2, -cgap / 2), c(0, 1.3), lty = 1)
+  lines(c(1 + cgap / 2, cgap / 2), c(-0.09, -0.09), lty = 1)
+  lines(c(cgap / 2, cgap / 2), c(0, 1.3), lty = 1)
+  sign <- ifelse(show_prop == TRUE, "(%)", "")
+  text(-0.5 - cgap / 2, -0.18, paste(labs[1], sign), pos = 3)
+  text(0.5 + cgap / 2, -0.18, paste(labs[3], sign), pos = 3)
+  text(0, 1.05, labs[2], pos = 3)
   Ci <- length(Center)
-  #draw center age labels
+  # draw center age labels
   for (i in 0:(Ci - 1)) {
-    if ((i%%Cstep) == 0) {
-      text(0, i/Ci + Cadj, paste(Center[i + 1]), pos = 3, 
-           cex = Csize) }}
-  #draw the population number on two sides of pyramid
-  if (Show.Values){
-    for(i in 0:(Ci - 1)){
-      text(-1.15 - Cgap/2, i/Ci + Cadj, paste(ll[i + 1]), pos = 3, cex = Csize)
-      text(1.15 + Cgap/2, i/Ci + Cadj, paste(rr[i + 1]), pos = 3, cex = Csize)
-      text(-0.5 - Cgap/2, 1.05, paste(round(sum(Left), 2)), pos =3, cex = Csize)
-      text(0.5 + Cgap/2, 1.05, paste(round(sum(Right), 2)), pos =3, cex = Csize)
+    if ((i %% cstep) == 0) {
+      text(0, i / Ci + cadj, paste(Center[i + 1]), pos = 3, cex = csize)
     }
   }
-  text(-(Laxis - LR)/LS - Cgap/2, rep(0, LI),
-       paste(formatC(Laxis, format = AxisFM,
-                     big.mark = AxisBM, big.interval = AxisBI)), pos = 1)
-  text((Raxis - RL)/RS + Cgap/2, rep(0, RI),
-       paste(formatC(Raxis,format = AxisFM,
-                     big.mark = AxisBM, big.interval = AxisBI)), pos = 1)
-  VB <- 0:(Ci - 1)/Ci
-  VT <- 1:Ci/Ci
-  LeftP <- -(Left - LR)/LS - Cgap/2
-  rect(LeftP, VB, rep(-Cgap/2, Ci), VT, col = Lcol, density = Ldens)
-  RightP <- (Right - RL)/RS + Cgap/2
-  rect(rep(Cgap/2, Ci), VB, RightP, VT, col = Rcol, density = Rdens)    
+  # draw the population number on two sides of pyramid
+  if (show_value) {
+    for (i in 0:(Ci - 1)) {
+      if ((i %% cstep) == 0) {
+        text(-1.15 - cgap / 2, i / Ci + cadj, paste(ll[i + 1]),
+          pos = 3,
+          cex = csize
+        )
+        text(1.15 + cgap / 2, i / Ci + cadj, paste(rr[i + 1]),
+          pos = 3,
+          cex = csize
+        )
+      }
+    }
+    text(-0.5 - cgap / 2, 1.05, paste(round(sum(Left), 2), sign),
+      pos = 3,
+      cex = csize
+    )
+    text(0.5 + cgap / 2, 1.05, paste(round(sum(Right), 2), sign),
+      pos = 3,
+      cex = csize
+    )
+  }
+  text(-(left_axis - LR) / LS - cgap / 2, rep(-0.022, LI),
+    paste(formatC(left_axis,
+      format = axis_fm,
+      big.mark = axis_bm, big.interval = axis_bi
+    )),
+    pos = 1
+  )
+  text((right_axis - RL) / RS + cgap / 2, rep(-0.022, RI),
+    paste(formatC(right_axis,
+      format = axis_fm,
+      big.mark = axis_bm, big.interval = axis_bi
+    )),
+    pos = 1
+  )
+  VB <- 0:(Ci - 1) / Ci
+  VT <- 1:Ci / Ci
+  LeftP <- -(Left - LR) / LS - cgap / 2
+  rect(LeftP, VB, rep(-cgap / 2, Ci), VT, col = cols[1], density = dens[1])
+  RightP <- (Right - RL) / RS + cgap / 2
+  rect(rep(cgap / 2, Ci), VB, RightP, VT, col = cols[2], density = dens[2])
+  par(opar)
+}
+
+pyramids <- function(Left, Right, Center = NULL, ...) {
+  if (is.null(Center)) {
+    dx <- data.frame(Left, Right, row.names = names(Left))
+  } else {
+    dx <- data.frame(Left, Right, Center)
+  }
+  pyramid(dx, ...)
 }

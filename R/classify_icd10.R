@@ -2,9 +2,9 @@
 #' @description
 #' Convert ICD10 codes to Cancer Categories according to the specified
 #' category type and language.
-#'    
 #'
-#' @param icd10 The ICD10 codes of cancer part (C00-C98 and D00-D48) collected 
+#'
+#' @param icd10 The ICD10 codes of cancer part (C00-C98 and D00-D48) collected
 #'        by the Population-Based Cancer Registration (PBCR).
 #' @param type Character, type of cancer category ("system","big","small"), by
 #'        default, the "big" category was choosed which will categorize the
@@ -18,7 +18,7 @@
 #'
 #' @author [Qiong Chen](https://www.chenq.site), Email: chenqiong@hnccr.org.cn
 #' @references National Cancer Center. Guidelines for Cancer Registration in
-#'        China (2016) \[M\]. Beijing: People's Medical Publishing House, 2016.  
+#'        China (2016) \[M\]. Beijing: People's Medical Publishing House, 2016.
 #' @examples
 #' library(canregtools)
 #' icd10 <- c("C16.1", "C15.1", "C34.1", "C34.2", "C15.0")
@@ -27,8 +27,10 @@
 classify_icd10 <- function(icd10, type = "big", lang = "cn") {
   icd_number <- as.numeric(gsub("[^0-9\\.]", "", icd10))
   if (type == "system") {
-    breaks <- c(-Inf, 0, 15, 27, 30, 40, 45, 50, 51, 59, 60, 64, 69, 76,
-                81, 97, 98, Inf)
+    breaks <- c(
+      -Inf, 0, 15, 27, 30, 40, 45, 50, 51, 59, 60, 64, 69, 76,
+      81, 97, 98, Inf
+    )
     labels <- c(0, 1, 2, 11, 3, 4, 11, 5, 6, 11, 7, 8, 9, 11, 10, 11, 0)
     icdd <- cut(icd_number, breaks = breaks, labels = labels, right = FALSE)
     icdd <- as.numeric(as.character(icdd))

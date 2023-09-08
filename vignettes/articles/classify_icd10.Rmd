@@ -1,0 +1,38 @@
+---
+title: "ICD10分类"
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+
+## classify_icd10
+classify_icd10 该函数把人群肿瘤登记数据的icd10编码转化为肿瘤分类的因子。目前可以实现如下功能:
+
+1. 按照不同的分类方式进行分类。
+1. 输出为不同的语言(简体中文和英语)。
+
+## 例子
+
+```{r setup}
+library(canregtools)
+file <- system.file("extdata", "411721.xls", package = "canregtools")
+data <- read_canreg(file)
+icd10 <- sample(data$FBcases$icd10, 20)
+icd10
+## 把icd10按照疾病系统进行分类，并输出为中文
+cate1 <- classify_icd10(icd10, type = "system", lang = "cn")
+cate1
+
+## 把icd10按照疾病大类进行分类，并输出为英文
+cate2 <- classify_icd10(icd10, type = "big", lang = "en")
+cate2
+
+## 把icd10按照疾病小类进行分类，并输出为中文
+cate3 <- classify_icd10(icd10, type = "small", lang = "cn")
+cate3
+```

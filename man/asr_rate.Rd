@@ -6,14 +6,18 @@
 \usage{
 asr_rate(
   data,
-  std_pop,
   ...,
-  event = "fbs",
-  pop = "rks",
+  method = "gamma",
+  event = fbs,
+  pop = rks,
   agegrp = "agegrp",
   std = c("segi", "china"),
   mp = 1e+05,
-  sig = 0.95
+  sig = 0.95,
+  decimal = 2,
+  show_var = FALSE,
+  type = "big",
+  lang = "cn"
 )
 }
 \arguments{
@@ -21,11 +25,13 @@ asr_rate(
 in risk, and stratification variables for calculating standardized
 rates.}
 
-\item{std_pop}{A data frame or tibble that containing the standard
-population, the variable name for age group must be 'agegrp'.}
-
 \item{...}{Variable or variables for stratification when compute
 age standard rates.}
+
+\item{method}{This parameter specifies the method used to calculate
+confidence intervals for the rates. The options are "gamma" (default),
+"normal", or "lognormal". Different methods may produce slightly
+different confidence intervals.}
 
 \item{event}{A variable within the input data that corresponds to the cases
 counts.}
@@ -45,6 +51,18 @@ std = c("segi", "china").}
 
 \item{sig}{The desired level of confidence in computing confidence intervals.
 The default is 0.95 for 95 percent CIs.}
+
+\item{decimal}{This parameter specifies the number of decimal places to
+round the results. The default is 2, which means rates will be
+rounded to two decimal places.}
+
+\item{show_var}{Logical value whether show variance or not.}
+
+\item{type}{Character, regrouping type for cancers, options are 'system',
+'big', or 'small', default is 'big'.}
+
+\item{lang}{Character, language for output, options are 'en' or 'cn'.
+Default is 'cn'.}
 }
 \value{
 A data frame or tibble contains the age standard rates and CIs.
