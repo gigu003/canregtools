@@ -276,9 +276,9 @@ dumbbell_chart <- function(data,
   y1 <- enquo(y1)
   y2 <- enquo(y2)
 
-  cate <- data |> pull(!!x)
-  left <- data |> pull(!!y1)
-  right <- data |> pull(!!y2)
+  cate <- data %>% pull(!!x)
+  left <- data %>% pull(!!y1)
+  right <- data %>% pull(!!y2)
 
   order <- order(left)
   cate <- tail(cate[order], topn)
