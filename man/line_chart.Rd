@@ -50,6 +50,5 @@ file <- system.file("extdata", "411721.xls", package = "canregtools")
 data <- read_canreg(file)
 fbsw <- count_canreg(data)
 age <- create_age_rate(fbsw, sex)
-age <- as.data.frame(age)
 line_chart(age, agegrp, rate, sex)
 }
