@@ -1,7 +1,7 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# canregtools <img src="man/figures/logo.png" align="right" height="74" />
+# canregtools <img src="man/figures/logo.png" align="right" height="139" />
 
 <!-- badges: start -->
 
@@ -35,6 +35,14 @@ install.packages("remotes")
 library(remotes)
 install_github("gigu003/canregtools")
 ```
+
+## 主要函数列表
+
+[主要函数列表](https://gigu003.github.io/canregtools/reference/index.html)
+
+## 应用实践
+
+1.  [icd10编码分类](https://gigu003.github.io/canregtools/articles/classify_icd10.html)
 
 ## 开发计划
 
