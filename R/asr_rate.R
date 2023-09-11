@@ -58,8 +58,7 @@
 #'
 #' @import dplyr
 #' @importFrom Rdpack reprompt
-#' @author [Qiong Chen](https://www.chenq.site),
-#'        Email:[chenqiong\@hnccr.org.cn](mailto:chenqiong\@hnccr.org.cn)
+#' @author [Qiong Chen](https://www.chenq.site)
 #' @references
 #' \insertRef{fay1997}{canregtools}
 asr_rate <- function(

@@ -8,7 +8,7 @@
 #' @export
 #'
 #' @examples
-#' gender <- c("男", "男性", "女", "女性", "女子", "男子")
+#' gender <- c("male", "men", "women", "female", "women", "man", "1", "2")
 #' tidy_sex(gender)
 tidy_sex <- function(x, lang = "cn") {
   x <- tolower(x)

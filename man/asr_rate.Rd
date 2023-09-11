@@ -93,6 +93,5 @@ confidence intervals(CIs).
 \insertRef{fay1997}{canregtools}
 }
 \author{
-\href{https://www.chenq.site}{Qiong Chen},
-Email:\href{mailto:chenqiong\@hnccr.org.cn}{chenqiong\@hnccr.org.cn}
+\href{https://www.chenq.site}{Qiong Chen}
 }
