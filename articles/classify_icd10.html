@@ -113,35 +113,35 @@
 <span><span class="co">#&gt; 2200  cases were read from FB sheet.1470  cases were read from SW sheet.</span></span>
 <span><span class="va">icd10</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sample.html" class="external-link">sample</a></span><span class="op">(</span><span class="va">data</span><span class="op">$</span><span class="va">FBcases</span><span class="op">$</span><span class="va">icd10</span>, <span class="fl">20</span><span class="op">)</span></span>
 <span><span class="va">icd10</span></span>
-<span><span class="co">#&gt;  [1] "C34.9" "C73"   "C34.9" "C16.1" "C15.8" "C34.0" "C18.2" "D33.2" "C34.9"</span></span>
-<span><span class="co">#&gt; [10] "C54.1" "C16.9" "C91.0" "C22.0" "C15.9" "C15.9" "C32.9" "C15.9" "C92.9"</span></span>
-<span><span class="co">#&gt; [19] "C15.9" "C17.0"</span></span>
+<span><span class="co">#&gt;  [1] "C18.9" "C34.9" "C16.9" "C16.9" "C66"   "C53.9" "C90.0" "C15.9" "C44.9"</span></span>
+<span><span class="co">#&gt; [10] "C18.2" "C95.0" "C23"   "C50.9" "C50.9" "C50.9" "C34.9" "C25.0" "C15.9"</span></span>
+<span><span class="co">#&gt; [19] "C95.0" "C16.9"</span></span>
 <span><span class="co">## 把icd10按照疾病系统进行分类，并输出为中文</span></span>
 <span><span class="va">cate1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/classify_icd10.html">classify_icd10</a></span><span class="op">(</span><span class="va">icd10</span>, type <span class="op">=</span> <span class="st">"system"</span>, lang <span class="op">=</span> <span class="st">"cn"</span><span class="op">)</span></span>
 <span><span class="va">cate1</span></span>
-<span><span class="co">#&gt;  [1] 呼吸系统       眼、脑、甲状腺 呼吸系统       消化系统       消化系统      </span></span>
-<span><span class="co">#&gt;  [6] 呼吸系统       消化系统       呼吸系统       呼吸系统       女性生殖系统  </span></span>
-<span><span class="co">#&gt; [11] 消化系统       造血系统       消化系统       消化系统       消化系统      </span></span>
-<span><span class="co">#&gt; [16] 呼吸系统       消化系统       造血系统       消化系统       消化系统      </span></span>
+<span><span class="co">#&gt;  [1] 消化系统       呼吸系统       消化系统       消化系统       泌尿系统      </span></span>
+<span><span class="co">#&gt;  [6] 女性生殖系统   造血系统       消化系统       骨、软骨、皮肤 消化系统      </span></span>
+<span><span class="co">#&gt; [11] 造血系统       消化系统       乳腺癌         乳腺癌         乳腺癌        </span></span>
+<span><span class="co">#&gt; [16] 呼吸系统       消化系统       消化系统       造血系统       消化系统      </span></span>
 <span><span class="co">#&gt; 12 Levels: 排除 唇口咽 消化系统 呼吸系统 骨、软骨、皮肤 乳腺癌 ... 其他</span></span>
 <span></span>
 <span><span class="co">## 把icd10按照疾病大类进行分类，并输出为英文</span></span>
 <span><span class="va">cate2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/classify_icd10.html">classify_icd10</a></span><span class="op">(</span><span class="va">icd10</span>, type <span class="op">=</span> <span class="st">"big"</span>, lang <span class="op">=</span> <span class="st">"en"</span><span class="op">)</span></span>
 <span><span class="va">cate2</span></span>
-<span><span class="co">#&gt;  [1] Lung         Thyroid      Lung         Stomach      Esophagus   </span></span>
-<span><span class="co">#&gt;  [6] Lung         Colon-rectum Brain        Lung         Uterus      </span></span>
-<span><span class="co">#&gt; [11] Stomach      Leukemia     Liver        Esophagus    Esophagus   </span></span>
-<span><span class="co">#&gt; [16] Larynx       Esophagus    Leukemia     Esophagus    Other       </span></span>
+<span><span class="co">#&gt;  [1] Colon-rectum Lung         Stomach      Stomach      Kidney      </span></span>
+<span><span class="co">#&gt;  [6] Cervix       Lymphoma     Esophagus    Other        Colon-rectum</span></span>
+<span><span class="co">#&gt; [11] Leukemia     Gallbladder  Breast       Breast       Breast      </span></span>
+<span><span class="co">#&gt; [16] Lung         Pancreas     Esophagus    Leukemia     Stomach     </span></span>
 <span><span class="co">#&gt; 27 Levels: Excluded Oral cavity &amp; pharynx Nasopharynx Esophagus ... Other</span></span>
 <span></span>
 <span><span class="co">## 把icd10按照疾病小类进行分类，并输出为中文</span></span>
 <span><span class="va">cate3</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/classify_icd10.html">classify_icd10</a></span><span class="op">(</span><span class="va">icd10</span>, type <span class="op">=</span> <span class="st">"small"</span>, lang <span class="op">=</span> <span class="st">"cn"</span><span class="op">)</span></span>
 <span><span class="va">cate3</span></span>
-<span><span class="co">#&gt;  [1] 气管、支气管、肺 甲状腺           气管、支气管、肺 胃              </span></span>
-<span><span class="co">#&gt;  [5] 食管             气管、支气管、肺 结肠             脑、神经系统    </span></span>
-<span><span class="co">#&gt;  [9] 气管、支气管、肺 子宫体           胃               淋巴样白血病    </span></span>
-<span><span class="co">#&gt; [13] 肝脏             食管             食管             喉              </span></span>
-<span><span class="co">#&gt; [17] 食管             髓样白血病       食管             小肠            </span></span>
+<span><span class="co">#&gt;  [1] 结肠             气管、支气管、肺 胃               胃              </span></span>
+<span><span class="co">#&gt;  [5] 输尿管           子宫颈           多发性骨髓瘤     食管            </span></span>
+<span><span class="co">#&gt;  [9] 皮肤其他         结肠             白血病,未特指    胆囊及其他      </span></span>
+<span><span class="co">#&gt; [13] 乳腺             乳腺             乳腺             气管、支气管、肺</span></span>
+<span><span class="co">#&gt; [17] 胰腺             食管             白血病,未特指    胃              </span></span>
 <span><span class="co">#&gt; 60 Levels: 排除 唇 舌 口 唾液腺 扁桃腺 其他口咽 鼻咽 下咽 咽,部位不明 ... 其他或未指明部位</span></span></code></pre></div>
 </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
