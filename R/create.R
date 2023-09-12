@@ -24,18 +24,18 @@ create_age_rate <- function(data,
                             decimal = 2) {
   stopifnot("fbswicd" %in% class(data))
   fbs <- "fbs"
-  output <- data |>
-    group_by(..., {{ agegrp }}) |>
-    reframe(across(c({{ event }}, {{ rks }}), ~ sum(.x))) |>
+  output <- data  %>%
+    group_by(..., {{ agegrp }})  %>%
+    reframe(across(c({{ event }}, {{ rks }}), ~ sum(.x)))  %>%
     mutate(
       cases = {{ event }},
       rate = round(mp * {{ event }} / {{ rks }}, decimal)
-    ) |>
+    )  %>%
     select(-{{ event }}, -{{ rks }})
   if (type == "long") {
     return(output)
   } else if (type == "wide") {
-    output <- output |>
+    output <- output  %>%
       pivot_wider(
         names_from = {{ agegrp }},
         values_from = c("cases", "rate"),
