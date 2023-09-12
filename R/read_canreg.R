@@ -54,10 +54,10 @@ read_canreg <- function(x, pop_type = "long") {
           )
           pop <- round(pop)
           pop <- tibble(
-            year = c(rep(fyear, 19)),
+            year = c(rep(fyear, 38)),
             sex = c(rep(1, 19), rep(2, 19)),
             agegrp = factor(c(rep(1:19, 2))),
-            rks = c(pop[, 1], pop[, 2])
+            rks = c(pop[[1]], pop[[2]])
           )
         } else if (type == "long") {
           pop <- read_excel(x, sheet = "POP")
