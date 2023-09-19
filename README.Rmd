@@ -19,10 +19,10 @@ knitr::opts_chunk$set(
 [![Codecov test coverage](https://codecov.io/gh/gigu003/canregtools/branch/main/graph/badge.svg)](https://app.codecov.io/gh/gigu003/canregtools?branch=main)
 [![R-CMD-check](https://github.com/gigu003/canregtools/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/gigu003/canregtools/actions/workflows/R-CMD-check.yaml)
 [![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
+[![CRAN status](https://www.r-pkg.org/badges/version/canregtools)](https://CRAN.R-project.org/package=canregtools)
 <!-- badges: end -->
 
-canregtools包的主要目的是为中国肿瘤登记工作者提供数据核查、数据准备、数据分析和可视化常用的功能和函数。
-
+肿瘤登记是恶性肿瘤监测的一项常规工作，它在人群中搜集、整理和统计分析肿瘤发病、死亡及生存资料，从而为肿瘤防控提供基础数据。**canregtools**包致力于为肿瘤登记工作提供数据逻辑核查、数据分析、可视化、和肿瘤登记报告等常用的功能和函数。
 
 
 ## 安装
@@ -58,6 +58,5 @@ install_github("gigu003/canregtools")
 
 1. 登记处数据分类合并统计
 1. 自动报告
-1. ICDO3编码转换
-1. 儿童肿瘤分类
+
 
