@@ -27,3 +27,60 @@ tidy_sex <- function(x, lang = "cn") {
   }
   factor(as.integer(x), levels = c(1, 2), labels = labels)
 }
+
+
+#' Tidy age description.
+#' 
+#'
+#' @param x Vector contains age description in Chinese.
+#' @param unit Character, unit of values return, options are "year", "month",
+#'        or "day", default is "year".
+#'
+#' @return Numeric vector contains age.
+#' @export
+#'
+#' @examples
+#' agedes <- c("50\u5c8110\u67083\u6708", "19\u5c815\u6708",
+#'             "1\u5c8130\u6708", "3\u670820\u6708","30\u6708")
+#' tidy_age(agedes, unit = "year")
+#' tidy_age(agedes, unit = "month")
+#' tidy_age(agedes, unit = "day")
+tidy_age <- function(x, unit = "year") {
+  x <- tolower(x)
+
+  calc_age <- function(age_des) {
+    #set initial value
+    years <- 0
+    months <- 0
+    days <- 0
+    #extract numeric value for years.
+    if (grepl("\u5c81", age_des)) {
+      years <- as.numeric(sub(".*?(\\d+)\\s*\u5c81.*", "\\1", age_des))
+    }
+    #extract numeric value for months.
+    if (grepl("\u6708", age_des)) {
+      months <- as.numeric(sub(".*?(\\d+)\\s*\u6708.*", "\\1", age_des))
+    }
+    #extract numeric value for days.
+    if (grepl("\u5929", age_des)) {
+      days <- as.numeric(sub(".*?(\\d+)\\s*\u5929.*", "\\1", age_des))
+    }
+    #convert year,month,and days to days.
+    total_days <- (years * 365.25) + (months * 30.44) + days
+    return(total_days)
+  }
+  #apply function to vector.
+  days <- unlist(lapply(x, calc_age))
+  days[is.na(days)] <- 0
+  #convert days to another unit.
+  if (unit == "year") {
+    res <-trunc(days / 365.25)
+  } else if (unit == "month") {
+    res <- trunc(days / 30.44)
+  } else if (unit == "day") {
+    res <- round(days, 0)
+  } else {
+    print("unit not supported")
+  }
+  return(res)
+}
