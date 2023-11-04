@@ -1,6 +1,10 @@
 # canregtools 0.2.3
 
+Added a new function tidy_address
+
 # canregtools 0.2.2
+
+Added a new function tidy_age
 
 # canregtools 0.2.1
 
