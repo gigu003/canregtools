@@ -27,6 +27,7 @@ Imports:
     readxl,
     Rdpack,
     tidyr,
-    stats
+    stats,
+    httr
 RdMacros: Rdpack
 LazyData: true

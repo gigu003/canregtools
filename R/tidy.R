@@ -84,3 +84,34 @@ tidy_age <- function(x, unit = "year") {
   }
   return(res)
 }
+
+#' Query address code 
+#'
+#' @param x A string vector that describe the address.
+#' @param api_key api_key for service provider.
+#'
+#' @return A data frame contains formatted address information.
+#' @export
+#'
+#' @importFrom "utils" "URLencode"
+#' @importFrom httr content GET
+tidy_address <- function(x, api_key) {
+  #query address for one element of vector
+  query <- function(x) {
+    url <- paste0("https://restapi.amap.com/v3/geocode/geo?key=",
+                  api_key, "&address=", URLencode(x))
+    data <- content(GET(url), "parsed")$geocodes[[1]]
+    data <- data.frame(country = data$country,
+                       province = data$province,
+                       city = data$city,
+                       distinct = data$district,
+                       adcode = data$adcode,
+                       location = data$location,
+                       address = data$formatted_address)
+    return(data)
+  }
+  #apply function to all elements of vector, and combine rows.
+  res <- lapply(x, query)|>
+    bind_rows()
+  return(res)
+}
