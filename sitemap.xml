@@ -85,6 +85,12 @@
     <loc>/reference/read_canreg.html</loc>
   </url>
   <url>
+    <loc>/reference/tidy_address.html</loc>
+  </url>
+  <url>
+    <loc>/reference/tidy_age.html</loc>
+  </url>
+  <url>
     <loc>/reference/tidy_sex.html</loc>
   </url>
 </urlset>
