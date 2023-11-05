@@ -111,7 +111,7 @@ tidy_address <- function(x, api_key) {
     return(data)
   }
   #apply function to all elements of vector, and combine rows.
-  res <- lapply(x, query)|>
+  res <- lapply(x, query) %>%
     bind_rows()
   return(res)
 }
