@@ -128,7 +128,47 @@ child_sub <- data.frame(
 
 label_child <- list(child_main, child_sub)
 
+#民族编码
+ethnic_map <- data.frame(
+  code = sprintf("%02d", c(1:56, 97, 98, 99)),
+  cname = c(
+    "汉族", "蒙古族", "回族", "藏族", "维吾尔族", "苗族", "彝族", "壮族",
+    "布依族", "朝鲜族", "满族", "桐族", "瑶族", "白族", "土家族", "哈尼族",
+    "哈萨克族", "傣族", "黎族", "傈僳族", "佤族", "畲族", "高山族", "拉祜族",
+    "水族", "东乡族", "纳西族", "景颇族", "柯尔克孜族", "土族", "达斡尔族",
+    "仫佬族", "羌族", "布朗族", "撒拉族", "毛难族", "仡佬族", "锡伯族",
+    "阿昌族","普米族", "塔吉克族", "怒族", "乌孜别克族", "俄罗斯族",
+    "鄂温克族", "德昂族", "保安族", "裕固族", "京族", "塔塔尔族", "独龙族",
+    "鄂伦春族", "赫哲族", "门巴族", "珞巴族", "基诺族", "其他",
+    "外国血统中国籍人士", "不详"),
+  ename = c(
+    "Han", "Mongol", "Hui", "Zang", "Uygur", "Miao", "Yi", "Zhuang", "Buyei",
+    "Chosen", "Man", "Dong", "Yao", "Bai", "Tujia", "Hani", "Kazak", "Dai",
+    "Li", "Lisu", "Va", "She", "Gaoshan", "Lahu", "Sui", "Dongxiang", "Naxi",
+    "Jingpo", "Kirgiz", "Tu", "Daur", "Mulao", "Qiang", "Blang", "Salar",
+    "Maonan", "Gelao", "Xibe", "Achang", "Pumi", "Tajik", "Nu", "Uzbek",
+    "Russ", "Ewenki", "Deang", "Bonan", "Yugur", "Gin", "Tatar", "Derung",
+    "Oroqen", "Hezhen", "Monba", "Lhoba", "Jino", "Others", "Foreign",
+    "Unknown"),
+  abbr = c(
+    "HA", "MG", "HU", "ZA", "UG", "MH", "YI", "ZH", "BY", "CS", "MA", "DO",
+    "YA", "BA", "TJ", "HN", "KZ", "DA", "LI", "LS", "VA", "SH", "GS", "LH",
+    "SU", "DX", "NX", "JP", "KG", "TU", "DU", "ML", "QI", "BL", "SL", "MN",
+    "GL", "XB", "AC", "PM", "TA", "NU", "UZ", "RS", "EW", "DE", "BN", "YG",
+    "GI", "TT", "DR", "OR", "HZ", "MB", "LB", "JN", "OT", "FO", "MI")
+)
 
+#职业编码
+occu_map <- data.frame(
+  code = sprintf("%02d", c(11, 13, 17, 21, 24, 27, 31, 37, 51, 54, 70, 80, 90)),
+  cname = c("国家公务员", "专业技术人员", "职员", "企业管理人员", "工人",
+            "农民", "学生", "现役军人", "自由职业者", "个体经营者", "无业人员",
+            "退（离）休人员", "其他"),
+  ename = c("Civil Servant", "Professional/Technical Personnel",
+            "Clerk", "Enterprise Manager", "Worker", "Farmer", "Student",
+            "Active Duty Military Personnel", "Self-employed",
+            "Small Business Owner", "Unemployed", "Retired", "Others")
+)
 
 
 ## 生成标准人口数据
@@ -155,20 +195,22 @@ std_pop <- data.frame(
 
 
 ## ICDO3 'Topo' sites and 'Behas' mapping with 'ICD10' codes.
-library(googlesheets4)
+
 library(dplyr)
 library(tidyr)
 library(stringr)
+library(googlesheets4)
 
-address <- "https://docs.google.com/spreadsheets/d/"
-googlesheetid <- "1cxUcA-odXV_A3_XKaXaMzJtEmVAFkqv05Zml7W6VxuU"
+
+# address <- "https://docs.google.com/spreadsheets/d/"
+# googlesheetid <- "1cxUcA-odXV_A3_XKaXaMzJtEmVAFkqv05Zml7W6VxuU"
 # 读取google sheet保存的icdo3 topo和beha编码与icd10的对应表
-topo_to_icd10 <- read_sheet(paste0(address, googlesheetid),
-  sheet = "topo",
-  range = "A4:K334"
-)
+# topo_to_icd10 <- read_sheet(paste0(address, googlesheetid),
+#                             sheet = "topo",
+#                             range = "A4:K334")
 # 提取并整理ICDO3 topo编码
-topo <- topo_to_icd10[, 1]$topo
+topo_to_icd10 <- read.csv("~/website/db/data/topo.csv")
+topo <- topo_to_icd10$topo
 topo_dict <- gsub("\\.", "", topo, perl = TRUE)
 
 ## ICDO3 behaviour codes list.
@@ -181,10 +223,12 @@ rownames(topo_to_icd10) <- topo_dict
 colnames(topo_to_icd10) <- behas
 
 
-data <- read_sheet(paste0(address, googlesheetid),
-  sheet = "histologies_2023",
-  col_types = "cccccc"
-)
+# data <- read_sheet(paste0(address, googlesheetid),
+#   sheet = "histologies_2023",
+#   col_types = "cccccc"
+# )
+
+data <- read.csv("~/website/db/data/morp.csv")
 
 # 提取ICDO3-2的形态学词典
 morp_dict <- unique(substr(data$morp, 1, 4))
@@ -279,6 +323,6 @@ morp_to_icd10 <- morp_to_icd10[, -1]
 
 ## 把信息写入系统数据
 usethis::use_data(label, std_pop, topo_dict, morp_dict, topo_to_icd10,
-  morp_to_icd10, all_to_icd10, label_child,
+  morp_to_icd10, all_to_icd10, label_child, ethnic_map, occu_map,
   internal = TRUE, overwrite = TRUE
 )

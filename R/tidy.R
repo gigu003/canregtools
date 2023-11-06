@@ -115,3 +115,40 @@ tidy_address <- function(x, api_key) {
     bind_rows()
   return(res)
 }
+
+
+#' Tidy occupation codes or description.
+#'
+#' @param x A character vector contains description of occupation
+#' @param lang Language, Options are "eng" for English, and "cn" for chinese.
+#'        Default is cn.
+#'
+#' @return A factor vector contains formatted occupation.
+#' @export
+#'
+tidy_occu <- function(x, lang = "cn") {
+  # initiate 
+  code <- NA
+  grepcode <- function(x){
+    for (occu in occu_map$cname) {
+      if (grepl(occu, x)) {
+        code <- occu_map[occu_map$cname == occu, "code"]
+        break
+      }
+      if(is.na(code)) {code <- 90}
+    }
+    return(code)
+  }
+  code <- unlist(lapply(x, grepcode))
+  if (tolower(lang) %in% c("cn","zh","zh-cn")){
+    code <- factor(code,
+                   levels = occu_map$code,
+                   labels = occu_map$cname)
+  } else if (tolower(lang) %in% c("eng", "en", "english")){
+    code <- factor(code,
+                   levels = occu_map$code,
+                   labels = occu_map$ename)
+  }
+  print("The convert was under GB/T 2261")
+  return(code)
+}
