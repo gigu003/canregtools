@@ -1,3 +1,5 @@
+# canregtools 0.2.4
+
 # canregtools 0.2.3
 
 Added a new function tidy_address
