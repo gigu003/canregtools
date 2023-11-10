@@ -3,6 +3,7 @@
 export(ageadjust)
 export(asr_rate)
 export(calc_age)
+export(check_id)
 export(classify_childhood)
 export(classify_icd10)
 export(clean_canreg)
