@@ -1,3 +1,5 @@
+# canregtools 0.2.5
+
 # canregtools 0.2.4
 
 Added a new function tidy_occu()
