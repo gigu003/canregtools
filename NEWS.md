@@ -1,5 +1,7 @@
 # canregtools 0.2.5
 
+add a new function check_id()
+
 # canregtools 0.2.4
 
 Added a new function tidy_occu()
