@@ -4,25 +4,32 @@
 #'          compliance with the GB 11643-1999 standard.
 #' @param return A character string used to specific the type of result
 #'          returned. Options are 'logical', 'date', 'areacode', 'formatted'.
-#'          Default is logical'.
-#'          - 'logical': Logical vector (default). A logical vector indicating
-#'          whether each input ID number complies with the standard (TRUE for
-#'          compliant, FALSE for non-compliant).
-#'          - 'date': Date vector representing birthdate contained in the ID
-#'          number.
-#'          - 'areacode': Character vector containing administrative region
-#'          codes extracted from the ID number.
-#'          - 'formatted': Character vector containing formatted ID numbers. 
+#'          Options include:
+#'          \itemize{
+#'            \item{'logical': Logical vector (default). Indicates whether
+#'                  each input ID number complies with the standard (TRUE for
+#'                  compliant, FALSE for non-compliant).}
+#'            \item{'date': Date vector representing birth date contained in
+#'                  the ID number.}
+#'            \item{'areacode': Character vector containing administrative
+#'                  region codes extracted from the ID number.}
+#'            \item{'formatted': Character vector containing formatted ID
+#'                  numbers.}
+#'          }
+#'
 #'
 #' @return A logical vector indicating whether each input ID number complies
-#'          with the standard (TRUE for compliant, FALSE for non-compliant), or
-#'          other types of information based on the 'return' parameter.
+#'          with the standard (TRUE for compliant, FALSE for non-compliant),
+#'          or other types of information based on the 'return' parameter.
 #' @export
 #'
 #' @examples
 #' ids <- c("412726198407240038", "110101199003070975",
 #'          "310101199001010101", "440101199102030303")
 #' check_id(ids)
+#' check_id(ids, return = "date")
+#' check_id(ids, return = "areacode")
+#' check_id(ids, return = "formatted")
 #' 
 #' 
 check_id <- function(x, return = "logical") {
