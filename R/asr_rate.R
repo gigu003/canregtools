@@ -75,7 +75,9 @@ asr_rate <- function(
     show_var = FALSE,
     type = "big",
     lang = "cn") {
+  
   groups <- quos(...)
+  
   fbs <- "fbs"
   rks <- "rks"
   icd_cat <- "icd_cat"
@@ -150,7 +152,10 @@ asr_rate <- function(
       sep_zero = FALSE
     )
     data <- data$fbswicd
+  } else {
+    data <- data$fbswicd
   }
+
 
   levels(std_pop$agegrp) <- levels(data$agegrp)
   output <- data %>%
