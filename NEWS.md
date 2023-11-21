@@ -1,3 +1,5 @@
+# canregtools 0.2.6
+
 # canregtools 0.2.5
 
 add a new function check_id()
