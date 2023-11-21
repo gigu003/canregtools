@@ -99,7 +99,9 @@ count_canreg <- function(x,
     purrr::reduce(left_join, by = c("year", "sex", "agegrp", "icd_cat")) %>%
     left_join(pop, by = c("year", "sex", "agegrp")) %>%
     arrange(year, sex, icd_cat, agegrp) %>%
+    mutate_all(~replace(., is.na(.), 0)) %>%
     filter(!(icd_cat %in% c("\u6392\u9664", "Excluded")))
+  
   result <- list(areacode = x$areacode,
                  county = x$county,
                  area_type = x$area_type,
