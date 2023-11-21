@@ -149,6 +149,7 @@ asr_rate <- function(
       lang = lang,
       sep_zero = FALSE
     )
+    data <- data$fbswicd
   }
 
   levels(std_pop$agegrp) <- levels(data$agegrp)

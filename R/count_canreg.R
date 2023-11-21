@@ -100,8 +100,14 @@ count_canreg <- function(x,
     left_join(pop, by = c("year", "sex", "agegrp")) %>%
     arrange(year, sex, icd_cat, agegrp) %>%
     filter(!(icd_cat %in% c("\u6392\u9664", "Excluded")))
-  attr(res, "class") <- c("fbswicd", class(res))
-  return(res)
+  result <- list(areacode = x$areacode,
+                 county = x$county,
+                 area_type = x$area_type,
+                 location = x$location,
+                 year = x$year,
+                 fbswicd = res)
+  attr(result, "class") <- c("fbswicd", class(result))
+  return(result)
 }
 
 #' Clean canreg data.

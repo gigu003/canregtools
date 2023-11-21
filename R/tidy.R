@@ -95,7 +95,7 @@ tidy_age <- function(x, unit = "year") {
 #'
 #' @importFrom "utils" "URLencode"
 #' @importFrom httr content GET
-tidy_address <- function(x, api_key) {
+tidy_address <- function(x, api_key = api_key) {
   #query address for one element of vector
   query <- function(x) {
     url <- paste0("https://restapi.amap.com/v3/geocode/geo?key=",

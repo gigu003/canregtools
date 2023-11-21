@@ -72,7 +72,7 @@ read_canreg <- function(x, pop_type = "long") {
         bsname <- tools::file_path_sans_ext(basename(x))
         areacode <- gsub("\\D", "", bsname)
         county <- gsub("\\d", "", bsname)
-        area_type <- ""
+        area_type <- classify_areacode(areacode)
         location <- ""
         res <- list(
           areacode = areacode,

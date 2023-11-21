@@ -229,6 +229,19 @@ colnames(topo_to_icd10) <- behas
 # )
 
 data <- read.csv("~/website/db/data/morp.csv")
+morp2 <- read.csv("~/website/db/data/morp2.csv")
+
+
+morp1 <- data %>%
+  mutate(morp = paste0("M",substr(morp,1, 6))) %>%
+  select(morp, morp_desen, comments) 
+
+morp_o3_2 <- morp1 %>%
+  full_join(morp2, by = ("morp")) %>%
+  arrange(morp) %>%
+  filter(mark == 0)
+  filter(!comments == "Not listed in ICD-O-3.2")
+
 
 # 提取ICDO3-2的形态学词典
 morp_dict <- unique(substr(data$morp, 1, 4))
@@ -323,6 +336,6 @@ morp_to_icd10 <- morp_to_icd10[, -1]
 
 ## 把信息写入系统数据
 usethis::use_data(label, std_pop, topo_dict, morp_dict, topo_to_icd10,
-  morp_to_icd10, all_to_icd10, label_child, ethnic_map, occu_map,
+  morp_to_icd10, all_to_icd10, label_child, ethnic_map, occu_map, morp_o3_2,
   internal = TRUE, overwrite = TRUE
 )

@@ -28,6 +28,9 @@ Imports:
     Rdpack,
     tidyr,
     stats,
-    httr
+    httr,
+    ggplot2,
+    leaflet,
+    sf
 RdMacros: Rdpack
 LazyData: true

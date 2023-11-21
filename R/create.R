@@ -23,6 +23,7 @@ create_age_rate <- function(data,
                             mp = 100000,
                             decimal = 2) {
   stopifnot("fbswicd" %in% class(data))
+  data <- data$fbswicd
   fbs <- "fbs"
   output <- data  %>%
     group_by(..., {{ agegrp }})  %>%
@@ -53,6 +54,7 @@ create_age_rate <- function(data,
 #'
 #' @return Data frame of class quality.
 #' @export
+#' 
 #'
 #' @examples
 #' library(canregtools)
@@ -61,6 +63,7 @@ create_age_rate <- function(data,
 #' fbsw <- count_canreg(data, cutage_method = "interval")
 #' quality <- create_quality(fbsw, year, sex, icd_cat)
 create_quality <- function(data, ..., decimal = 2) {
+  data <- data$fbswicd
   output <- data %>%
     group_by(...) %>%
     reframe(

@@ -78,3 +78,57 @@ check_id <- function(x, return = "logical") {
     print("Return_type specified is not supported.")
   }
 }
+
+
+#' Verify if the topographic site codes for ICDO3 comply with the ICDO3
+#' coding rules.
+#'
+#' @param x Character vector contains the topographic site codes for ICDO3.
+#' @param return Character, specify the output type of the result.
+#'          Options are as below.
+#'          \itemize{
+#'            \item{'logical': Logical vector (default). Indicates whether
+#'                  the topographic site codes comply with ICDO3 coding rules.
+#'                  (TRUE for compliant, FALSE for non-compliant).}
+#'            \item{'formatted': Character vector containing formatted
+#'                  topographic site code for ICDO3.}
+#'          }
+#'          
+#' @return Logical vector or Character vector.
+#' @export
+#'
+#' @examples
+#' topos <- c("C50.9", "16.2", "C151", "33.2")
+#' check_topo(topos)
+#' check_topo(topos, "formatted")
+#' 
+check_topo <- function(x, return = "logical"){
+  x <- gsub("[^0-9]", "", x)
+  x[nchar(x)== 3] <- paste0("C", x[nchar(x) == 3])
+  x[nchar(x)== 2] <- paste0("C0", x[nchar(x) == 2])
+  x[nchar(x)== 1] <- paste0("C00", x[nchar(x) == 1])
+  islegal <- x %in% topo_dict
+  if (return == "logical"){
+    return(islegal)
+  } else if (return == "formatted"){
+    res <- paste0(substr(x, 1, 3),".", substr(x, 4, 4))
+    res[!islegal] <- NA
+    return(res)
+  }
+}
+
+
+check_morp <- function(morp, beha){
+  morp <- gsub("[^0-9]", "", morp)
+  morp_logi <- morp %in% morp_dict
+  beha_logi <- beha %in% c("0","1","2","3","6","9")
+  morp_beha_logi <- paste0("M", morp, "/", beha) %in% morp_o3_2$morp
+  res <- morp_logi & morp_beha_logi & beha_logi
+  err <- ifelse(!morp_logi, "morp",
+                ifelse(!beha_logi,"beha",
+                       ifelse(!morp_beha_logi,"morp/beha",NA)))
+  res <- list(check = res, message = err)
+  return(res)
+}
+
+

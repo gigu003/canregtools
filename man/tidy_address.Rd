@@ -4,7 +4,7 @@
 \alias{tidy_address}
 \title{Query address code}
 \usage{
-tidy_address(x, api_key)
+tidy_address(x, api_key = api_key)
 }
 \arguments{
 \item{x}{A string vector that describe the address.}
