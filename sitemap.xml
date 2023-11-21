@@ -37,6 +37,9 @@
     <loc>/reference/check_id.html</loc>
   </url>
   <url>
+    <loc>/reference/check_topo.html</loc>
+  </url>
+  <url>
     <loc>/reference/classify_childhood.html</loc>
   </url>
   <url>
@@ -50,6 +53,9 @@
   </url>
   <url>
     <loc>/reference/create_age_rate.html</loc>
+  </url>
+  <url>
+    <loc>/reference/create_map.html</loc>
   </url>
   <url>
     <loc>/reference/create_quality.html</loc>
