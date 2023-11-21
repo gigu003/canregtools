@@ -147,6 +147,13 @@ for Chinese, or 'en' for English.</p></dd>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Processing data: 2200 FBcases."</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Processing data: 1470 SWcases."</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Processing POP data of year: 2016"</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>There were 3 warnings in `mutate()`.</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> The first warning was:</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> In argument: `sex = (structure(function (..., .x = ..1, .y = ..2, . = ..1)</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span>   ...`.</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> Caused by warning in `[&lt;-.factor`:</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span style="color: #BBBB00;">!</span> invalid factor level, NA generated</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Run `dplyr::last_dplyr_warnings()` to see the 2 remaining warnings.</span>
 <span class="r-in"><span><span class="va">fbsw</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $areacode</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "411721"</span>
@@ -166,7 +173,7 @@ for Chinese, or 'en' for English.</p></dd>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $fbswicd</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 208 × 11</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     year sex   agegrp   icd_cat   fbs   sws    mv    ub   sub   dco    rks</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span> <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span> <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 1</span>  <span style="text-decoration: underline;">2</span>016 男性  0-14 岁  口腔        0     0     0     0     0     0  <span style="text-decoration: underline;">80</span>846</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 2</span>  <span style="text-decoration: underline;">2</span>016 男性  15-39 岁 口腔        1     0     1     0     1     0 <span style="text-decoration: underline;">180</span>929</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 3</span>  <span style="text-decoration: underline;">2</span>016 男性  40-64 岁 口腔        5     2     5     0     3     0 <span style="text-decoration: underline;">155</span>155</span>
