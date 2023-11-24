@@ -109,13 +109,14 @@ tidy_address <- function(x, api_key = api_key) {
       # Check if the expected data structure is present
       if (!is.null(data)) {
         data <- data.frame(
-          country = data$country,
-          province = data$province,
+          country = ifelse(length(data$country) == 0, NA, data$country),
+          province = ifelse(length(data$province) == 0, NA, data$province),
           city = ifelse(length(data$city)==0, NA, data$city),
-          distinct = data$district,
-          adcode = data$adcode,
-          location = data$location,
-          address = data$formatted_address
+          district = ifelse(length(data$district) == 0, NA, data$district),
+          adcode = ifelse(length(data$adcode) == 0, NA, data$adcode),
+          location = ifelse(length(data$location) == 0, NA, data$location),
+          address = ifelse(length(data$formatted_address) == 0, NA,
+                           data$formatted_address)
         )
       } else {
         # If data structure is not as expected, return a default missing value
