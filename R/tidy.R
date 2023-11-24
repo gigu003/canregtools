@@ -94,25 +94,58 @@ tidy_age <- function(x, unit = "year") {
 #' @export
 #'
 #' @importFrom "utils" "URLencode"
-#' @importFrom httr content GET
+#' @importFrom httr content GET http_status
 tidy_address <- function(x, api_key = api_key) {
   #query address for one element of vector
   query <- function(x) {
     url <- paste0("https://restapi.amap.com/v3/geocode/geo?key=",
                   api_key, "&address=", URLencode(x))
-    data <- content(GET(url), "parsed")$geocodes[[1]]
-    data <- data.frame(country = data$country,
-                       province = data$province,
-                       city = data$city,
-                       distinct = data$district,
-                       adcode = data$adcode,
-                       location = data$location,
-                       address = data$formatted_address)
+    response <- GET(url)
+    
+    # Check if the response is successful (status code 200)
+    if (http_status(response)$category == "Success") {
+      data <- content(response, "parsed")$geocodes[[1]]
+      
+      # Check if the expected data structure is present
+      if (!is.null(data)) {
+        data <- data.frame(
+          country = data$country,
+          province = data$province,
+          city = ifelse(length(data$city)==0, NA, data$city),
+          distinct = data$district,
+          adcode = data$adcode,
+          location = data$location,
+          address = data$formatted_address
+        )
+      } else {
+        # If data structure is not as expected, return a default missing value
+        data <- data.frame(
+          country = NA,
+          province = NA,
+          city = NA,
+          distinct = NA,
+          adcode = NA,
+          location = NA,
+          address = NA
+        )
+      }
+    } else {
+      # If API call is not successful, return a default missing value
+      data <- data.frame(
+        country = NA,
+        province = NA,
+        city = NA,
+        distinct = NA,
+        adcode = NA,
+        location = NA,
+        address = NA
+      )
+    }
     return(data)
   }
+  
   #apply function to all elements of vector, and combine rows.
-  res <- lapply(x, query) %>%
-    bind_rows()
+  res <- do.call(rbind, lapply(x, query))
   return(res)
 }
 
