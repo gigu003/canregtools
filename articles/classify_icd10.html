@@ -14,8 +14,8 @@
 <link rel="apple-touch-icon" type="image/png" sizes="76x76" href="../apple-touch-icon-76x76.png">
 <link rel="apple-touch-icon" type="image/png" sizes="60x60" href="../apple-touch-icon-60x60.png">
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<link href="../deps/bootstrap-5.2.2/bootstrap.min.css" rel="stylesheet">
-<script src="../deps/bootstrap-5.2.2/bootstrap.bundle.min.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
+<link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
+<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
 <!-- bootstrap-toc --><script src="https://cdn.jsdelivr.net/gh/afeld/bootstrap-toc@v1.0.1/dist/bootstrap-toc.min.js" integrity="sha256-4veVQbu7//Lk5TSmc7YV48MxtMy98e26cf5MrgZYnwo=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- search --><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/autocomplete.js/0.38.0/autocomplete.jquery.min.js" integrity="sha512-GU9ayf+66Xx2TmpxqJpliWbT5PiGYxpaG8rfnBEk1LL8l1KGkRShhngwdXK1UgqhAzWpZHSiYPc09/NwDQIGyg==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js" integrity="sha512-5CYOlHXGh6QpOFA/TeTylKLWfB3ftPsde7AnmhuitiTX4K5SqCLBeKro6sPS8ilsz1Q4NRx3v8Ko2IBiszzdww==" crossorigin="anonymous"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="ICD10分类">
 <meta property="og:description" content="canregtools">
@@ -113,38 +113,35 @@
 <span><span class="co">#&gt; 2200  cases were read from FB sheet.1470  cases were read from SW sheet.</span></span>
 <span><span class="va">icd10</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sample.html" class="external-link">sample</a></span><span class="op">(</span><span class="va">data</span><span class="op">$</span><span class="va">FBcases</span><span class="op">$</span><span class="va">icd10</span>, <span class="fl">20</span><span class="op">)</span></span>
 <span><span class="va">icd10</span></span>
-<span><span class="co">#&gt;  [1] "D43.2" "C34.9" "C16.0" "C50.9" "C34.9" "C16.9" "D47.3" "C50.9" "C22.0"</span></span>
-<span><span class="co">#&gt; [10] "C18.7" "C16.0" "C15.9" "C10.9" "C34.9" "C22.9" "C34.9" "C22.0" "C22.0"</span></span>
-<span><span class="co">#&gt; [19] "C73"   "C22.0"</span></span>
+<span><span class="co">#&gt;  [1] "D35.2" "C34.9" "C15.9" "C22.0" "C64"   "D46.9" "C50.9" "C25.9" "C15.3"</span></span>
+<span><span class="co">#&gt; [10] "C53.9" "C34.9" "C20"   "C15.9" "C22.0" "C34.9" "C16.3" "C16.9" "C34.9"</span></span>
+<span><span class="co">#&gt; [19] "C22.0" "C73"</span></span>
 <span><span class="co">## 把icd10按照疾病系统进行分类，并输出为中文</span></span>
 <span><span class="va">cate1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/classify_icd10.html">classify_icd10</a></span><span class="op">(</span><span class="va">icd10</span>, type <span class="op">=</span> <span class="st">"system"</span>, lang <span class="op">=</span> <span class="st">"cn"</span><span class="op">)</span></span>
 <span><span class="va">cate1</span></span>
-<span><span class="co">#&gt;  [1] 骨、软骨、皮肤 呼吸系统       消化系统       乳腺癌         呼吸系统      </span></span>
-<span><span class="co">#&gt;  [6] 消化系统       其他           乳腺癌         消化系统       消化系统      </span></span>
-<span><span class="co">#&gt; [11] 消化系统       消化系统       唇口咽         呼吸系统       消化系统      </span></span>
-<span><span class="co">#&gt; [16] 呼吸系统       消化系统       消化系统       眼、脑、甲状腺 消化系统      </span></span>
+<span><span class="co">#&gt;  [1] 呼吸系统       呼吸系统       消化系统       消化系统       泌尿系统      </span></span>
+<span><span class="co">#&gt;  [6] 其他           乳腺癌         消化系统       消化系统       女性生殖系统  </span></span>
+<span><span class="co">#&gt; [11] 呼吸系统       消化系统       消化系统       消化系统       呼吸系统      </span></span>
+<span><span class="co">#&gt; [16] 消化系统       消化系统       呼吸系统       消化系统       眼、脑、甲状腺</span></span>
 <span><span class="co">#&gt; 12 Levels: 排除 唇口咽 消化系统 呼吸系统 骨、软骨、皮肤 乳腺癌 ... 其他</span></span>
 <span></span>
 <span><span class="co">## 把icd10按照疾病大类进行分类，并输出为英文</span></span>
 <span><span class="va">cate2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/classify_icd10.html">classify_icd10</a></span><span class="op">(</span><span class="va">icd10</span>, type <span class="op">=</span> <span class="st">"big"</span>, lang <span class="op">=</span> <span class="st">"en"</span><span class="op">)</span></span>
 <span><span class="va">cate2</span></span>
-<span><span class="co">#&gt;  [1] Brain                 Lung                  Stomach              </span></span>
-<span><span class="co">#&gt;  [4] Breast                Lung                  Stomach              </span></span>
-<span><span class="co">#&gt;  [7] Leukemia              Breast                Liver                </span></span>
-<span><span class="co">#&gt; [10] Colon-rectum          Stomach               Esophagus            </span></span>
-<span><span class="co">#&gt; [13] Oral cavity &amp; pharynx Lung                  Liver                </span></span>
-<span><span class="co">#&gt; [16] Lung                  Liver                 Liver                </span></span>
-<span><span class="co">#&gt; [19] Thyroid               Liver                </span></span>
+<span><span class="co">#&gt;  [1] Other        Lung         Esophagus    Liver        Kidney      </span></span>
+<span><span class="co">#&gt;  [6] Leukemia     Breast       Pancreas     Esophagus    Cervix      </span></span>
+<span><span class="co">#&gt; [11] Lung         Colon-rectum Esophagus    Liver        Lung        </span></span>
+<span><span class="co">#&gt; [16] Stomach      Stomach      Lung         Liver        Thyroid     </span></span>
 <span><span class="co">#&gt; 27 Levels: Excluded Oral cavity &amp; pharynx Nasopharynx Esophagus ... Other</span></span>
 <span></span>
 <span><span class="co">## 把icd10按照疾病小类进行分类，并输出为中文</span></span>
 <span><span class="va">cate3</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/classify_icd10.html">classify_icd10</a></span><span class="op">(</span><span class="va">icd10</span>, type <span class="op">=</span> <span class="st">"small"</span>, lang <span class="op">=</span> <span class="st">"cn"</span><span class="op">)</span></span>
 <span><span class="va">cate3</span></span>
-<span><span class="co">#&gt;  [1] 脑、神经系统     气管、支气管、肺 胃               乳腺            </span></span>
-<span><span class="co">#&gt;  [5] 气管、支气管、肺 胃               髓样白血病       乳腺            </span></span>
-<span><span class="co">#&gt;  [9] 肝脏             结肠             胃               食管            </span></span>
-<span><span class="co">#&gt; [13] 其他口咽         气管、支气管、肺 肝脏             气管、支气管、肺</span></span>
-<span><span class="co">#&gt; [17] 肝脏             肝脏             甲状腺           肝脏            </span></span>
+<span><span class="co">#&gt;  [1] 其他或未指明部位 气管、支气管、肺 食管             肝脏            </span></span>
+<span><span class="co">#&gt;  [5] 肾               髓样白血病       乳腺             胰腺            </span></span>
+<span><span class="co">#&gt;  [9] 食管             子宫颈           气管、支气管、肺 直肠            </span></span>
+<span><span class="co">#&gt; [13] 食管             肝脏             气管、支气管、肺 胃              </span></span>
+<span><span class="co">#&gt; [17] 胃               气管、支气管、肺 肝脏             甲状腺          </span></span>
 <span><span class="co">#&gt; 60 Levels: 排除 唇 舌 口 唾液腺 扁桃腺 其他口咽 鼻咽 下咽 咽,部位不明 ... 其他或未指明部位</span></span></code></pre></div>
 </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
