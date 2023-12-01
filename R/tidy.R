@@ -108,7 +108,7 @@ tidy_address <- function(x, api_key = api_key) {
     # Check if the response is successful (status code 200)
     if (http_status(response)$category == "Success") {
       data <- content(response, "parsed")$geocodes[[1]]
-      
+      count <- content(response, "parsed")$count
       # Check if the expected data structure is present
       if (!is.null(data)) {
         data <- data.frame(
@@ -119,7 +119,8 @@ tidy_address <- function(x, api_key = api_key) {
           adcode = ifelse(length(data$adcode) == 0, NA, data$adcode),
           location = ifelse(length(data$location) == 0, NA, data$location),
           address = ifelse(length(data$formatted_address) == 0, NA,
-                           data$formatted_address)
+                           data$formatted_address),
+          count = count,
         )
       } else {
         # If data structure is not as expected, return a default missing value
@@ -130,7 +131,8 @@ tidy_address <- function(x, api_key = api_key) {
           district = NA,
           adcode = NA,
           location = NA,
-          address = NA
+          address = NA,
+          count = NA
         )
       }
     } else {
@@ -142,7 +144,8 @@ tidy_address <- function(x, api_key = api_key) {
         district = NA,
         adcode = NA,
         location = NA,
-        address = NA
+        address = NA,
+        count = NA
       )
     }
     return(data)
