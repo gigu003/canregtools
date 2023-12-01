@@ -120,7 +120,7 @@ tidy_address <- function(x, api_key = api_key) {
           location = ifelse(length(data$location) == 0, NA, data$location),
           address = ifelse(length(data$formatted_address) == 0, NA,
                            data$formatted_address),
-          count = count,
+          count = count
         )
       } else {
         # If data structure is not as expected, return a default missing value
