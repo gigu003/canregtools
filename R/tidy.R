@@ -100,6 +100,75 @@ tidy_age <- function(x, unit = "year") {
 #' @import memoise cachem
 #' 
 tidy_address <- function(x, unique = TRUE, cache_refresh = FALSE){
+  # Function to query address for one element of vector
+  query <- memoise::memoise(function(x, unique = TRUE) {
+    api_key <- Sys.getenv("AMAP_API_KEY")
+    
+    if (nzchar(api_key)) {
+      url <- paste0("https://restapi.amap.com/v3/geocode/geo?key=",
+                    api_key, "&address=", URLencode(x))
+    } else {
+      warning("AMAP_API_KEY is not set. Please set the API key.")
+      return(NULL)
+    }
+    
+    response <- tryCatch(
+      {
+        GET(url)
+      },
+      error = function(e) {
+        # Handle errors, e.g., print an error message
+        cat("Error in GET request:", conditionMessage(e), "\n")
+        return(NULL)
+      }
+    )
+    
+    # Introduce a delay to avoid hitting rate limits
+    #Sys.sleep(1)
+    
+    if (http_status(response)$category != "Success") {
+      return(default_data())
+    }
+    data <- content(response, "parsed")$geocodes
+    count <- length(data)
+    if (is.null(data)) {
+      return(default_data())
+    }
+    to_frame <- function(x) {
+      data.frame(
+        country = ifelse(length(x$country) == 0, NA, x$country),
+        province = ifelse(length(x$province) == 0, NA, x$province),
+        city = ifelse(length(x$city) == 0, NA, x$city),
+        district = ifelse(length(x$district) == 0, NA, x$district),
+        adcode = ifelse(length(x$adcode) == 0, NA, x$adcode),
+        location = ifelse(length(x$location) == 0, NA, x$location),
+        address = ifelse(length(x$formatted_address) == 0, NA, x$formatted_address),
+        count = count
+      )
+    }
+    if (unique == TRUE){
+      data <- cbind(to_frame(data[[1]]), rank = 1)
+    } else {
+      data <- cbind(bind_rows(lapply(data, to_frame)),
+                    rank = seq_along(data))
+    }
+    return(data)
+  }, cache = cachem::cache_disk("./.Cache_tidy_address"))
+  
+  default_data <- function() {
+    data.frame(
+      country = NA,
+      province = NA,
+      city = NA,
+      district = NA,
+      adcode = NA,
+      location = NA,
+      address = NA,
+      count = NA,
+      rank = NA
+    )
+  }
+  
   # Check if the input vector is not empty
   if (length(x) == 0) {
     warning("Input vector is empty. Returning an empty data frame.")
@@ -111,74 +180,8 @@ tidy_address <- function(x, unique = TRUE, cache_refresh = FALSE){
   return(res)
 }
 
-default_data <- function() {
-  data.frame(
-    country = NA,
-    province = NA,
-    city = NA,
-    district = NA,
-    adcode = NA,
-    location = NA,
-    address = NA,
-    count = NA,
-    rank = NA
-  )
-}
 
-# Function to query address for one element of vector
-query <- memoise::memoise(function(x, unique = TRUE) {
-  api_key <- Sys.getenv("AMAP_API_KEY")
-  
-  if (nzchar(api_key)) {
-    url <- paste0("https://restapi.amap.com/v3/geocode/geo?key=",
-                  api_key, "&address=", URLencode(x))
-  } else {
-    warning("AMAP_API_KEY is not set. Please set the API key.")
-    return(NULL)
-  }
-  
-  response <- tryCatch(
-    {
-      GET(url)
-    },
-    error = function(e) {
-      # Handle errors, e.g., print an error message
-      cat("Error in GET request:", conditionMessage(e), "\n")
-      return(NULL)
-    }
-  )
-  
-  # Introduce a delay to avoid hitting rate limits
-  #Sys.sleep(1)
-  
-  if (http_status(response)$category != "Success") {
-    return(default_data())
-  }
-  data <- content(response, "parsed")$geocodes
-  count <- length(data)
-  if (is.null(data)) {
-    return(default_data())
-  }
-  to_frame <- function(x) {
-    data.frame(
-      country = ifelse(length(x$country) == 0, NA, x$country),
-      province = ifelse(length(x$province) == 0, NA, x$province),
-      city = ifelse(length(x$city) == 0, NA, x$city),
-      district = ifelse(length(x$district) == 0, NA, x$district),
-      adcode = ifelse(length(x$adcode) == 0, NA, x$adcode),
-      location = ifelse(length(x$location) == 0, NA, x$location),
-      address = ifelse(length(x$formatted_address) == 0, NA, x$formatted_address),
-      count = count
-    )
-  }
-  if (unique == TRUE){
-    data <- cbind(to_frame(data[[1]]), rank = 1)
-  } else {
-    data <- cbind(bind_rows(lapply(data, to_frame)),
-                  rank = seq_along(data))
-  }
-  return(data)
-}, cache = cachem::cache_disk())
+
 
 
 #' Tidy occupation codes or description.
