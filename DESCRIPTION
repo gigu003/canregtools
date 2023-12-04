@@ -30,7 +30,6 @@ Imports:
     stats,
     httr,
     ggplot2,
-    leaflet,
     sf,
     cachem,
     memoise

@@ -6,15 +6,15 @@
 \usage{
 create_map(
   x,
-  value = NULL,
+  value = c(rep(1, length(x))),
   breaks = NULL,
   class = "province",
-  type = "ggplot2",
+  bound = "city",
   bg_cols = c("lightgray", "white"),
   highlight_cols = c("white", "red"),
-  label = TRUE,
+  label = FALSE,
   label_size = 2,
-  legend = TRUE,
+  legend = FALSE,
   legend_title = "Incidence"
 )
 }
@@ -27,7 +27,7 @@ create_map(
 
 \item{class}{Province or city}
 
-\item{type}{ggplot2 or leaflet}
+\item{bound}{Show bound of background map.}
 
 \item{bg_cols}{background colors.}
 

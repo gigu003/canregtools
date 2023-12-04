@@ -11,6 +11,9 @@ tidy_address(x, unique = TRUE)
 
 \item{unique}{Logical value for multiple output or not.}
 }
+\value{
+Data frame contains formatted address information.
+}
 \description{
 Query address code
 }

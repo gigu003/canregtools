@@ -91,7 +91,7 @@ tidy_age <- function(x, unit = "year") {
 #' @param x A string vector that describe the address.
 #' @param unique Logical value for multiple output or not.
 #'
-#' @return
+#' @return Data frame contains formatted address information.
 #' @export
 #' 
 #' @importFrom "utils" "URLencode"
