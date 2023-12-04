@@ -4,15 +4,12 @@
 \alias{tidy_address}
 \title{Query address code}
 \usage{
-tidy_address(x, api_key = api_key)
+tidy_address(x, unique = TRUE)
 }
 \arguments{
 \item{x}{A string vector that describe the address.}
 
-\item{api_key}{api_key for service provider.}
-}
-\value{
-A data frame contains formatted address information.
+\item{unique}{Logical value for multiple output or not.}
 }
 \description{
 Query address code

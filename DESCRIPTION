@@ -31,6 +31,8 @@ Imports:
     httr,
     ggplot2,
     leaflet,
-    sf
+    sf,
+    cachem,
+    memoise
 RdMacros: Rdpack
 LazyData: true

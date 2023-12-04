@@ -85,76 +85,98 @@ tidy_age <- function(x, unit = "year") {
   return(res)
 }
 
+# Function to create default data frame
 #' Query address code 
 #'
 #' @param x A string vector that describe the address.
-#' @param api_key api_key for service provider.
+#' @param unique Logical value for multiple output or not.
 #'
-#' @return A data frame contains formatted address information.
+#' @return
 #' @export
-#'
+#' 
 #' @importFrom "utils" "URLencode"
 #' @importFrom httr content GET http_status
-tidy_address <- function(x, api_key = api_key) {
-  pattern <- "\uff10\uff11\uff12\uff13\uff14\uff15\uff16\uff17\uff18\uff19"
-  replacement <- "0123456789"
-  chartr(pattern, replacement, x)
-  #query address for one element of vector
-  query <- function(x) {
-    url <- paste0("https://restapi.amap.com/v3/geocode/geo?key=",
-                  api_key, "&address=", URLencode(x))
-    response <- GET(url)
-    
-    # Check if the response is successful (status code 200)
-    if (http_status(response)$category == "Success") {
-      data <- content(response, "parsed")$geocodes[[1]]
-      count <- content(response, "parsed")$count
-      # Check if the expected data structure is present
-      if (!is.null(data)) {
-        data <- data.frame(
-          country = ifelse(length(data$country) == 0, NA, data$country),
-          province = ifelse(length(data$province) == 0, NA, data$province),
-          city = ifelse(length(data$city)==0, NA, data$city),
-          district = ifelse(length(data$district) == 0, NA, data$district),
-          adcode = ifelse(length(data$adcode) == 0, NA, data$adcode),
-          location = ifelse(length(data$location) == 0, NA, data$location),
-          address = ifelse(length(data$formatted_address) == 0, NA,
-                           data$formatted_address),
-          count = count
-        )
-      } else {
-        # If data structure is not as expected, return a default missing value
-        data <- data.frame(
-          country = NA,
-          province = NA,
-          city = NA,
-          district = NA,
-          adcode = NA,
-          location = NA,
-          address = NA,
-          count = NA
-        )
-      }
-    } else {
-      # If API call is not successful, return a default missing value
-      data <- data.frame(
-        country = NA,
-        province = NA,
-        city = NA,
-        district = NA,
-        adcode = NA,
-        location = NA,
-        address = NA,
-        count = NA
-      )
-    }
-    return(data)
+#' @import memoise cachem
+#' 
+tidy_address <- function(x, unique = TRUE){
+  # Check if the input vector is not empty
+  if (length(x) == 0) {
+    warning("Input vector is empty. Returning an empty data frame.")
+    return(default_data())
   }
-  
   #apply function to all elements of vector, and combine rows.
-  res <- do.call(rbind, lapply(x, query))
+  res <- bind_rows(lapply(x, query, unique = unique))
   return(res)
 }
+
+default_data <- function() {
+  data.frame(
+    country = NA,
+    province = NA,
+    city = NA,
+    district = NA,
+    adcode = NA,
+    location = NA,
+    address = NA,
+    count = NA,
+    rank = NA
+  )
+}
+
+# Function to query address for one element of vector
+query <- memoise::memoise(function(x, unique = TRUE) {
+  api_key <- Sys.getenv("AMAP_API_KEY")
+  
+  if (nzchar(api_key)) {
+    url <- paste0("https://restapi.amap.com/v3/geocode/geo?key=",
+                  api_key, "&address=", URLencode(x))
+  } else {
+    warning("AMAP_API_KEY is not set. Please set the API key.")
+    return(NULL)
+  }
+  
+  response <- tryCatch(
+    {
+      GET(url)
+    },
+    error = function(e) {
+      # Handle errors, e.g., print an error message
+      cat("Error in GET request:", conditionMessage(e), "\n")
+      return(NULL)
+    }
+  )
+  
+  # Introduce a delay to avoid hitting rate limits
+  #Sys.sleep(1)
+  
+  if (http_status(response)$category != "Success") {
+    return(default_data())
+  }
+  data <- content(response, "parsed")$geocodes
+  count <- length(data)
+  if (is.null(data)) {
+    return(default_data())
+  }
+  to_frame <- function(x) {
+    data.frame(
+      country = ifelse(length(x$country) == 0, NA, x$country),
+      province = ifelse(length(x$province) == 0, NA, x$province),
+      city = ifelse(length(x$city) == 0, NA, x$city),
+      district = ifelse(length(x$district) == 0, NA, x$district),
+      adcode = ifelse(length(x$adcode) == 0, NA, x$adcode),
+      location = ifelse(length(x$location) == 0, NA, x$location),
+      address = ifelse(length(x$formatted_address) == 0, NA, x$formatted_address),
+      count = count
+    )
+  }
+  if (unique == TRUE){
+    data <- cbind(to_frame(data[[1]]), rank = 1)
+  } else {
+    data <- cbind(bind_rows(lapply(data, to_frame)),
+                  rank = seq_along(data))
+  }
+  return(data)
+}, cache = cachem::cache_disk())
 
 
 #' Tidy occupation codes or description.
