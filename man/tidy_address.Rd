@@ -4,12 +4,14 @@
 \alias{tidy_address}
 \title{Query address code}
 \usage{
-tidy_address(x, unique = TRUE)
+tidy_address(x, unique = TRUE, cache_refresh = FALSE)
 }
 \arguments{
 \item{x}{A string vector that describe the address.}
 
 \item{unique}{Logical value for multiple output or not.}
+
+\item{cache_refresh}{Logical value for clean cache or not.}
 }
 \value{
 Data frame contains formatted address information.

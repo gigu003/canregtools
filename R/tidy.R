@@ -90,6 +90,7 @@ tidy_age <- function(x, unit = "year") {
 #'
 #' @param x A string vector that describe the address.
 #' @param unique Logical value for multiple output or not.
+#' @param cache_refresh Logical value for clean cache or not.
 #'
 #' @return Data frame contains formatted address information.
 #' @export
@@ -98,12 +99,13 @@ tidy_age <- function(x, unit = "year") {
 #' @importFrom httr content GET http_status
 #' @import memoise cachem
 #' 
-tidy_address <- function(x, unique = TRUE){
+tidy_address <- function(x, unique = TRUE, cache_refresh = FALSE){
   # Check if the input vector is not empty
   if (length(x) == 0) {
     warning("Input vector is empty. Returning an empty data frame.")
     return(default_data())
   }
+  if (cache_refresh){forget(query)}
   #apply function to all elements of vector, and combine rows.
   res <- bind_rows(lapply(x, query, unique = unique))
   return(res)
