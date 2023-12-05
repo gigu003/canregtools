@@ -124,7 +124,7 @@ tidy_address <- function(x, unique = TRUE, cache_refresh = FALSE){
     )
     
     # Introduce a delay to avoid hitting rate limits
-    #Sys.sleep(1)
+    Sys.sleep(1)
     
     if (http_status(response)$category != "Success") {
       return(default_data())
