@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">canregtools</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.6</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.7</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -63,7 +63,13 @@
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">tidy_address</span><span class="op">(</span><span class="va">x</span>, unique <span class="op">=</span> <span class="cn">TRUE</span>, cache_refresh <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">tidy_address</span><span class="op">(</span></span>
+<span>  <span class="va">x</span>,</span>
+<span>  unique <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  cache_dir <span class="op">=</span> <span class="st">"~/.cache_tidy_address"</span>,</span>
+<span>  cache_refresh <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  sleep <span class="op">=</span> <span class="fl">0.1</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -76,8 +82,16 @@
 <dd><p>Logical value for multiple output or not.</p></dd>
 
 
+<dt>cache_dir</dt>
+<dd><p>Cache directory of the returned address.</p></dd>
+
+
 <dt>cache_refresh</dt>
 <dd><p>Logical value for clean cache or not.</p></dd>
+
+
+<dt>sleep</dt>
+<dd><p>Waiting time for query api.</p></dd>
 
 </dl></div>
     <div class="section level2">
