@@ -6,12 +6,13 @@
 \usage{
 create_map(
   x,
-  value = c(rep(1, length(x))),
+  values = NULL,
   breaks = NULL,
-  class = "province",
-  bound = "city",
+  bg_level = "province",
+  bg_bound = "county",
   bg_cols = c("lightgray", "white"),
-  highlight_cols = c("white", "red"),
+  h_type = "",
+  h_cols = c("white", "darkred"),
   label = FALSE,
   label_size = 2,
   legend = FALSE,
@@ -21,17 +22,19 @@ create_map(
 \arguments{
 \item{x}{Areacodes.}
 
-\item{value}{Values.}
+\item{values}{values.}
 
 \item{breaks}{Cutoff values.}
 
-\item{class}{Province or city}
+\item{bg_level}{Province or city}
 
-\item{bound}{Show bound of background map.}
+\item{bg_bound}{Show bound of background map.}
 
 \item{bg_cols}{background colors.}
 
-\item{highlight_cols}{highlight colors.}
+\item{h_type}{map type.}
+
+\item{h_cols}{highlight colors.}
 
 \item{label}{Logical value.}
 

@@ -4,14 +4,24 @@
 \alias{tidy_address}
 \title{Query address code}
 \usage{
-tidy_address(x, unique = TRUE, cache_refresh = FALSE)
+tidy_address(
+  x,
+  unique = TRUE,
+  cache_dir = "~/.cache_tidy_address",
+  cache_refresh = FALSE,
+  sleep = 0.1
+)
 }
 \arguments{
 \item{x}{A string vector that describe the address.}
 
 \item{unique}{Logical value for multiple output or not.}
 
+\item{cache_dir}{Cache directory of the returned address.}
+
 \item{cache_refresh}{Logical value for clean cache or not.}
+
+\item{sleep}{Waiting time for query api.}
 }
 \value{
 Data frame contains formatted address information.

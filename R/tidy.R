@@ -90,31 +90,43 @@ tidy_age <- function(x, unit = "year") {
 #'
 #' @param x A string vector that describe the address.
 #' @param unique Logical value for multiple output or not.
+#' @param cache_dir Cache directory of the returned address.
 #' @param cache_refresh Logical value for clean cache or not.
+#' @param sleep Waiting time for query api.
 #'
 #' @return Data frame contains formatted address information.
 #' @export
 #' 
-#' @importFrom "utils" "URLencode"
-#' @importFrom httr content GET http_status
-#' @import memoise cachem
+#' @importFrom utils URLencode
+#' @importFrom httr content GET http_status timeout
+#' @importFrom memoise memoise forget
+#' @importFrom cachem cache_disk
+#' @import progress
 #' 
-tidy_address <- function(x, unique = TRUE, cache_refresh = FALSE){
+tidy_address <- function(x,
+                         unique = TRUE,
+                         cache_dir = "~/.cache_tidy_address",
+                         cache_refresh = FALSE,
+                         sleep = 0.1){
   # Function to query address for one element of vector
+  pb <- progress_bar$new(total = length(x),
+                         format = "[:bar] :percent :elapsed Time remaining: :eta")
+  api_key <- Sys.getenv("AMAP_API_KEY")
+  api_key <- ifelse(!nzchar(api_key), getOption("AMAP_API_KEY"), api_key)
   query <- memoise::memoise(function(x, unique = TRUE) {
-    api_key <- Sys.getenv("AMAP_API_KEY")
-    
-    if (nzchar(api_key)) {
-      url <- paste0("https://restapi.amap.com/v3/geocode/geo?key=",
-                    api_key, "&address=", URLencode(x))
-    } else {
-      warning("AMAP_API_KEY is not set. Please set the API key.")
+    pb$tick()
+    if (!nzchar(api_key)) {
+      warning("AMAP_API_KEY is not set. Please set the API key using
+              Sys.setenv(AMAP_API_KEY = 'your_key'). or using
+              options(AMAP_API_KEY = 'your_key')")
       return(NULL)
     }
+    url <- paste0("https://restapi.amap.com/v3/geocode/geo?key=",
+                  api_key, "&address=", URLencode(x))
     
     response <- tryCatch(
       {
-        GET(url)
+        httr::GET(url, httr::timeout(5))
       },
       error = function(e) {
         # Handle errors, e.g., print an error message
@@ -124,7 +136,7 @@ tidy_address <- function(x, unique = TRUE, cache_refresh = FALSE){
     )
     
     # Introduce a delay to avoid hitting rate limits
-    Sys.sleep(1)
+    Sys.sleep(sleep)
     
     if (http_status(response)$category != "Success") {
       return(default_data())
@@ -152,8 +164,9 @@ tidy_address <- function(x, unique = TRUE, cache_refresh = FALSE){
       data <- cbind(bind_rows(lapply(data, to_frame)),
                     rank = seq_along(data))
     }
+    
     return(data)
-  }, cache = cachem::cache_disk("./.Cache_tidy_address"))
+  }, cache = cachem::cache_disk(dir = cache_dir))
   
   default_data <- function() {
     data.frame(
@@ -177,6 +190,7 @@ tidy_address <- function(x, unique = TRUE, cache_refresh = FALSE){
   if (cache_refresh){forget(query)}
   #apply function to all elements of vector, and combine rows.
   res <- bind_rows(lapply(x, query, unique = unique))
+  pb$terminate()
   return(res)
 }
 
