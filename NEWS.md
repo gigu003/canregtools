@@ -1,5 +1,5 @@
 # canregtools 0.2.7
-
+add a new function read_map() and modify the function of create_map()
 # canregtools 0.2.6
 add a new function create_map()
 
