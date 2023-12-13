@@ -171,11 +171,11 @@ read_map <- function(x,
       geo_data1 <- st_read(json_addr("100000"), as_tibble = TRUE, quiet = TRUE)
       province_code <- geo_data1$adcode
       province_code <- province_code[nchar(province_code)==6&!province_code=="710000"]
-      geo_data <- bind_rows(lapply(province_code, read_json)) |>
+      geo_data <- bind_rows(lapply(province_code, read_json)) %>%
         mutate(adcode = as.character(adcode))
-      a1 <- geo_data|>filter(childrenNum == 0)
-      a2 <- geo_data|>filter(childrenNum > 0)
-      geo_data2 <- bind_rows(lapply(a2$adcode, read_json)) |>
+      a1 <- geo_data %>% filter(childrenNum == 0)
+      a2 <- geo_data %>% filter(childrenNum > 0)
+      geo_data2 <- bind_rows(lapply(a2$adcode, read_json)) %>%
         mutate(adcode = as.character(adcode))
       geo_data <- bind_rows(geo_data1, geo_data, geo_data2, a1) %>%
         arrange(adcode)
