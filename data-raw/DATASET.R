@@ -171,8 +171,45 @@ occu_map <- data.frame(
 )
 
 
+
+region_label_cn <- c("华北", "东北", "华东", "中南", "西南", "西北", "港澳台")
+region_label_en <- c("North", "North East", "East", "South", "South West",
+                     "North West", "GAT")
+prov_label_cn <- 
+  c("北京市", "天津市", "河北省", "山西省", "内蒙古自治区",
+    "辽宁省", "吉林省", "黑龙江省",
+    "上海市", "江苏省", "浙江省", "安徽省", "福建省", "江西省", "山东省",
+    "河南省", "湖北省", "湖南省", "广东省", "广西壮族自治区", "海南省",
+    "重庆市", "四川省", "贵州省", "云南省", "西藏自治区",
+    "陕西省", "甘肃省", "青海省", "宁夏回族自治区", "新疆维吾尔自治区",
+    "台湾省", "香港特别行政区", "澳门特别行政区")
+prov_label_en <- 
+  c("BeiJing", "TianJin", "HeBei", "ShanXi", "NeiMengGu",
+    "LiaoNing", "JiLin", "HeiLongJiang",
+    "ShangHai", "JiangSu", "ZheJiang", "AnHui", "FuJian", "JiangXi", "ShanDong",
+    "Henan", "HuBei", "HuNan", "GuangDong", "GuangXi", "HaiNan",
+    "ChongQing", "SiChuan", "GuiZhou", "YunNan", "XiZang",
+    "ShannXi", "GanSu", "QingHai", "NingXia", "XinJiang",
+    "TaiWan", "XiangGang", "AoMen")
+prov_label <- list(prov_label_cn = prov_label_cn,
+                   prov_label_en = prov_label_en)
+region_label <- list(region_label_cn = region_label_cn,
+                     region_label_en = region_label_en)
+
+areacodes <- c("410102", "410103", "410106",
+               "410302", "410303", "410304", "410305",
+               "410402", "410403", "410411",
+               "410602", "410603", "410611",
+               "410802", "410803", "410811",
+               "411102", "411104")
+
+registry_dict <- as.list(c(rep("410100", 3), rep("410300", 4),
+                           rep("410400", 3), rep("410600", 3),
+                           rep("410800", 3), rep("411100", 2)
+                           ))
+names(registry_dict) <- areacodes
 ## 生成标准人口数据
-std_pop <- data.frame(
+std_pop2 <- data.frame(
   agegrp = factor(c(seq(2, 19, 1))),
   segi = c(
     12000, 10000, 9000, 9000, 8000, 8000, 6000,
@@ -191,7 +228,28 @@ std_pop <- data.frame(
   )
 )
 
-
+std_pop <- data.frame(
+  agegrp = factor(c(seq(1, 19, 1))),
+  cn64 = c(
+    4.1, 10.42, 13.65, 12.52, 9.01, 7.37, 7.31,
+    6.77, 5.97, 5.17, 4.47, 3.84, 3.27, 2.56, 1.69,
+    1.07, 0.55, 0.2, 0.06
+  ),
+  cn82 = c(
+    2.07, 7.36, 11.03, 13.13, 12.49, 7.41, 9.22,
+    7.27, 5.4, 4.82, 4.72, 4.07, 3.38, 2.73, 2.12,
+    1.43, 0.86, 0.37, 0.12
+  ),
+  china = c(
+    13793799, 55184575, 90152587, 125396633, 103031165, 94573174, 117602265,
+    127314298, 109147295, 81242945, 85521045, 63304200, 46370375, 41703848,
+    34780460, 25574149, 15928330, 7989158, 4001925
+  ),
+  segi = c(
+    2.4, 9.6, 10, 9, 9, 8, 8, 6, 6, 6, 6,
+    5, 4, 4, 3, 2, 1, 0.5, 0.5
+  )
+)
 
 
 ## ICDO3 'Topo' sites and 'Behas' mapping with 'ICD10' codes.
@@ -239,7 +297,7 @@ morp1 <- data %>%
 morp_o3_2 <- morp1 %>%
   full_join(morp2, by = ("morp")) %>%
   arrange(morp) %>%
-  filter(mark == 0)
+  filter(mark == 0) %>%
   filter(!comments == "Not listed in ICD-O-3.2")
 
 
@@ -337,5 +395,6 @@ morp_to_icd10 <- morp_to_icd10[, -1]
 ## 把信息写入系统数据
 usethis::use_data(label, std_pop, topo_dict, morp_dict, topo_to_icd10,
   morp_to_icd10, all_to_icd10, label_child, ethnic_map, occu_map, morp_o3_2,
+  prov_label, region_label, registry_dict,
   internal = TRUE, overwrite = TRUE
 )

@@ -22,7 +22,7 @@
 #' @importFrom sf st_read
 #' 
 #' 
-create_map <- function(x,
+draw_map <- function(x,
                        values = NULL,
                        breaks = NULL,
                        bg_level = "province",

@@ -12,6 +12,9 @@
 #'        'sub', default is 'main'.
 #' @param lang Language of the output, options are 'cn' or 'en',
 #'        default is 'cn'.
+#'        
+#' @import dplyr
+#' @import Rdpack
 #'
 #' @return Factor of ICCC3 classification for childhood cancer.
 #' @export

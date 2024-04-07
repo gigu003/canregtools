@@ -31,13 +31,14 @@ classify_icd10 <- function(icd10, type = "big", lang = "cn") {
       -Inf, 0, 15, 27, 30, 40, 45, 50, 51, 59, 60, 64, 69, 76,
       81, 97, 98, Inf
     )
-    labels <- c(0, 1, 2, 11, 3, 4, 11, 5, 6, 11, 7, 8, 9, 11, 10, 11, 0)
+    labels <- c(0, 1, 2, 11, 3, 4, 11, 5, 6, 11, 7, 8, 9, 11, 10, 11, 0) + 200
+    labels <- ifelse(labels == 200, 0, labels)
     icdd <- cut(icd_number, breaks = breaks, labels = labels, right = FALSE)
     icdd <- as.numeric(as.character(icdd))
     if (lang == "cn") {
-      icdd <- factor(icdd, levels = c(0:11), labels = label[[1]]$cn)
+      icdd <- factor(icdd, levels = c(0, 201:211), labels = label[[1]]$cn)
     } else {
-      icdd <- factor(icdd, levels = c(0:11), labels = label[[1]]$en)
+      icdd <- factor(icdd, levels = c(0, 201:211), labels = label[[1]]$en)
     }
   } else if (type == "big") {
     breaks <-
@@ -47,13 +48,12 @@ classify_icd10 <- function(icd10, type = "big", lang = "cn") {
         61, 62, 63, 64, 67, 68, 69, 70, 73, 74, 81, 86, 88,
         89, 90, 91, 96, 97, 98, Inf
       )
-    labels <-
-      c(
-        0, 1, 2, 1, 3, 4, 26, 5, 6, 7, 8, 26, 9,
-        10, 26, 11, 26, 12, 26, 13, 26, 14, 26, 15, 16,
-        17, 26, 18, 19, 26, 20, 21, 20, 26, 22, 23, 26,
-        24, 26, 24, 26, 24, 25, 24, 26, 0
-      )
+    labels <-c(0, 1, 2, 1, 3, 4, 26, 5, 6, 7, 8, 26, 9,
+               10, 26, 11, 26, 12, 26, 13, 26, 14, 26, 15, 16,
+               17, 26, 18, 19, 26, 20, 21, 20, 26, 22, 23, 26,
+               24, 26, 24, 26, 24, 25, 24, 26, 0) + 100
+    labels <- ifelse(labels == 100, 0, labels)
+    
     icdd <- cut(icd_number, breaks = breaks, labels = labels, right = FALSE)
     icdd <- as.numeric(as.character(icdd))
     loc <- which(toupper(substring(icd10, 1, 1)) == "D" &
@@ -61,16 +61,16 @@ classify_icd10 <- function(icd10, type = "big", lang = "cn") {
         as.numeric(gsub("[^0-9\\.]", "", icd10)) < 34) |
         (as.numeric(gsub("[^0-9\\.]", "", icd10)) >= 42 &
           as.numeric(gsub("[^0-9\\.]", "", icd10)) < 44)))
-    icdd[loc] <- 22
+    icdd[loc] <- 122
 
     loc <- which(toupper(substring(icd10, 1, 1)) == "D" &
       (as.numeric(gsub("[^0-9\\.]", "", icd10)) >= 45 &
         as.numeric(gsub("[^0-9\\.]", "", icd10)) < 48))
-    icdd[loc] <- 25
+    icdd[loc] <- 125
     if (lang == "cn") {
-      icdd <- factor(icdd, levels = c(0:26), labels = label[[2]]$cn)
+      icdd <- factor(icdd, levels = c(0, 101:126), labels = label[[2]]$cn)
     } else {
-      icdd <- factor(icdd, levels = c(0:26), labels = label[[2]]$en)
+      icdd <- factor(icdd, levels = c(0, 101:126), labels = label[[2]]$en)
     }
   } else if (type == "small") {
     breaks <-
@@ -107,16 +107,4 @@ classify_icd10 <- function(icd10, type = "big", lang = "cn") {
     }
   }
   return(icdd)
-}
-
-classify_areacode <- function(x, return = "type"){
-  x <- substr(x, 1, 6)
-  is_urban <- x %in% c(410102:410105, 410302:410305, 410402:410404, 410411,
-                      410502:410503, 410505:410506, 410602:410603, 410611,
-                      410702:410704, 410711, 410802:410804, 410811, 410902,
-                      411002:411003, 411102:411104, 411202:411203,
-                      411302:411303, 411402:411403, 411502:411503,
-                      411602:411603, 411702)
-  res <- ifelse(is_urban, "Urban", "Rural")
-  return(res)
 }

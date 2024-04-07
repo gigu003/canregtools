@@ -33,6 +33,7 @@ Imports:
     sf,
     cachem,
     memoise,
-    progress
+    progress,
+    rvest
 RdMacros: Rdpack
 LazyData: true

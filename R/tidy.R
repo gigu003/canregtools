@@ -89,10 +89,12 @@ tidy_age <- function(x, unit = "year") {
 #' Query address code 
 #'
 #' @param x A string vector that describe the address.
+#' @param city City that address x belongs to.
 #' @param unique Logical value for multiple output or not.
 #' @param cache_dir Cache directory of the returned address.
 #' @param cache_refresh Logical value for clean cache or not.
 #' @param sleep Waiting time for query api.
+
 #'
 #' @return Data frame contains formatted address information.
 #' @export
@@ -104,10 +106,11 @@ tidy_age <- function(x, unit = "year") {
 #' @import progress
 #' 
 tidy_address <- function(x,
+                         city = NULL,
                          unique = TRUE,
                          cache_dir = "~/.cache_tidy_address",
                          cache_refresh = FALSE,
-                         sleep = 0.1){
+                         sleep = 0.05){
   # Function to query address for one element of vector
   pb <- progress_bar$new(total = length(x),
                          format = "[:bar] :percent :elapsed Time remaining: :eta")
@@ -121,8 +124,11 @@ tidy_address <- function(x,
               options(AMAP_API_KEY = 'your_key')")
       return(NULL)
     }
+    
     url <- paste0("https://restapi.amap.com/v3/geocode/geo?key=",
                   api_key, "&address=", URLencode(x))
+    
+    if(!is.null(city)) url <- paste0(url, "&city=", city)
     
     response <- tryCatch(
       {
@@ -138,9 +144,14 @@ tidy_address <- function(x,
     # Introduce a delay to avoid hitting rate limits
     Sys.sleep(sleep)
     
-    if (http_status(response)$category != "Success") {
+    if (is.null(response)) {
+      # Handle the case when the response is NULL (e.g., due to a timeout)
+      return(default_data())
+    } else if (http_status(response)$category != "Success") {
+      # Handle the case when the response status is not success
       return(default_data())
     }
+  
     data <- content(response, "parsed")$geocodes
     count <- length(data)
     if (is.null(data)) {
@@ -233,3 +244,6 @@ tidy_occu <- function(x, lang = "cn") {
   print("The convert was under GB/T 2261")
   return(code)
 }
+
+
+

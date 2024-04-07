@@ -4,14 +4,14 @@
 \alias{lt}
 \title{Calculate life table from mortality rates.}
 \usage{
-lt(mx, sage = 0, agegrp = 5, sex = "male")
+lt(mx, sage = 0, age_width = 5, sex = "male")
 }
 \arguments{
 \item{mx}{Death rate at age x.}
 
 \item{sage}{Start age.}
 
-\item{agegrp}{Age groups width.}
+\item{age_width}{Age groups width.}
 
 \item{sex}{Gender for the life table, it could be "male","female" or "total".}
 }
@@ -30,16 +30,15 @@ A data frame containing the following values.
 Calculate life table from mortality rates.
 }
 \examples{
-px <- c(
-  20005, 86920, 102502, 151494, 182932,
-  203107, 240289, 247076, 199665, 163820,
-  145382, 86789, 69368, 51207, 39112, 20509,
-  12301, 6586, 1909
-)
-dx <- c(
-  156, 58, 47, 49, 48, 68, 120, 162, 160, 294,
-  417, 522, 546, 628, 891, 831, 926, 731, 269
-)
+px <- c(20005, 86920, 102502, 151494, 182932, 203107, 240289, 247076, 199665,
+        163820, 145382, 86789, 69368, 51207, 39112, 20509, 12301, 6586, 1909)
+dx <- c(156, 58, 47, 49, 48, 68, 120, 162, 160, 294, 417, 522, 546, 628,
+        891, 831, 926, 731, 269)
 mx <- dx / px
-lt(mx, sage = 0, agegrp = 5, sex = "total")
+lt(mx, sage = 0, age_width = 5, sex = "male")
+mx <- c(0.01685, 0.00085, 0.00044, 0.00045, 0.00064, 0.00086, 0.00103,
+        0.00136, 0.00195, 0.00291, 0.00429, 0.00672, 0.00985, 0.01596,
+        0.02605, 0.04536, 0.07247, 0.12078, 0.17957, 0.25938, 0.25989)
+lt(mx, sage = 0, age_width = 5, sex = "total")
+
 }

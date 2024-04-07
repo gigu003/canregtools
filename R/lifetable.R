@@ -2,7 +2,7 @@
 #'
 #' @param mx Death rate at age x.
 #' @param sage Start age.
-#' @param agegrp Age groups width.
+#' @param age_width Age groups width.
 #' @param sex Gender for the life table, it could be "male","female" or "total".
 #'
 #' @return A data frame containing the following values.
@@ -17,110 +17,39 @@
 #' @export
 #'
 #' @examples
-#' px <- c(
-#'   20005, 86920, 102502, 151494, 182932,
-#'   203107, 240289, 247076, 199665, 163820,
-#'   145382, 86789, 69368, 51207, 39112, 20509,
-#'   12301, 6586, 1909
-#' )
-#' dx <- c(
-#'   156, 58, 47, 49, 48, 68, 120, 162, 160, 294,
-#'   417, 522, 546, 628, 891, 831, 926, 731, 269
-#' )
+#' px <- c(20005, 86920, 102502, 151494, 182932, 203107, 240289, 247076, 199665,
+#'         163820, 145382, 86789, 69368, 51207, 39112, 20509, 12301, 6586, 1909)
+#' dx <- c(156, 58, 47, 49, 48, 68, 120, 162, 160, 294, 417, 522, 546, 628,
+#'         891, 831, 926, 731, 269)
 #' mx <- dx / px
-#' lt(mx, sage = 0, agegrp = 5, sex = "total")
-lt <- function(mx, sage = 0, agegrp = 5, sex = "male") {
-  # Omit missing ages
-  if (is.na(mx[1])) {
-    mx[1] <- 0
-  }
-  firstmiss <- (1:length(mx))[is.na(mx)][1]
-  if (!is.na(firstmiss)) {
-    mx <- mx[1:(firstmiss - 1)]
-  }
+#' lt(mx, sage = 0, age_width = 5, sex = "male")
+#' mx <- c(0.01685, 0.00085, 0.00044, 0.00045, 0.00064, 0.00086, 0.00103,
+#'         0.00136, 0.00195, 0.00291, 0.00429, 0.00672, 0.00985, 0.01596,
+#'         0.02605, 0.04536, 0.07247, 0.12078, 0.17957, 0.25938, 0.25989)
+#' lt(mx, sage = 0, age_width = 5, sex = "total")
+#' 
+lt <- function(mx, sage = 0, age_width = 5, sex = "male"){
   nn <- length(mx)
-  if (nn < 1) {
-    stop("Not enough data to proceed")
-  }
-
-  # Compute width of each age group
-  if (agegrp == 1) {
-    nx <- c(rep(1, nn - 1), Inf)
-    age <- c(0, seq(1, nn - 1, 1))
-  } else if (agegrp == 5) {
-    # First age group 0, then 1-4, then 5-year groups.
-    nx <- c(1, 4, rep(5, nn - 3), Inf)
-    age <- c(sage, 1, seq(5, (nn - 2) * 5, 5))
-  } else {
-    stop("agegroup must be either 1 or 5")
-  }
-
-  if (agegrp == 5 & sage > 0 & sage < 5) {
-    stop("0 < sage < 5 not supported for 5-year age groups")
-  }
-
-  if (sage == 0) # for single year data and the first age (0) in 5-year data
-    {
-      if (sex == "female") {
-        if (mx[1] < 0.107) {
-          a0 <- 0.053 + 2.8 * mx[1]
-        } else {
-          a0 <- 0.35
-        }
-      } else if (sex == "male") {
-        if (mx[1] < 0.107) {
-          a0 <- 0.045 + 2.684 * mx[1]
-        } else {
-          a0 <- 0.33
-        }
-      } else # if(sex == "total")
-      {
-        if (mx[1] < 0.107) {
-          a0 <- 0.049 + 2.742 * mx[1]
-        } else {
-          a0 <- 0.34
-        }
-      }
-    } else if (sage > 0) {
-    a0 <- 0.5
-  } else {
-    stop("sage must be non-negative")
-  }
-  if (agegrp == 1) {
-    if (nn > 1) {
-      ax <- c(a0, rep(0.5, nn - 2), Inf)
-    } else {
-      ax <- Inf
-    }
-  } else if (agegrp == 5 & sage == 0) {
-    if (sex == "female") {
-      if (mx[1] < 0.107) {
-        a1 <- 1.522 - 1.518 * mx[1]
-      } else {
-        a1 <- 1.361
-      }
-    } else if (sex == "male") {
-      if (mx[1] < 0.107) {
-        a1 <- 1.651 - 2.816 * mx[1]
-      } else {
-        a1 <- 1.352
-      }
-    } else # sex == "total"
-    {
-      if (mx[1] < 0.107) {
-        a1 <- 1.5865 - 2.167 * mx[1]
-      } else {
-        a1 <- 1.3565
-      }
-    }
-    ax <- c(a0, a1, rep(2.6, nn - 3), Inf)
-    ### ax=2.5 known to be too low esp at low levels of mortality
-  } else # agegrp==5 and sage > 0
-  {
-    ax <- c(rep(2.6, nn - 1), Inf)
-    nx <- c(rep(5, nn))
-  }
+  ax <- calc_ax(mx, sage, age_width, sex)
+  # calculate width of each age group
+  switch(as.character(age_width),
+         "1" = {
+           nx <- c(rep(1, nn - 1), Inf)
+           age <- c(sage,seq(1, nn - 1, 1))
+         },
+         "5" = {
+           if (sage == 0){
+             nx <- c(1, 4, rep(5, nn - 3), Inf)
+             age <- c(sage, 1, seq(5, (nn - 2) * 5, 5))
+           } else{
+             nx <- c(ceiling(sage/5)*5-sage, rep(5, nn-2), Inf)
+             age <- c(sage, seq(ceiling(sage/5)*5, (nn - 1) * 5, 5))
+           }
+         }
+  )
+  
   qx <- nx * mx / (1 + (nx - ax) * mx)
+  
   qx[nn] <- 1
   if (nn > 1) {
     lx <- c(1, cumprod(1 - qx[1:(nn - 1)]))
@@ -139,7 +68,7 @@ lt <- function(mx, sage = 0, agegrp = 5, sex = "male") {
   } else {
     rx <- c(Lx[1] / lx[1])
   }
-  if (agegrp == 5) {
+  if (age_width == 5) {
     rx <- c(
       0, (Lx[1] + Lx[2]) / 5 * lx[1], Lx[3] / (Lx[1] + Lx[2]),
       Lx[4:(nn - 1)] / Lx[3:(nn - 2)], Tx[nn] / Tx[nn - 1]
@@ -147,10 +76,48 @@ lt <- function(mx, sage = 0, agegrp = 5, sex = "male") {
   }
   result <- data.frame(
     age = age, mx = mx, qx = qx, lx = lx,
-    dx = dx, Lx = Lx, Tx = Tx, ex = ex
-  )
+    dx = dx, Lx = Lx, Tx = Tx, ex = ex )
   return(result)
 }
+
+calc_ax <- function(mx, sage, age_width, sex){
+  nn <- length(mx)
+  # calculate a0
+  if (sage == 0){
+    switch(sex,
+           female = {a0 <- ifelse(mx[1] < 0.107, 0.053 + 2.8 * mx[1], 0.35)},
+           male = {a0 <- ifelse(mx[1] < 0.107, 0.045 + 2.684 * mx[1], 0.33)},
+           total = {a0 <- ifelse(mx[1] < 0.107, 0.049 + 2.742 * mx[1], 0.34)},
+           default = {stop(paste("unsupported sex value:", sex))})
+  } else if (sage > 0){
+    a0 <- 0.5
+  } else {
+    stop("sage must be non-negative")
+  }
+  
+  # calculate a1
+  if (age_width == 5 && sage == 0){
+    switch(sex,
+           female = {a1 <-ifelse(mx[1] < 0.107, 1.522 - 1.518 * mx[1], 1.361)},
+           male = {a1 <-ifelse(mx[1] < 0.107, 1.651 - 2.816 * mx[1], 1.352)},
+           total = {a1 <- ifelse(mx[1] < 0.107, 1.5865 - 2.167 * mx[1], 1.3565)},
+           default = {stop(paste("unsupported sex value:", sex))})
+  }
+
+  # calculate ax
+  if(sage == 0){
+    switch(as.character(age_width),
+           "1" = {ax <- c(a0, rep(0.5, nn - 2), Inf)},
+           "5" = {ax <- c(a0, a1, rep(2.5, nn - 3), Inf)})
+  } else {
+    switch(as.character(age_width),
+           "1" = {ax <- c(rep(0.5, nn - 1), Inf)},
+           "5" = {ax <- c(rep(2.5, nn - 1), Inf)})
+  }
+  return(ax)
+}
+
+
 
 #' Expand five-year(abridged) life table to one-year(complete) life table.
 #'
@@ -171,7 +138,6 @@ lt <- function(mx, sage = 0, agegrp = 5, sex = "male") {
 #' expand_lifetable(lx)
 expand_lifetable <- function(lx) {
   ages <- c(0, 1, seq(5, 85, 5))
-  lx <- lx / 100000
   coef1 <- matrix(c(
     1, 0, 0, 0, 0, 0,
     .56203, .7176, -.4784, .283886, -.100716, .0156,

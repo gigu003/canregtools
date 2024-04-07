@@ -1,3 +1,54 @@
+#' count canreg data.
+#'
+#' @param x Object data of class 'canreg' or 'canregs'.
+#' @param cutage_method Methods for Specifying Age Groups. Options are
+#'        "interval", "distance", or "quantile". Default is "distance".
+#' @param smooth_age Methods for expanding age groups from 5 years to 1 year.
+#' @param breaks Specicify the break points classify age groups when
+#'        cutage_method is 'interval'. Default is 'c(0, 15, 40, 65)'.
+#' @param length Specify the length of each age group when cutage_method is
+#'        'distance'. Default is 5.
+#' @param maxage Specify the max age of age group when cutage_method is
+#'        'distance'. Default is 85.
+#' @param sep_zero Logical value, TRUE or FALSE, specifying whether to treat age
+#'        0 as a separate group. Default is TRUE.
+#' @param labels Labels for age groups. Default is NULL.
+#' @param label_tail Tail label to be added to the labels. Default is NULL.
+#' @param type Method for classify cancer sites.
+#' @param lang Character value for specify the language used. options are 'cn'
+#'        for Chinese, or 'en' for English.
+#'
+#' @return data of class fbswicd.
+#' @export
+#'
+count_canreg <- function(x,
+                         cutage_method = "distance",
+                         smooth_age = "natural",
+                         breaks = c(0, 15, 40, 65),
+                         length = 5,
+                         maxage = 85,
+                         sep_zero = TRUE,
+                         labels = NULL,
+                         label_tail = NULL,
+                         type = "big",
+                         lang = "cn") {
+  UseMethod("count_canreg", x)
+}
+
+#' count the canreg data for class canregs.
+#'
+#' @param x data of class canregs.
+#' @param ... Others options.
+#'
+#' @return An object of class fbswicds.
+#' @export
+#'
+count_canreg.canregs <- function(x, ...) {
+  res <- lapply(x, count_canreg.canreg, ...)
+  class(res) <- c("fbswicds", "list")
+  return(res)
+}
+
 #' Count the canreg data.
 #'
 #' @param x Object data of class 'canreg'.
@@ -28,7 +79,7 @@
 #' data <- read_canreg(file)
 #' fbsw <- count_canreg(data, cutage_method = "interval")
 #' fbsw
-count_canreg <- function(x,
+count_canreg.canreg <- function(x,
                          cutage_method = "distance",
                          smooth_age = "natural",
                          breaks = c(0, 15, 40, 65),
@@ -39,15 +90,13 @@ count_canreg <- function(x,
                          label_tail = NULL,
                          type = "big",
                          lang = "cn") {
-  if (!inherits(x, "canreg")) {
-    stop("Input must be a valid canreg object.")
-  }
   year <- "year"
   sex <- "sex"
   agegrp <- "agegrp"
   icd_cat <- "icd_cat"
   basi <- "basi"
   icd10 <- "icd10"
+  morp <- "morp"
 
   reg_count <- function(data, varname = "fbs") {
     bind_rows(
@@ -94,6 +143,7 @@ count_canreg <- function(x,
     fb %>% filter(basi %in% c(5, 6, 7)) %>% reg_count(varname = "mv"),
     fb %>% filter(substr(icd10, 1, 3) %in% ubs) %>% reg_count(varname = "ub"),
     fb %>% filter(substr(icd10, 5, 5) == "9") %>% reg_count(varname = "sub"),
+    fb %>% filter(morp %in% c("8000","8001")) %>% reg_count(varname ="m8000"),
     fb %>% filter(basi == 0) %>% reg_count(varname = "dco")
   ) %>%
     purrr::reduce(left_join, by = c("year", "sex", "agegrp", "icd_cat")) %>%
@@ -107,7 +157,8 @@ count_canreg <- function(x,
                  area_type = x$area_type,
                  location = x$location,
                  year = x$year,
-                 fbswicd = res)
+                 fbswicd = res,
+                 pop = pop)
   attr(result, "class") <- c("fbswicd", class(result))
   return(result)
 }
@@ -154,7 +205,7 @@ clean_canreg <- function(x,
   dclass <- dclass[dclass %in% c("FBcases", "SWcases", "population")]
   switch(dclass,
     FBcases = {
-      print(paste0("Processing data: ", length(x$sex), " FBcases."))
+      #cat("Processing data: ", length(x$sex), " FBcases.\n")
       year <- as.numeric(format(x$inciden, "%Y"))
       sex <- tidy_sex(x$sex, lang = lang)
       age <- calc_age(x$birthda, x$inciden)
@@ -170,11 +221,12 @@ clean_canreg <- function(x,
       basi <- as.integer(x$basi)
       icd10 <- toupper(x$icd10)
       icd_cat <- classify_icd10(icd10, type = type, lang = lang)
-      res <- tibble(year, sex, agegrp, icd10, icd_cat, basi)
+      morp <- x$morp
+      res <- tibble(year, sex, agegrp, icd10, icd_cat, basi, morp)
       return(res)
     },
     SWcases = {
-      print(paste0("Processing data: ", length(x$sex), " SWcases."))
+      #cat("Processing data: ", length(x$sex), " SWcases.\n")
       year <- as.numeric(format(x$deathda, "%Y"))
       sex <- tidy_sex(x$sex, lang = lang)
       age <- calc_age(x$birthda, x$deathda)
@@ -193,7 +245,7 @@ clean_canreg <- function(x,
       return(res)
     },
     population = {
-      print(paste0("Processing POP data of year: ", unique(x$year)))
+      #cat("Processing POP data of year: ", unique(x$year),"\n")
       res <- x %>%
         mutate(sex = tidy_sex(sex, lang = lang)) %>%
         group_by(year, sex) %>%

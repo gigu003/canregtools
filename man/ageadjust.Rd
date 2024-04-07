@@ -8,7 +8,7 @@ ageadjust(
   count,
   pop,
   rate = NULL,
-  stdpop,
+  stdpop = NULL,
   method = "gamma",
   conf_level = 0.95,
   mp = 1e+05

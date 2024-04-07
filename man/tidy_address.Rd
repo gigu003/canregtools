@@ -6,14 +6,17 @@
 \usage{
 tidy_address(
   x,
+  city = NULL,
   unique = TRUE,
   cache_dir = "~/.cache_tidy_address",
   cache_refresh = FALSE,
-  sleep = 0.1
+  sleep = 0.05
 )
 }
 \arguments{
 \item{x}{A string vector that describe the address.}
+
+\item{city}{City that address x belongs to.}
 
 \item{unique}{Logical value for multiple output or not.}
 
