@@ -44,6 +44,6 @@ Draw group bar chart.
 \examples{
 file <- system.file("extdata", "411721.xls", package = "canregtools")
 data <- read_canreg(file)
-rate <- create_asr(data, year, sex, icd_cat, event = fbs)
+rate <- create_asr(data, year, sex, icd_cat, event = fbs, lang="en")
 draw_barchart(rate)
 }

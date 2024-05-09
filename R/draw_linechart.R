@@ -19,7 +19,7 @@
 #' library(canregtools)
 #' file <- system.file("extdata", "411721.xls", package = "canregtools")
 #' data <- read_canreg(file)
-#' fbsw <- count_canreg(data)
+#' fbsw <- count_canreg(data, lang = "en")
 #' age <- create_age_rate(fbsw, sex)
 #' draw_line(age, agegrp, rate, sex)
 draw_line <- function(data,
