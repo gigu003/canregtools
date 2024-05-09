@@ -27,7 +27,7 @@ jobs:
           # Use 3.6 to trigger usage of RTools35
           #- {os: windows-latest, r: '3.6'}
           # use 4.1 to check with rtools40's older compiler
-          - {os: windows-latest, r: '4.4'}
+          - {os: windows-latest, r: '4.3'}
 
           #- {os: ubuntu-latest,   r: 'devel', http-user-agent: 'release'}
           - {os: ubuntu-latest,   r: 'release'}
@@ -50,11 +50,10 @@ jobs:
           r-version: ${{ matrix.config.r }}
           http-user-agent: ${{ matrix.config.http-user-agent }}
           use-public-rspm: true
-
-      - uses: r-lib/actions/setup-r-dependencies@v2
+      - uses: r-lib/actions/setup-renv@v2
         with:
-          extra-packages: any::rcmdcheck
-          needs: check
+          profile: '"shiny"'
+
 
       - uses: r-lib/actions/check-r-package@v2
         with:
