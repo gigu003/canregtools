@@ -8,7 +8,7 @@
 \description{
 \if{html}{\figure{logo.png}{options: style='float: right' alt='logo' width='120'}}
 
-This package includes functions for analyzing PBCR data, such as ICD-10 classification on the Cancer part, logic check of registration, data cleaning, generating cancer registration reports, data visualization, etc.
+This package includes functions for data analysis, visualization, and automatic report generation in the field of Population-Based Cancer Registration.
 }
 \seealso{
 Useful links:

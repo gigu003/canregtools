@@ -21,7 +21,7 @@
 #' cases <- c(50, 60, 45, 70)
 #' pop <- c(1000, 1200, 1100, 900)
 #' spop <- c(800, 1000, 1100, 900)
-#' ageadjust(cases, pop, stdpop = spop, mp = 1000)
+#' ageadjust(cases, pop, stdpop = spop, mp = 100000)
 ageadjust <- function(count,
                       pop,
                       rate = NULL,
@@ -104,7 +104,3 @@ ageadjust <- function(count,
   }
  return(res)
 }
-cases <- c(50, 60, 45, 70)
-pop <- c(1000, 1200, 1100, 900)
-spop <- c(800, 1000, 1100, 900)
-ageadjust(cases, pop, stdpop = spop, mp = 1000)

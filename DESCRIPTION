@@ -4,10 +4,9 @@ Version: 0.2.7
 Authors@R: 
     person("Qiong", "Chen", , "chenqiong@hnccr.org.cn", role = c("aut", "cre"),
            comment = c(ORCID = "https://orcid.org/0000-0003-2401-0046"))
-Description: This package includes functions for analyzing PBCR data,
-    such as ICD-10 classification on the Cancer part, logic check of registration,
-    data cleaning, generating cancer registration reports, data
-    visualization, etc.
+Description: This package includes functions for data analysis, visualization,
+    and automatic report generation in the field of Population-Based Cancer
+    Registration.
 License: MIT + file LICENSE
 URL: https://gigu003.github.io/canregtools/
 Depends: 
