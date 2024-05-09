@@ -45,18 +45,6 @@ install.packages("remotes")
 library(remotes)
 install_github("gigu003/canregtools")
 ```
-## 主要函数列表
 
-[主要函数列表](https://gigu003.github.io/canregtools/reference/index.html)
-
-## 应用实践
-
-1. [icd10编码分类](https://gigu003.github.io/canregtools/articles/classify_icd10.html)
-
-
-## 开发计划
-
-1. 登记处数据分类合并统计
-1. 自动报告
 
 
