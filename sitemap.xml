@@ -28,10 +28,10 @@
     <loc>/reference/ageadjust.html</loc>
   </url>
   <url>
-    <loc>/reference/asr_rate.html</loc>
+    <loc>/reference/calc_age.html</loc>
   </url>
   <url>
-    <loc>/reference/calc_age.html</loc>
+    <loc>/reference/canregtools-package.html</loc>
   </url>
   <url>
     <loc>/reference/check_id.html</loc>
@@ -49,25 +49,64 @@
     <loc>/reference/clean_canreg.html</loc>
   </url>
   <url>
+    <loc>/reference/count_canreg.canreg.html</loc>
+  </url>
+  <url>
+    <loc>/reference/count_canreg.canregs.html</loc>
+  </url>
+  <url>
     <loc>/reference/count_canreg.html</loc>
+  </url>
+  <url>
+    <loc>/reference/create_age_rate.fbswicd.html</loc>
   </url>
   <url>
     <loc>/reference/create_age_rate.html</loc>
   </url>
   <url>
-    <loc>/reference/create_map.html</loc>
+    <loc>/reference/create_asr.canreg.html</loc>
+  </url>
+  <url>
+    <loc>/reference/create_asr.fbswicd.html</loc>
+  </url>
+  <url>
+    <loc>/reference/create_asr.html</loc>
   </url>
   <url>
     <loc>/reference/create_quality.html</loc>
   </url>
   <url>
+    <loc>/reference/cumrate.html</loc>
+  </url>
+  <url>
+    <loc>/reference/cumrisk.html</loc>
+  </url>
+  <url>
     <loc>/reference/cutage.html</loc>
   </url>
   <url>
-    <loc>/reference/dulbar_chart.html</loc>
+    <loc>/reference/draw_bar.html</loc>
   </url>
   <url>
-    <loc>/reference/dumbbell_chart.html</loc>
+    <loc>/reference/draw_barchart.html</loc>
+  </url>
+  <url>
+    <loc>/reference/draw_dumbbell.html</loc>
+  </url>
+  <url>
+    <loc>/reference/draw_line.html</loc>
+  </url>
+  <url>
+    <loc>/reference/draw_map.html</loc>
+  </url>
+  <url>
+    <loc>/reference/draw_pyramid.fbswicd.html</loc>
+  </url>
+  <url>
+    <loc>/reference/draw_pyramid.html</loc>
+  </url>
+  <url>
+    <loc>/reference/estimate_pop.html</loc>
   </url>
   <url>
     <loc>/reference/expand_age_pop.html</loc>
@@ -82,19 +121,28 @@
     <loc>/reference/index.html</loc>
   </url>
   <url>
-    <loc>/reference/line_chart.html</loc>
-  </url>
-  <url>
     <loc>/reference/lt.html</loc>
   </url>
   <url>
     <loc>/reference/pyramid.html</loc>
   </url>
   <url>
+    <loc>/reference/read_areacode.html</loc>
+  </url>
+  <url>
     <loc>/reference/read_canreg.html</loc>
   </url>
   <url>
     <loc>/reference/read_map.html</loc>
+  </url>
+  <url>
+    <loc>/reference/reframe_fbswicd.canregs.html</loc>
+  </url>
+  <url>
+    <loc>/reference/reframe_fbswicd.fbswicds.html</loc>
+  </url>
+  <url>
+    <loc>/reference/reframe_fbswicd.html</loc>
   </url>
   <url>
     <loc>/reference/tidy_address.html</loc>
@@ -107,5 +155,17 @@
   </url>
   <url>
     <loc>/reference/tidy_sex.html</loc>
+  </url>
+  <url>
+    <loc>/reference/truncrate.html</loc>
+  </url>
+  <url>
+    <loc>/reference/write_area_type.html</loc>
+  </url>
+  <url>
+    <loc>/reference/write_areacode.html</loc>
+  </url>
+  <url>
+    <loc>/reference/write_registry.html</loc>
   </url>
 </urlset>
