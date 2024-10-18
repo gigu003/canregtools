@@ -4,6 +4,7 @@
 #' @param sage Start age.
 #' @param age_width Age groups width.
 #' @param sex Gender for the life table, it could be "male","female" or "total".
+#' @param sep_zero Specify whether the zero age group was separate.
 #'
 #' @return A data frame containing the following values.
 #' \item{age}{Start age in each age group.}
@@ -28,7 +29,7 @@
 #'         0.02605, 0.04536, 0.07247, 0.12078, 0.17957, 0.25938, 0.25989)
 #' lt(mx, sage = 0, age_width = 5, sex = "total")
 #' 
-lt <- function(mx, sage = 0, age_width = 5, sex = "male"){
+lt <- function(mx, sage = 0, sep_zero = TRUE ,age_width = 5, sex = "male"){
   nn <- length(mx)
   ax <- calc_ax(mx, sage, age_width, sex)
   # calculate width of each age group

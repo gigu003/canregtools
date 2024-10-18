@@ -1,0 +1,138 @@
+---
+title: "Cancer Annual Report"
+author: "Qiong Chen"
+date: "2024-08-21"
+output:
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, message = FALSE)
+library(canregtools)
+library(dplyr)
+library(flextable)
+library(showtext)
+showtext_auto()
+```
+
+```{r}
+library(canregtools)
+data <- load_canreg()
+```
+
+# 人口
+
+```{r}
+fbsw <- count_canreg(data)
+draw_pyramid(fbsw, show_value=F, csize=0.8, grid = c(1,1), cgap=0.2)
+```
+
+# 质量控制指标
+
+```{r}
+qua <- create_quality(data, decimal = 2, year, cancer) |> 
+  filter(!cancer == 0) |> 
+  add_labels() |> 
+  select(site, icd10, mi, mv, ub, dco) 
+```
+
+```{r}
+qua |> flextable()
+```
+
+# 癌症发病情况
+## 总体发病情况
+
+```{r}
+asr1 <- create_asr(data, year, sex, decimal=2)
+asr2 <- create_asr(data, year, decimal=2)
+asr <- bind_rows(asr1, asr2) |>
+  add_labels() |>
+  arrange(sex)
+```
+
+```{r}
+asr |> 
+  select(sex, no_cases, cr, asr_cn2000, asr_wld85, cumur) |> 
+  flextable()
+```
+
+## 年龄别发病情况
+
+```{r}
+agerate <- create_age_rate(data, sex, cancer) |> 
+  filter(cancer %nin% c(60, 61)) |> 
+  drop_others() |> 
+  add_labels(label_type = "abbr")
+agerate <- agerate |> 
+  filter(cancer %in% c(103:106, 110,114,115,118,122,123))
+draw_linechart(agerate,facet_var=site,grid=c(2,5),
+              x_var=agegrp,y_var=rate,group_var=sex,axis_label=c("年龄","年龄别率"))
+```
+
+
+## 前十位癌症发病情况
+
+```{r}
+asr <- create_asr(data, year, sex, cancer) |> 
+  filter(!cancer %in% c(60,61)) |>
+  drop_others() |> 
+  add_labels(label_type = "abbr")
+draw_barchart(asr,
+              plot_var = asr_cn2000,
+              cate_var=site,
+              group_var = year,
+              side_var = sex,
+              side_label = c("男性(1/10万)", "女性(1/10万)"),
+              )
+```
+
+
+# 癌症死亡情况
+## 总体死亡情况
+
+```{r}
+asr1 <- create_asr(data, event = sws, year, sex,decimal=2)
+asr2 <- create_asr(data, event = sws, year,decimal=2)
+asr <- bind_rows(asr1, asr2) |>
+  add_labels() |>
+  arrange(sex)
+```
+
+```{r}
+asr |> 
+  select(sex, no_cases, cr, asr_cn2000, asr_wld85, cumur) |> 
+  #mutate(across(c(cr,asr_cn2000,asr_wld85,cumur), format, nsmall=2)) |> 
+  flextable()
+```
+
+## 年龄别死亡情况
+
+
+```{r}
+agerate <- create_age_rate(data, event = sws, sex, cancer) |> 
+  filter(cancer %nin% c(60, 61)) |> 
+  drop_others() |> 
+  add_labels(label_type = "abbr")
+agerate <- agerate |> 
+  filter(cancer %in% c(103:106, 110,114,115,118,122,123))
+draw_linechart(agerate,facet_var=site,grid=c(3,4),
+              x_var=agegrp,y_var=rate,group_var=sex,axis_label=c("年龄","年龄别率"))
+```
+
+## 前十位癌症死亡情况
+
+```{r}
+asr <- create_asr(data, event = sws, year, sex, cancer) |> 
+  filter(!cancer %in% c(60, 61)) |>
+  drop_others() |> 
+  add_labels(label_type = "abbr")
+draw_barchart(asr,
+              plot_var = asr_cn2000,
+              cate_var=site,
+              group_var = year,
+              side_var = sex,
+              side_label = c("男性(1/10万)", "女性(1/10万)"),
+              cols = c("darkred", "darkgreen"), gap=0.1)
+```
+

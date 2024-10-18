@@ -22,10 +22,7 @@
 #' @param legend Logical value indicates plot legend or not.
 #' @param legend_label Character for the legend label. 
 #' @param ... Other options.
-
-#'
-#' @importFrom grDevices palette
-#' @importFrom graphics legend par points
+#' 
 #' @return A bar chart.
 #' @export
 #' 
@@ -63,9 +60,9 @@ draw_bar <- function(values, cates = NULL, axis = NULL, groups = length(values),
   }
   
   if (groups > length(cols)){
-    cols <- brewer.pal(n=groups, name="Dark2")
-  }
-  
+    cols <- c("#4C00FF", "#0019FF", "#0080FF", "#00E5FF", "#00FF4D", "#E6FF00",
+              "#FFFF00", "#FFDE59")
+    }
   
   max_axis <- max(axis)
   min_axis <- min(axis)
@@ -148,28 +145,30 @@ draw_bar <- function(values, cates = NULL, axis = NULL, groups = length(values),
 #' @param cate_var Category variable name.
 #' @param group_var Group variable name.
 #' @param side_var Panel variable name.
+#' @param side_label Labels for each side.
+#' @param bar_side Orientation of the bar chart: 1 for left and 2 for right.
 #' @param topn Top n 'plot_var' in each 'group_var' and 'side_var'. 
-#' @param bar_side Bar oriention, 1 for left, 2 for right.
-#' @param nrow The number of subplots included in each row.
+#' @param grid The number of rows and columns in the plot area.
 #' @param ... Other options in draw_bar.
 #'
 #' @return Bar chart
 #' @export
 #'
 #' @examples
-#' file <- system.file("extdata", "411721.xls", package = "canregtools")
-#' data <- read_canreg(file)
-#' rate <- create_asr(data, year, sex, icd_cat, event = fbs, lang="en")
+#' data <- load_canreg()
+#' rate <- create_asr(data, year, sex, cancer, event = fbs)
 #' draw_barchart(rate)
 draw_barchart <- function(data,
-                         plot_var = cr,
-                         cate_var = icd_cat,
-                         group_var = year,
-                         side_var = sex,
-                         topn = 10,
-                         bar_side = 1,
-                         nrow = 2,
-                         ...) {
+                          plot_var = cr,
+                          cate_var = cancer,
+                          group_var = year,
+                          side_var = sex,
+                          side_label = NULL,
+                          bar_side = 1,
+                          topn = 10,
+                          grid = c(1, 1),
+                          ...) {
+  data <- data |> arrange({{side_var}})
   data_pre <- data %>% group_split({{side_var}})
   side_value <- data %>% pull({{side_var}}) %>% unique()
   max_plot_var <- data %>% pull({{plot_var}}) %>% max()
@@ -183,6 +182,10 @@ draw_barchart <- function(data,
     over_lay <- c(rep(FALSE, length(data_pre)))
   }
   
+  if (!is.null(side_label)){
+    side_value <- side_label
+  }
+  
   plotbar <- function(i){
     #arrange data by group_var and plot_var.
     yy <- data_pre[[i]] %>% arrange({{group_var}}, desc({{plot_var}}))
@@ -194,18 +197,22 @@ draw_barchart <- function(data,
     values <- lapply(values, rev)
     values <- rev(values)
     names(values) <- group_name
-    draw_bar(values, cates, axis, bar_way = way, bar_side = sides[i],
+    draw_bar(values, cates, axis,
+             bar_way = way,
+             bar_side = sides[i],
              overlay = over_lay[i],
              label = c(rep(side_value[i], 2)),
              side_label = ifelse(length(data_pre)==2, 2, 1),
-             legend = ifelse(i == 1, FALSE, TRUE), ...)
+             legend = ifelse(i == 1, TRUE, FALSE),
+             ...)
   }
 
-  #par(mfrow = c(nrow, ceiling(length(side_value))/nrow))
-  par(mfrow=c(1,1))
-  for(i in 1:length(data_pre)){
+  par(mfrow = grid)
+  
+  for(i in 1:length(side_value)){
     plotbar(i)
   }
+  
   par(mfrow=c(1, 1))
 }
 

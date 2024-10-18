@@ -7,12 +7,13 @@
 draw_barchart(
   data,
   plot_var = cr,
-  cate_var = icd_cat,
+  cate_var = cancer,
   group_var = year,
   side_var = sex,
-  topn = 10,
+  side_label = NULL,
   bar_side = 1,
-  nrow = 2,
+  topn = 10,
+  grid = c(1, 1),
   ...
 )
 }
@@ -27,11 +28,13 @@ draw_barchart(
 
 \item{side_var}{Panel variable name.}
 
+\item{side_label}{Labels for each side.}
+
+\item{bar_side}{Orientation of the bar chart: 1 for left and 2 for right.}
+
 \item{topn}{Top n 'plot_var' in each 'group_var' and 'side_var'.}
 
-\item{bar_side}{Bar oriention, 1 for left, 2 for right.}
-
-\item{nrow}{The number of subplots included in each row.}
+\item{grid}{The number of rows and columns in the plot area.}
 
 \item{...}{Other options in draw_bar.}
 }
@@ -42,8 +45,7 @@ Bar chart
 Draw group bar chart.
 }
 \examples{
-file <- system.file("extdata", "411721.xls", package = "canregtools")
-data <- read_canreg(file)
-rate <- create_asr(data, year, sex, icd_cat, event = fbs, lang="en")
+data <- load_canreg()
+rate <- create_asr(data, year, sex, cancer, event = fbs)
 draw_barchart(rate)
 }

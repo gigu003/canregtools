@@ -2,18 +2,26 @@
 % Please edit documentation in R/reframe_fbswicd.R
 \name{reframe_fbswicd}
 \alias{reframe_fbswicd}
-\title{Reframe the fbswicds.}
+\alias{reframe_fbswicd.canregs}
+\alias{reframe_fbswicd.fbswicds}
+\title{Reframe data of class fbswicds}
 \usage{
 reframe_fbswicd(x, ...)
+
+\method{reframe_fbswicd}{canregs}(x, ..., cancer_type = "big")
+
+\method{reframe_fbswicd}{fbswicds}(x, ...)
 }
 \arguments{
 \item{x}{Object of class fbswicds.}
 
 \item{...}{Stratification variables used to reframe.}
+
+\item{cancer_type}{Method for classify cancer sites.}
 }
 \value{
-Object of class fbswicd.
+Merged fbswicd.
 }
 \description{
-Reframe the fbswicds.
+Reframe data of class fbswicds
 }

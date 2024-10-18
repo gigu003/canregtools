@@ -6,8 +6,6 @@
 #' @param pop_type Format of population sheet, options area 'long' or 'wide',
 #'        default is 'long'.
 #'
-#' @importFrom readxl read_excel
-#'
 #' @return An object of canreg class or a list of objects of canreg class.
 #' @export
 #'
@@ -23,12 +21,12 @@ read_canreg <- function(x, pop_type = "long") {
     tryCatch(
       {
         fb <- read_excel(x, sheet = "FB")
-        cat(nrow(fb), " cases were read from FB sheet.")
+        message(paste0(nrow(fb),"cases were read from FB sheet."))
         fb$inciden <- as.Date(fb$inciden)
         fb$birthda <- as.Date(fb$birthda)
         names(fb) <- tolower(names(fb))
         sw <- read_excel(x, sheet = "SW")
-        cat(nrow(sw), " cases were read from SW sheet.")
+        message(paste0(nrow(sw),"cases were read from SW sheet."))
         sw$inciden <- as.Date(sw$inciden)
         sw$birthda <- as.Date(sw$birthda)
         sw$deathda <- as.Date(sw$deathda)
@@ -48,15 +46,15 @@ read_canreg <- function(x, pop_type = "long") {
           )
           pop <- round(pop)
           pop <- tibble(
-            year = c(rep(fyear, 38)),
-            sex = c(rep(1, 19), rep(2, 19)),
+            year = as.integer(c(rep(fyear, 38))),
+            sex = as.integer(c(rep(1, 19), rep(2, 19))),
             agegrp = factor(c(rep(1:19, 2))),
-            rks = c(pop[[1]], pop[[2]])
+            rks = as.integer(c(pop[[1]], pop[[2]]))
           )
         } else if (type == "long") {
           pop <- read_excel(x, sheet = "POP")
           pop$year <- as.integer(pop$year)
-          pop$rks <- round(pop$rks)
+          pop$rks <- as.integer(round(pop$rks))
           pop$sex <- as.integer(pop$sex)
           pop$agegrp <- factor(pop$agegrp)
         }
@@ -70,10 +68,6 @@ read_canreg <- function(x, pop_type = "long") {
         location <- ""
         res <- list(
           areacode = areacode,
-          county = county,
-          area_type = area_type,
-          location = location,
-          year = year,
           FBcases = fb,
           SWcases = sw,
           POP = pop

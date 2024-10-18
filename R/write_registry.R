@@ -12,12 +12,12 @@ write_areacode <- function(areacode, name){
     return(NULL)
     }
   # create dict directory if it doesn't exist.
-  if(!dir.exists(".cache_dict")) {
-    dir.create(".cache_dict")
+  if(!dir.exists("~/.canregtools/.cache_dict")) {
+    dir.create("~/.canregtools/.cache_dict")
   }
   # read dict file if it exist or create an empty one.
-  if(file.exists(".cache_dict/areacode_dict.rds")) {
-    areacode_dict <- readRDS(".cache_dict/areacode_dict.rds")
+  if(file.exists("~/.canregtools/.cache_dict/areacode_dict.rds")) {
+    areacode_dict <- readRDS("~/.canregtools/.cache_dict/areacode_dict.rds")
   } else {
     areacode_dict <- data.frame(areacode = character(),
                                 name = character(),
@@ -33,7 +33,7 @@ write_areacode <- function(areacode, name){
   areacode_dict <- rbind(areacode_dict, data.frame(areacode = areacode,
                                                    name = name,
                                                    stringsAsFactors = FALSE))
-  saveRDS(areacode_dict, file = ".cache_dict/areacode_dict.rds")
+  saveRDS(areacode_dict, file = "~/.canregtools/.cache_dict/areacode_dict.rds")
   print(areacode_dict)
 }
 
@@ -53,17 +53,17 @@ write_area_type <- function(areacode, area_type){
     return(NULL)
     }
   # create dict directory if it doesn't exist.
-    if(!dir.exists(".cache_dict")){
-      dir.create(".cache_dict")
+    if(!dir.exists("~/.canregtools/.cache_dict")){
+      dir.create("~/.canregtools/.cache_dict")
     }
   # read dict file if it exist or create an empty one.
-    if(file.exists(".cache_dict/area_type_dict.rds")) {
-      area_type_dict <- readRDS(".cache_dict/area_type_dict.rds")
+    if(file.exists("~/.canregtools/.cache_dict/area_type_dict.rds")) {
+      area_type_dict <- readRDS("~/.canregtools/.cache_dict/area_type_dict.rds")
     } else {
       area_type_dict <- list()  
     }
     area_type_dict[areacode] <- area_type
-    saveRDS(area_type_dict, file = ".cache_dict/area_type_dict.rds")
+    saveRDS(area_type_dict, file = "~/.canregtools/.cache_dict/area_type_dict.rds")
     print(area_type_dict)
 }
 
@@ -83,14 +83,14 @@ write_registry <- function(areacode, registry){
     return(NULL)
   }
   # create dict directory if it doesn't exist.
-    if(!dir.exists(".cache_dict")) {
-      dir.create(".cache_dict")
+    if(!dir.exists("~/.canregtools/.cache_dict")) {
+      dir.create("~/.canregtools/.cache_dict")
     }
   # read dict file if it exist or create an empty one.
-    if(file.exists(".cache_dict/registry_dict.rds")) {
-      registry_dict <- readRDS(".cache_dict/registry_dict.rds")
+    if(file.exists("~/.canregtools/.cache_dict/registry_dict.rds")) {
+      registry_dict <- readRDS("~/.canregtools/.cache_dict/registry_dict.rds")
     } 
     registry_dict[areacode] <- registry
-    saveRDS(registry_dict, file = ".cache_dict/registry_dict.rds")
+    saveRDS(registry_dict, file = "~/.canregtools/.cache_dict/registry_dict.rds")
     print(registry_dict)
 }

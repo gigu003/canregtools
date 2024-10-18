@@ -6,8 +6,6 @@
 <!-- badges: start -->
 
 [![R-CMD-check](https://github.com/gigu003/canregtools/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/gigu003/canregtools/actions/workflows/R-CMD-check.yaml)
-[![CRAN
-status](https://www.r-pkg.org/badges/version/canregtools)](https://CRAN.R-project.org/package=canregtools)
 <!-- badges: end -->
 
 肿瘤登记是恶性肿瘤监测的一项常规工作，它在人群中搜集、整理和统计分析肿瘤发病、死亡及生存资料，从而为肿瘤防控提供基础数据。**canregtools**包致力于为肿瘤登记工作提供数据逻辑核查、数据分析、可视化、和肿瘤登记报告等常用的功能和函数。

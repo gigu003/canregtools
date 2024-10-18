@@ -108,21 +108,30 @@ cutage <- function(x,
 #' ages <- calc_age(bdate, event)
 #' ages
 calc_age <- function(birth_date, onset_date) {
+  # Ensure both inputs are Date objects
   birth_date <- as.Date(birth_date)
   onset_date <- as.Date(onset_date)
-  birth_year <- as.numeric(format(birth_date, "%Y"))
-  onset_year <- as.numeric(format(onset_date, "%Y"))
-  age <- onset_year - birth_year
-  birth_month <- as.numeric(format(birth_date, "%m"))
-  onset_month <- as.numeric(format(onset_date, "%m"))
-  birth_day <- as.numeric(format(birth_date, "%d"))
-  onset_day <- as.numeric(format(onset_date, "%d"))
-  age[onset_month < birth_month |
-    (onset_month == birth_month &
-      onset_day < birth_day)] <-
-    age[onset_month < birth_month |
-      (onset_month == birth_month &
-        onset_day < birth_day)] - 1
+  
+  # Initialize age as NA for missing values
+  age <- rep(NA, length(birth_date))
+  
+  # Identify non-NA values
+  valid_idx <- !(is.na(birth_date) | is.na(onset_date))
+  
+  # Calculate age for non-missing values
+  birth_year <- as.numeric(format(birth_date[valid_idx], "%Y"))
+  onset_year <- as.numeric(format(onset_date[valid_idx], "%Y"))
+  birth_month <- as.numeric(format(birth_date[valid_idx], "%m"))
+  onset_month <- as.numeric(format(onset_date[valid_idx], "%m"))
+  birth_day <- as.numeric(format(birth_date[valid_idx], "%d"))
+  onset_day <- as.numeric(format(onset_date[valid_idx], "%d"))
+  
+  age[valid_idx] <- onset_year - birth_year
+  age[valid_idx][onset_month < birth_month | 
+                   (onset_month == birth_month & onset_day < birth_day)] <- 
+    age[valid_idx][onset_month < birth_month | 
+                     (onset_month == birth_month & onset_day < birth_day)] - 1
+  
   return(age)
 }
 

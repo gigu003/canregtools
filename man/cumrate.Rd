@@ -11,8 +11,8 @@ cumrate(
   eage = 70,
   agewidth = 5,
   sep_zero = TRUE,
-  mp = 100,
-  decimal = 2
+  mp = 1,
+  decimal = 6
 )
 }
 \arguments{
@@ -28,7 +28,7 @@ cumrate(
 
 \item{sep_zero}{Logical value, if the 0 age group was separate.}
 
-\item{mp}{A multiplier used to scale the calculated rates. Default is 100.}
+\item{mp}{A multiplier used to scale the calculated rates. Default is 1.}
 
 \item{decimal}{Decimals of the calculated rates.}
 }

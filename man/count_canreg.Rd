@@ -2,20 +2,34 @@
 % Please edit documentation in R/count_canreg.R
 \name{count_canreg}
 \alias{count_canreg}
+\alias{count_canreg.canregs}
+\alias{count_canreg.canreg}
 \title{count canreg data.}
 \usage{
 count_canreg(
   x,
   cutage_method = "distance",
-  smooth_age = "natural",
   breaks = c(0, 15, 40, 65),
   length = 5,
   maxage = 85,
   sep_zero = TRUE,
   labels = NULL,
   label_tail = NULL,
-  type = "big",
-  lang = "cn"
+  cancer_type = "big"
+)
+
+\method{count_canreg}{canregs}(x, ...)
+
+\method{count_canreg}{canreg}(
+  x,
+  cutage_method = "distance",
+  breaks = c(0, 15, 40, 65),
+  length = 5,
+  maxage = 85,
+  sep_zero = TRUE,
+  labels = NULL,
+  label_tail = NULL,
+  cancer_type = "big"
 )
 }
 \arguments{
@@ -24,9 +38,7 @@ count_canreg(
 \item{cutage_method}{Methods for Specifying Age Groups. Options are
 "interval", "distance", or "quantile". Default is "distance".}
 
-\item{smooth_age}{Methods for expanding age groups from 5 years to 1 year.}
-
-\item{breaks}{Specicify the break points classify age groups when
+\item{breaks}{Specify the break points classify age groups when
 cutage_method is 'interval'. Default is 'c(0, 15, 40, 65)'.}
 
 \item{length}{Specify the length of each age group when cutage_method is
@@ -42,14 +54,20 @@ cutage_method is 'interval'. Default is 'c(0, 15, 40, 65)'.}
 
 \item{label_tail}{Tail label to be added to the labels. Default is NULL.}
 
-\item{type}{Method for classify cancer sites.}
+\item{cancer_type}{Method for classify cancer sites.}
 
-\item{lang}{Character value for specify the language used. options are 'cn'
-for Chinese, or 'en' for English.}
+\item{...}{Parameters.}
 }
 \value{
 data of class fbswicd.
 }
 \description{
 count canreg data.
+}
+\examples{
+library(canregtools)
+file <- system.file("extdata", "411721.xls", package = "canregtools")
+data <- read_canreg(file)
+fbsw <- count_canreg(data, cutage_method = "interval")
+fbsw
 }

@@ -4,13 +4,15 @@
 \alias{tidy_sex}
 \title{Tidy gender variable}
 \usage{
-tidy_sex(x, lang = "cn")
+tidy_sex(x, lang = "zh", as_factor = FALSE)
 }
 \arguments{
 \item{x}{Vector contains gender information.}
 
 \item{lang}{Character, specify the output language, options are 'cn',
 or 'en', default is 'cn'.}
+
+\item{as_factor}{Return factor value.}
 }
 \value{
 A factor vector contains gender information.

@@ -4,11 +4,11 @@
 \name{canregtools-package}
 \alias{canregtools}
 \alias{canregtools-package}
-\title{canregtools: Analysis Data from PBCR (Population-Based Cancer Registration,PBCR)}
+\title{canregtools: Tools for Analyzing Population-Based Cancer Registry (PBCR) Data}
 \description{
 \if{html}{\figure{logo.png}{options: style='float: right' alt='logo' width='120'}}
 
-This package includes functions for data analysis, visualization, and automatic report generation in the field of Population-Based Cancer Registration.
+This package provides tools for analyzing, visualizing, and generating reports from Population-Based Cancer Registry (PBCR) data.
 }
 \seealso{
 Useful links:

@@ -4,12 +4,14 @@
 \alias{lt}
 \title{Calculate life table from mortality rates.}
 \usage{
-lt(mx, sage = 0, age_width = 5, sex = "male")
+lt(mx, sage = 0, sep_zero = TRUE, age_width = 5, sex = "male")
 }
 \arguments{
 \item{mx}{Death rate at age x.}
 
 \item{sage}{Start age.}
+
+\item{sep_zero}{Specify whether the zero age group was separate.}
 
 \item{age_width}{Age groups width.}
 

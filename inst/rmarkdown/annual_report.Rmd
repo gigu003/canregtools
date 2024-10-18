@@ -14,6 +14,7 @@ library(canregtools)
 
 ```{r,fig.width=10,fig.height=7}
 library(canregtools)
+data <- load_canreg()
 fbsw <- count_canreg(data)
 draw_pyramid(fbsw, show_value=T, csize=0.8, grid = c(1,1), cgap=0.4)
 ```

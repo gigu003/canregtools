@@ -1,3 +1,4 @@
+
 ## code create the system label dataset.
 
 label_system <- data.frame(
@@ -395,6 +396,7 @@ morp_to_icd10 <- morp_to_icd10[, -1]
 ## 把信息写入系统数据
 usethis::use_data(label, std_pop, topo_dict, morp_dict, topo_to_icd10,
   morp_to_icd10, all_to_icd10, label_child, ethnic_map, occu_map, morp_o3_2,
-  prov_label, region_label, registry_dict,
+  prov_label, region_label, registry_dict, not_icd10, iarc_check_site_morp,
+  iccc3_2005,
   internal = TRUE, overwrite = TRUE
 )

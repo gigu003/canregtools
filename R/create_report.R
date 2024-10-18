@@ -21,7 +21,6 @@ create_report <- function(data,
                     ))
   
   cat("Report generated:", output_file, "\n")
-
 }
 
 

@@ -2,42 +2,31 @@
 % Please edit documentation in R/classify_childhood.R
 \name{classify_childhood}
 \alias{classify_childhood}
-\title{Classify the Childhood cancer into ICCC3}
+\title{Classify pediatric tumors according to the ICCC3 standards.}
 \usage{
-classify_childhood(topo, morp, type = "main", lang = "cn")
+classify_childhood(topo, morp, beha, type = "sub", version = "v2005")
 }
 \arguments{
-\item{topo}{Topography parts of ICDO3 codes in the format of 'C15.6' or
-'C156'.}
+\item{topo}{Topography codes of ICDO3, it could be in the format of 'C15.6'
+or C156'.}
 
-\item{morp}{Morphology parts of ICDO3 codes in the format of '8000' or
+\item{morp}{Morphology codes of ICDO3, it could be in the format of '8000' or
 'M8140'.}
+
+\item{beha}{Behaviour code of ICDO3.}
 
 \item{type}{Type of Classification for the output, options are 'main' or
 'sub', default is 'main'.}
 
-\item{lang}{Language of the output, options are 'cn' or 'en',
-default is 'cn'.}
+\item{version}{The ICCC3 standards, "v2005" or "v2017".}
 }
 \value{
-Factor of ICCC3 classification for childhood cancer.
+Recode of ICCC3 classification.
 }
 \description{
-Classify the Childhood cancer into ICCC3
+Classify pediatric tumors according to the ICCC3 standards.
 }
 \details{
 This function classify the 'topo' and 'morp' parts of ICDO3 codes into
 ICCC3 (International Classification of Childhood Cancer, Third edition).
-}
-\examples{
-library(canregtools)
-file <- system.file("extdata", "411721.xls", package = "canregtools")
-data <- read_canreg(file)
-fbcases <- data$FBcases
-fbcases <- fbcases[fbcases$age <= 14,]
-classify_childhood(fbcases$topo, fbcases$morp, lang = "cn")
-classify_childhood(fbcases$topo, fbcases$morp, lang = "en")
-classify_childhood(fbcases$topo, fbcases$morp, type = "sub", lang = "cn")
-classify_childhood(fbcases$topo, fbcases$morp, type = "sub", lang = "en")
-
 }

@@ -2,35 +2,58 @@
 % Please edit documentation in R/create_asr.R
 \name{create_asr}
 \alias{create_asr}
+\alias{create_asr.canregs}
+\alias{create_asr.canreg}
+\alias{create_asr.fbswicds}
+\alias{create_asr.fbswicd}
 \title{Calculate age-standardized rate.}
 \usage{
 create_asr(
   x,
   ...,
   event = fbs,
-  pop = rks,
-  agegrp = agegrp,
-  std = c(china, segi),
+  std = c("cn2000", "wld85"),
   mp = 1e+05,
   decimal = 2,
   show_var = FALSE,
-  show_ci = FALSE,
-  keep_sex_specific = FALSE
+  show_ci = FALSE
+)
+
+\method{create_asr}{canregs}(x, ..., cancer_type = "big")
+
+\method{create_asr}{canreg}(x, ..., cancer_type = "big")
+
+\method{create_asr}{fbswicds}(
+  x,
+  ...,
+  event = fbs,
+  std = c("cn2000", "wld85"),
+  mp = 1e+05,
+  decimal = 6,
+  show_pop = FALSE,
+  show_var = FALSE,
+  show_ci = FALSE
+)
+
+\method{create_asr}{fbswicd}(
+  x,
+  ...,
+  event = fbs,
+  std = c("cn2000", "wld85"),
+  mp = 1e+05,
+  decimal = 6,
+  show_pop = FALSE,
+  show_var = FALSE,
+  show_ci = FALSE
 )
 }
 \arguments{
-\item{x}{data with class of fbswicd.}
+\item{x}{data with class of 'fbswicd' or 'canreg'.}
 
-\item{...}{Stratification factors.}
+\item{...}{Variable names used to stratification.}
 
 \item{event}{A variable within the input data that corresponds to the cases
 counts.}
-
-\item{pop}{A variable within the input data that corresponds to the
-population in risk in each stratification.}
-
-\item{agegrp}{A variable within the input data that corresponds to the age
-categories.}
 
 \item{std}{Specify the standard population structure in the 'std_pop'
 data frame used for calculating standardized rates. When
@@ -48,10 +71,13 @@ be rounded to two decimal places.}
 \item{show_ci}{Logical value whether output confidence(lower or upper
 bound) or not.}
 
-\item{keep_sex_specific}{Deal with sex specific cases.}
+\item{cancer_type}{Classification type of cancer site, options are "big", "small"
+or "system", default is "big".}
+
+\item{show_pop}{Logical value whether output population or not.}
 }
 \value{
-class of asr.
+A data frame or tibble contains the age standard rates and CIs.
 }
 \description{
 Calculate age-standardized rate.

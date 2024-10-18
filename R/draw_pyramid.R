@@ -38,7 +38,6 @@
 #' @param main The main title of the pyramid.
 #' @param ... Other options.
 #'
-#' @importFrom graphics lines rect segments text
 #' @return A population pyramid plot.
 #' @export
 #' @examples
@@ -66,7 +65,6 @@ pyramid <- function(data, show_value = TRUE, show_prop = TRUE,
                     main = "", ...) {
  # opar <- par(no.readonly = TRUE)
 par(mar = c(0, 0, 2, 0))
-
   data <- as.data.frame(data)
   if (show_prop == TRUE) {
     ll <- data[, 1]
@@ -194,7 +192,7 @@ par(mar = c(0, 0, 2, 0))
 
 pyramids <- function(left, right, center = NULL, ...) {
   if (is.null(center)) {
-    dx <- data.frame(left, right, row.names = names(Left))
+    dx <- data.frame(left, right, row.names = names(left))
   } else {
     dx <- data.frame(left, right, center)
   }
@@ -240,8 +238,7 @@ pyramids <- function(left, right, center = NULL, ...) {
 #' @return Pyramids plot.
 #' @export
 #'
-draw_pyramid <- 
-  function(x,
+draw_pyramid <- function(x,
            show_value = TRUE, show_prop = TRUE,
            left_axis = NULL, right_axis = NULL, axis_fm = "g",
            axis_bm = "", axis_bi = 3, cgap = 0.3, cstep = 1, csize = 1,
