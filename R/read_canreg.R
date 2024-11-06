@@ -14,89 +14,28 @@
 #' file <- system.file("extdata", "411721.xls", package = "canregtools")
 #' data <- read_canreg(file)
 read_canreg <- function(x, pop_type = "long") {
-  # if the file or folder exist.
-
-  # Read the cancer registration file stored in excel.
-  get_file <- function(x, type = pop_type) {
-    tryCatch(
-      {
-        fb <- read_excel(x, sheet = "FB")
-        message(paste0(nrow(fb),"cases were read from FB sheet."))
-        fb$inciden <- as.Date(fb$inciden)
-        fb$birthda <- as.Date(fb$birthda)
-        names(fb) <- tolower(names(fb))
-        sw <- read_excel(x, sheet = "SW")
-        message(paste0(nrow(sw),"cases were read from SW sheet."))
-        sw$inciden <- as.Date(sw$inciden)
-        sw$birthda <- as.Date(sw$birthda)
-        sw$deathda <- as.Date(sw$deathda)
-        names(sw) <- tolower(names(sw))
-        # Extract year information
-        fyear <- table(format(as.Date(fb$inciden), "%Y"))
-        fyear <- as.numeric(names(fyear))
-        syear <- table(format(as.Date(sw$deathda), "%Y"))
-        syear <- as.numeric(names(syear))
-        year <- unique(c(fyear, syear))
-
-        if (type == "wide") {
-          pop <- read_excel(x,
-            sheet = "POP",
-            range = "B2:C20",
-            col_names = c("male", "female")
-          )
-          pop <- round(pop)
-          pop <- tibble(
-            year = as.integer(c(rep(fyear, 38))),
-            sex = as.integer(c(rep(1, 19), rep(2, 19))),
-            agegrp = factor(c(rep(1:19, 2))),
-            rks = as.integer(c(pop[[1]], pop[[2]]))
-          )
-        } else if (type == "long") {
-          pop <- read_excel(x, sheet = "POP")
-          pop$year <- as.integer(pop$year)
-          pop$rks <- as.integer(round(pop$rks))
-          pop$sex <- as.integer(pop$sex)
-          pop$agegrp <- factor(pop$agegrp)
-        }
-        attr(fb, "class") <- c("FBcases", "tbl_df", "tbl", "data.frame")
-        attr(sw, "class") <- c("SWcases", "tbl_df", "tbl", "data.frame")
-        attr(pop, "class") <- c("population", "tbl_df", "tbl", "data.frame")
-        bsname <- tools::file_path_sans_ext(basename(x))
-        areacode <- gsub("\\D", "", bsname)
-        county <- gsub("\\d", "", bsname)
-        area_type <- tidy_areacode(areacode)$area_type
-        location <- ""
-        res <- list(
-          areacode = areacode,
-          FBcases = fb,
-          SWcases = sw,
-          POP = pop
-        )
-        class(res) <- c("canreg", "list")
-        return(res)
-      },
-      error = function(e) {
-        message("An error occurred: ", conditionMessage(e))
-        return(NULL) # Return NULL if an error occurs
-      }
-    )
-  }
-
   if (unique(file.info(x)$isdir)) {
     files <- list.files(x)
     isxls <- tolower(tools::file_ext(files)) %in% c("xls", "xlsx")
     files <- files[isxls]
+    names <- tools::file_path_sans_ext(basename(files))
     if (length(files) == 0) {
       stop("No Excel files found in the specified directory.")
     }
     files <- paste0(x, "/", files)
-    res <- lapply(files, get_file)
+    res <- purrr::map(files, read_file, pop_type = pop_type,
+                      .progress = "Reading canreg data #")
+    names(res) <- names
     class(res) <- c("canregs", "list")
     return(res)
   } else if (length(x)==1){
-    get_file(x, type = pop_type)
-  } else if (length(x)>1){
-    res <- lapply(x, get_file)
+    read_file(x, pop_type = pop_type)
+  } else if (length(x) > 1){
+    isxls <- tolower(tools::file_ext(x)) %in% c("xls", "xlsx")
+    files <- x[isxls]
+    names <- tools::file_path_sans_ext(basename(files))
+    res <- purrr::map(files, read_file, pop_type = pop_type)
+    names(res) <- names
     class(res) <- c("canregs", "list")
     return(res)
   } else {
@@ -106,3 +45,71 @@ read_canreg <- function(x, pop_type = "long") {
           3. folder.\n")
   }
 }
+
+
+get_year <- function(x, date_var = "inciden") {
+  date_var <- rlang::sym(date_var)
+  res <- x |> pull(!!date_var) |> format("%Y") |> unique() |> as.integer() |> 
+    na.omit()
+  return(res)
+}
+
+
+
+read_file <- function(x, pop_type = "long", pop_var="popu", death_var="death") {
+  tryCatch({
+    fb <- read_sheet(x, sheet = "FB")
+    sw <- read_sheet(x, sheet = "SW")
+    # Extract year information
+    fyear <- get_year(fb, date_var = "inciden")
+    syear <- get_year(sw, date_var = "deathda")
+    year <- unique(c(fyear, syear))
+    if (pop_type == "wide") { pop <- read_single_pop(x, year = fyear) }
+    else if (pop_type == "long") { pop <- read_long_pop(x) }
+    attr(fb, "class") <- c("FBcases", class(fb))
+    attr(sw, "class") <- c("SWcases", class(sw))
+    attr(pop, "class") <- c("population", class(pop))
+    bsname <- tools::file_path_sans_ext(basename(x))
+    areacode <- gsub("\\D", "", bsname)
+    res <- list(areacode = areacode, FBcases = fb, SWcases = sw, POP = pop)
+    class(res) <- c("canreg", "list")
+    return(res)},
+    error = function(e) {
+      message("An error occurred: ", conditionMessage(e))
+      return(NULL) }
+  )
+}
+
+read_sheet <- function(x, sheet= "FB") {
+  date_vars <- rlang::syms(c("inciden", "deathda", "birthda"))
+  res <- read_excel(x, sheet = sheet) |>
+    rename_all(tolower) |>
+    mutate(across(c(!!!date_vars), as.Date))
+  return(res)
+}
+
+read_single_pop <- function(x, year) {
+  pop <- read_excel(x, sheet = "POP", range = "B2:C20",
+                    col_names = c("male", "female"))
+  pop <- round(pop)
+  pop <- tibble(
+    year = as.integer(c(rep(year, 38))),
+    sex = as.integer(c(rep(1L, 19), rep(2L, 19))),
+    agegrp = factor(c(rep(1:19, 2))),
+    rks = as.integer(c(pop[[1]], pop[[2]]))
+    )
+  return(pop)
+}
+
+read_long_pop <- function(x, pop_var = "popu", age_var= "agegroup") {
+  strat_vars <- rlang::syms(c("year", "sex"))
+  pop_var <- rlang::sym(pop_var)
+  age_var <- rlang::sym(age_var)
+  pop <- read_excel(x, sheet = "POP") |> 
+    mutate(across(c(!!!strat_vars), as.integer),
+           rks = as.integer(round(!!pop_var)),
+           agegrp = factor(!!age_var)) |> 
+    select(c(!!!strat_vars), agegrp, rks)
+  return(pop)
+}
+

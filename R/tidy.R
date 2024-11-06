@@ -1,3 +1,11 @@
+#' Get attributes affiliated with the areacode
+#'
+#' @param x Character vector of six digits areacode.
+#' @param lang Character string indicate the language.
+#'
+#' @return List of atttributes of areacode.
+#' @export
+#'
 tidy_areacode <- function(x, lang = "cn"){
   # Check if the province code existed.
   provs <- c(11:15, 21:23, 31:37, 41:46, 50:54, 61:65, 71, 81, 82)
@@ -15,8 +23,8 @@ tidy_areacode <- function(x, lang = "cn"){
   # Judge urban or rural according to the fifth number of the area code.
   county_codes <- ifelse(substr(x, 5, 5) %in% c("0", "1"), 1, 2)
   # Judge urban or rural according to the user defined area type dict.
-  if (file.exists(".cache_dict/area_type_dict.rds")){
-    area_type_dict <- readRDS(".cache_dict/area_type_dict.rds")
+  if (file.exists("~/.canregtools/.cache_dict/area_type_dict.rds")){
+    area_type_dict <- readRDS("~/.canregtools/.cache_dict/area_type_dict.rds")
     type_logi <- x %in% names(area_type_dict)
     dict_urban_rural <- unlist(area_type_dict[x[type_logi]])
     urban_rural <- ifelse(tolower(dict_urban_rural) == "urban", 1, 2)
@@ -45,8 +53,8 @@ tidy_areacode <- function(x, lang = "cn"){
   #Extract city codes.
   city_codes <- paste0(substr(x, 1, 4), "00")
   registry <- x
-  if (file.exists(".cache_dict/registry_dict.rds")){
-    registry_dict <- readRDS(".cache_dict/registry_dict.rds")
+  if (file.exists(".canregtools/cache_dict/registry_dict.rds")){
+    registry_dict <- readRDS(".canregtools/.cache_dict/registry_dict.rds")
     registry_logi <- registry %in% names(registry_dict)
     registry[registry_logi] <- unlist(registry_dict[registry[registry_logi]])
   }

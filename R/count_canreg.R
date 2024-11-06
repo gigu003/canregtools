@@ -98,6 +98,7 @@ count_canreg.canreg <- function(x,
   # prepare the data for counting
 
   fb <- as.data.table(fb)
+  fb <- na.omit(fb, cols = c("year", "sex"))
   # 使用data.table进行过滤
   fb_basi_5_7 <- fb[basi %in% c(5, 6, 7), ]
   fb_ubs <- fb[substr(icd10, 1, 3) %in% ubs, ]
@@ -125,14 +126,15 @@ count_canreg.canreg <- function(x,
              agegrp = as.factor(levels(res$agegrp)), sorted = TRUE)
   res <- merge(cate, res, by = c("year", "sex", "agegrp", "cancer"),
                all.x = TRUE)
+  
   num_cols <- names(res)[sapply(res, is.numeric)]
   res[, (num_cols) := lapply(.SD, function(x) replace(x, is.na(x), 0)), .SDcols = num_cols]
   res[, (num_cols) := lapply(.SD, as.integer), .SDcols = num_cols]
+
   sitemorp <- fb[, .(
     site = list(count_tp(icd10)),
     morp = list(count_tp(morp))
   ), by = .(year, sex, cancer)]
-
     
     result <- list(areacode = as.character(x$areacode),
                    fbswicd = res,
@@ -162,8 +164,8 @@ reg_count <- function(data, varname = "fbs") {
 # function count sub-sites of icd10 or morphology code in each year, sex, cancer
 count_tp <- function(x) {
   var_name <- rlang::ensym(x)
-  res <- as.data.frame(table(x), stringsAsFactors = FALSE)
-  colnames(res)[1] <- rlang::as_string(var_name)
-  colnames(res)[2] <- "count"
-  return(res)
+    res <- as.data.frame(table(x), stringsAsFactors = FALSE)
+    colnames(res)[1] <- rlang::as_string(var_name)
+    colnames(res)[2] <- "count"
+    return(res)
 }
