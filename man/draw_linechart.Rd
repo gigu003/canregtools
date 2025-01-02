@@ -19,6 +19,7 @@ draw_line(
   line_type = "l",
   main = NULL,
   add = FALSE,
+  offset = 0.02,
   ...
 )
 
@@ -59,6 +60,8 @@ for stair steps and "h" for histogram-like vertical lines. Finally,
 \item{main}{Optional. The title of the plot.}
 
 \item{add}{Plots to be added.}
+
+\item{offset}{Offset of the axis.}
 
 \item{...}{Parameters}
 

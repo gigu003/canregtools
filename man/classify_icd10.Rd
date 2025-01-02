@@ -2,36 +2,35 @@
 % Please edit documentation in R/classify_icd10.R
 \name{classify_icd10}
 \alias{classify_icd10}
-\title{Convert ICD10 Codes to Cancer Categories.}
+\title{Classify ICD10 Codes to Cancer Categories.}
 \usage{
-classify_icd10(icd10, cancer_type = "big", lang = "cn")
+classify_icd10(x, cancer_type = "big", as_factor = FALSE)
 }
 \arguments{
-\item{icd10}{The ICD10 codes of cancer part (C00-C98 and D00-D48) collected
+\item{x}{The ICD10 codes of cancer part (C00-C98 and D00-D48) collected
 by the Population-Based Cancer Registration (PBCR).}
 
-\item{cancer_type}{Character, type of cancer category ("system","big","small"), by
-default, the "big" category was choosed which will categorize the
-icd10 code 25 cancer categories.}
+\item{cancer_type}{A character string specifying the classification method
+used to categorize ICD-10 codes. This determines how ICD-10 codes are
+classified. Options include \code{"big"} (classify ICD-10 codes into 26
+cancer categories), \code{"small"} (classify ICD-10 codes into 59 cancer
+categories, more specific categories), \code{"system"} (classify ICD-10
+codes into organ system), and \code{"gco"} (classify ICD-10 code into
+cancer categories same as classification published by the Global
+Cancer Observatory). This parameter is only available when the
+input data is a vector of ICD-10 codes, or object with class of
+\code{'canreg'} or \code{'canregs'}.}
 
-\item{lang}{Character, two options ("cn","en"), by default, lang="cn" was
-choosed, which will output the categories in Chinese, otherwise, in
-English.}
+\item{as_factor}{logical indicate that the output value as factor.}
 }
 \value{
-a vector that contain the cancer categories.
+Cancer code
 }
 \description{
-Convert ICD10 codes to Cancer Categories according to the specified
+Classify ICD10 codes into Cancer Categories according to the specified
 category type and language.
 }
 \examples{
-library(canregtools)
-icd10 <- c("C16.1", "C15.1", "C34.1", "C34.2", "C15.0")
-category <- classify_icd10(icd10, cancer_type = "system", lang = "en")
-
-}
-\references{
-National Cancer Center. Guidelines for Cancer Registration in
-China (2016) [M]. Beijing: People's Medical Publishing House, 2016.
+icd10 <- c("C15.2", "C33.4", "C80.9", "C26.2", "C16.3")
+classify_icd10(icd10, cancer_type = "big")
 }

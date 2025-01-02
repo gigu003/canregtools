@@ -2,61 +2,86 @@
 #'
 #' @param x Character vector of six digits areacode.
 #' @param lang Character string indicate the language.
+#' @param as_factor Logical value, indicate if output as factor or not.
 #'
 #' @return List of atttributes of areacode.
 #' @export
 #'
-tidy_areacode <- function(x, lang = "cn"){
-  # Check if the province code existed.
-  provs <- c(11:15, 21:23, 31:37, 41:46, 50:54, 61:65, 71, 81, 82)
-  prov_logi <- substr(x, 1, 2) %in% provs
-  # Check if the district code is valid (6 digits)
+tidy_areacode <- function(x, lang = "cn", as_factor = FALSE){
+  # Validate input: 'x' must be a character vector
+  if (!is.character(x)) {
+    stop("Input 'x' must be a character vector.")
+  }
+  
+  # Define valid province codes (first two digits of the area code)
+  provs <- sprintf("%02d", c(11:15, 21:23, 31:37, 41:46, 50:54, 61:65, 71, 81, 82))
+  prov_logi <- substr(x, 1, 2) %in% provs  # Check if the first two digits match valid province codes
+  
+  # Validate area code format (must be exactly 6 digits)
   format_logi <- grepl("^\\d{6}$", x)
-  check <- prov_logi & format_logi
+  check <- prov_logi & format_logi  # Combined validation check
+  x[!check] <- NA  # Set invalid area codes to NA
   
-  x[!check] <- NA
+  # Extract province codes (first two digits + "0000")
+  prov_codes <- paste0(substr(x, 1, 2), "0000")
   
-  # Extract the province codes.
-  prov_codes <- substr(x, 1, 2)
-  breakpoints <- c(10, 20, 30, 40, 50, 60, 70, 90)
+  # Determine urban or rural classification based on the fifth digit of the area code
+  county_codes <- ifelse(substr(x, 5, 5) %in% c("0", "1"), "910000", "920000")
   
-  # Judge urban or rural according to the fifth number of the area code.
-  county_codes <- ifelse(substr(x, 5, 5) %in% c("0", "1"), 1, 2)
-  # Judge urban or rural according to the user defined area type dict.
-  if (file.exists("~/.canregtools/.cache_dict/area_type_dict.rds")){
-    area_type_dict <- readRDS("~/.canregtools/.cache_dict/area_type_dict.rds")
+  # Use cached dictionary to determine urban/rural classification if available
+  area_type_dict_file <- "~/.canregtools/.cache_dict/area_type_dict.rds"
+  if (file.exists(area_type_dict_file)) {
+    area_type_dict <- readRDS(area_type_dict_file)
     type_logi <- x %in% names(area_type_dict)
-    dict_urban_rural <- unlist(area_type_dict[x[type_logi]])
-    urban_rural <- ifelse(tolower(dict_urban_rural) == "urban", 1, 2)
-    county_codes[type_logi] <- urban_rural
+    dict_urban_rural <- tolower(unlist(area_type_dict[x[type_logi]]))
+    county_codes[type_logi] <- ifelse(dict_urban_rural == "urban", "910000", "920000")
   }
   
-  if (lang == "cn"){
-    prov_name <- factor(prov_codes, levels = provs, labels = prov_label[[1]])
-    regions <- cut(as.numeric(prov_codes),
-                   breaks = breakpoints,
-                   labels = region_label[[1]],
-                   include.lowest = TRUE)
-    area_type <- factor(county_codes, levels = c(1, 2),
-                        labels = c("\u57ce\u5e02", "\u519c\u6751"))
-  } else {
-    prov_name <- factor(prov_codes, levels = provs, labels = prov_label[[2]])
-    regions <- cut(as.numeric(prov_codes),
-                   breaks = breakpoints,
-                   labels = region_label[[2]],
-                   include.lowest = TRUE)
-    area_type <- factor(county_codes, levels = c(1, 2),
-                        labels = c("Urban", "Rural"))
-  }
-  
-  
-  #Extract city codes.
+  # Extract city codes (first four digits + "00")
   city_codes <- paste0(substr(x, 1, 4), "00")
-  registry <- x
-  if (file.exists(".canregtools/cache_dict/registry_dict.rds")){
-    registry_dict <- readRDS(".canregtools/.cache_dict/registry_dict.rds")
-    registry_logi <- registry %in% names(registry_dict)
-    registry[registry_logi] <- unlist(registry_dict[registry[registry_logi]])
+  
+  
+  # Handle registry information using a cached dictionary if available
+  registry_dict_file <- "~/.canregtools/.cache_dict/registry_dict.rds"
+  registry <- x  # Initialize registry as the input area code
+  if (file.exists(registry_dict_file)) {
+    registry_dict <- readRDS(registry_dict_file)
+    regi_logi <- x %in% names(registry_dict)
+    registry[regi_logi] <- unlist(registry_dict[x[regi_logi]])  
+    registry <- unlist(registry)
+  }
+
+  
+  pp <- as.integer(substr(prov_codes, 1, 2))
+  region_code <- case_match(pp, 11:15 ~ 1, 21:23 ~ 2, c(31:34, 37) ~ 3,
+                            c(41:43, 36) ~ 4, c(44:46, 35) ~ 5,
+                            50:54 ~ 6, 61:65 ~ 7, c(71, 81, 82) ~ 8) + 71
+  region_code <- as.character(region_code * 10000)
+
+  # Convert to factors if requested
+  if (as_factor) {
+    if (tolower(lang) %in% c("cn", "zh-cn", "zh", "chinese")) {
+      # Convert province codes and area types to factors (Chinese labels)
+      prov_name <- factor(prov_codes, levels = paste0(provs, "0000"),
+                          labels = prov_label[[1]])
+      area_type <- factor(county_codes, levels = c("910000", "920000"), 
+                          labels = c("\u57ce\u5e02", "\u519c\u6751"))
+      region <- factor(region_code, levels = as.character(72:79*10000),
+                       labels = region_label[[1]])
+    } else if (tolower(lang) %in% c("en", "eng", "english")) {
+      # Convert province codes and area types to factors (English labels)
+      prov_name <- factor(prov_codes, levels = paste0(provs, "0000"),
+                          labels = prov_label[[2]])
+      area_type <- factor(county_codes, levels = c("910000", "920000"),
+                          labels = c("Urban", "Rural"))
+      region <- factor(region_code, levels = as.character(72:79*10000),
+                       labels = region_label[[2]])
+    }
+  } else {
+    # If no factor conversion is needed, use raw values
+    prov_name <- prov_codes
+    area_type <- county_codes
+    region <- region_code
   }
   
   # return result list
@@ -65,7 +90,7 @@ tidy_areacode <- function(x, lang = "cn"){
               province = prov_name,
               city = city_codes,
               area_type = area_type,
-              region = regions)
+              region =region)
   return(res)
 }
 
@@ -240,7 +265,7 @@ tidy_occu <- function(x, lang = "cn") {
     return(code)
   }
   code <- unlist(lapply(x, grepcode))
-  if (tolower(lang) %in% c("cn","zh","zh-cn")){
+  if (tolower(lang) %in% c("cn", "zh", "zh-cn")){
     code <- factor(code,
                    levels = occu_map$code,
                    labels = occu_map$cname)

@@ -14,9 +14,15 @@ summary.canreg <- function(object, ...) {
   fb <- purrr::pluck(object, "FBcases")
   sw <- purrr::pluck(object, "SWcases")
   pop <- purrr::pluck(object, "POP")
+
+  basi <- purrr::pluck(fb, "basi")
+  basi2 <- basi[basi %in% 5:7]
+  basi0 <- basi[basi == 0]
   
   fbs <- nrow(fb)
   sws <- nrow(sw)
+  mv <- round(length(basi2)/fbs*100, 2)
+  dco <- round(length(basi0)/fbs*100, 2)
   rks <- sum(purrr::pluck(pop, "rks"))
   rks_year <- pop |> pull(!!rlang::sym("year")) |> unique()
   inci <- round(fbs/rks*100000, 2)
@@ -34,12 +40,14 @@ summary.canreg <- function(object, ...) {
 
   res <- list(
     areacode = purrr::pluck(object, "areacode"),
+    rks = rks,
     fbs = fbs,
     inci = inci,
     sws = sws,
     mort = mort,
-    mi = sws / fbs,
-    rks = rks,
+    mi = round(sws / fbs, 2),
+    mv = mv,
+    dco = dco,
     rks_year = rks_year,
     inci_vars = inci_vars,
     miss_r_vars_inci = miss_r_vars_inci,
@@ -59,9 +67,3 @@ summary.canregs <- function(object, collapse = TRUE, ...) {
   return(res)
 }
 
-#' @rdname summary
-#' @method summary check
-#' @export
-summary.check <- function(object,...) {
-  return(any(unlist(object[["POP"]])))
-}

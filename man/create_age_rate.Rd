@@ -24,7 +24,6 @@ create_age_rate(
   x,
   ...,
   event = fbs,
-  collapse = TRUE,
   format = "long",
   mp = 1e+05,
   decimal = 6,
@@ -42,24 +41,37 @@ create_age_rate(
 )
 }
 \arguments{
-\item{x}{The input data. For \code{create_age_rate}, this could be an object of
-class \code{canreg} or \code{fbswicd}.}
+\item{x}{The input data, object with class of \code{'fbswicd'}, \code{'fbswicds'},
+\code{'canreg'}, or \code{'canregs'}.}
 
-\item{...}{Variable name(s) used for stratification.}
+\item{...}{One or more variables used for stratification. For example, you
+can stratify by \code{sex}, \code{year}, \code{cancer}, or just by \code{year}. If sex
+is not passed as a parameter, the output will be the result for the
+combined gender.}
 
-\item{event}{Event used for calculating age-specific rates.}
+\item{event}{A variable used to specify the type of calculation, options are
+fbs or sws, fbs for cancer incidence, and sws for cancer mortality.}
 
-\item{cancer_type}{Method used to classify ICD10.}
+\item{cancer_type}{A character string specifying the classification method
+used to categorize ICD-10 codes. This determines how ICD-10 codes are
+classified. Options include \code{"big"} (classify ICD-10 codes into 26
+cancer categories), \code{"small"} (classify ICD-10 codes into 59 cancer
+categories, more specific categories), \code{"system"} (classify ICD-10
+codes into organ system), and \code{"gco"} (classify ICD-10 code into
+cancer categories same as classification published by the Global
+Cancer Observatory). This parameter is only available when the
+input data is a vector of ICD-10 codes, or object with class of
+\code{'canreg'} or \code{'canregs'}.}
 
 \item{format}{Format of the output data frame, either "long" or "wide".}
 
-\item{mp}{Correction factor, default is 100000.}
+\item{mp}{A constant to multiply rates by (e.g. mp=1000 for rates per 1000).}
 
-\item{decimal}{Number of decimal places for rounding, default is 6.}
+\item{decimal}{This parameter specifies the number of decimal places to
+round the results. The default is 2, which means rates will
+be rounded to two decimal places.}
 
 \item{show_pop}{Logical value whether output population or not.}
-
-\item{collapse}{Whether the output collapse to tibble.}
 }
 \value{
 A data frame of age-specific rates.

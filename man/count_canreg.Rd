@@ -4,7 +4,7 @@
 \alias{count_canreg}
 \alias{count_canreg.canregs}
 \alias{count_canreg.canreg}
-\title{count canreg data.}
+\title{Count canreg data.}
 \usage{
 count_canreg(
   x,
@@ -54,7 +54,16 @@ cutage_method is 'interval'. Default is 'c(0, 15, 40, 65)'.}
 
 \item{label_tail}{Tail label to be added to the labels. Default is NULL.}
 
-\item{cancer_type}{Method for classify cancer sites.}
+\item{cancer_type}{A character string specifying the classification method
+used to categorize ICD-10 codes. This determines how ICD-10 codes are
+classified. Options include \code{"big"} (classify ICD-10 codes into 26
+cancer categories), \code{"small"} (classify ICD-10 codes into 59 cancer
+categories, more specific categories), \code{"system"} (classify ICD-10
+codes into organ system), and \code{"gco"} (classify ICD-10 code into
+cancer categories same as classification published by the Global
+Cancer Observatory). This parameter is only available when the
+input data is a vector of ICD-10 codes, or object with class of
+\code{'canreg'} or \code{'canregs'}.}
 
 \item{...}{Parameters.}
 }
@@ -62,7 +71,7 @@ cutage_method is 'interval'. Default is 'c(0, 15, 40, 65)'.}
 data of class fbswicd.
 }
 \description{
-count canreg data.
+Count canreg data.
 }
 \examples{
 library(canregtools)

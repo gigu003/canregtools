@@ -12,3 +12,6 @@ Character vector contain names of standard population.
 \description{
 list all standard population names available
 }
+\examples{
+ls_std_vars()
+}

@@ -3,29 +3,26 @@
 \name{cr_merge}
 \alias{cr_merge}
 \alias{cr_merge.canregs}
+\alias{cr_merge.fbswicds}
 \alias{cr_merge.asrs}
 \alias{cr_merge.qualities}
 \title{Merge elements from objects of class canregs, fbswicds, or asrs}
 \usage{
-cr_merge(data, nested = NULL)
+cr_merge(data)
 
 \method{cr_merge}{canregs}(data)
+
+\method{cr_merge}{fbswicds}(data)
 
 \method{cr_merge}{asrs}(data)
 
 \method{cr_merge}{qualities}(data)
-
-cr_merge(data, nested = NULL)
 }
 \arguments{
-\item{data}{list need to be merged.}
-
-\item{nested}{Nested list.}
+\item{data}{An object of class 'canregs', 'asrs', or 'fbswicds'.}
 }
 \value{
 An object with merged elements.
-
-object
 }
 \description{
 Merge elements from object of class 'canregs', 'fbswicds', or 'asrs' based

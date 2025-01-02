@@ -3,14 +3,11 @@
 \name{summary.canreg}
 \alias{summary.canreg}
 \alias{summary.canregs}
-\alias{summary.check}
 \title{Summary object of class 'canreg'}
 \usage{
 \method{summary}{canreg}(object, ...)
 
 \method{summary}{canregs}(object, collapse = TRUE, ...)
-
-\method{summary}{check}(object, ...)
 }
 \arguments{
 \item{object}{Object data with class of 'canreg', 'canregs'}

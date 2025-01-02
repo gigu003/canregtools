@@ -1,40 +1,29 @@
 #' Write Six-digit administrative division code to the user defined dict.
 #'
-#' @param areacode Six-digit administrative division code.
-#' @param name Label for the Six-digit administrative division code.
+#' @param x A data frame contains areacode, label_cn, label_en, label_abbr_cn
+#'        label_abbr_en
 #'
 #' @return Null
 #' @export
 #'
-write_areacode <- function(areacode, name){
-  if (!length(areacode) == length(name)) {
-    cat("Lengths of 'areacode' and 'name' must be the same.")
-    return(NULL)
-    }
+write_areacode <- function(x) {
   # create dict directory if it doesn't exist.
-  if(!dir.exists("~/.canregtools/.cache_dict")) {
-    dir.create("~/.canregtools/.cache_dict")
-  }
-  # read dict file if it exist or create an empty one.
-  if(file.exists("~/.canregtools/.cache_dict/areacode_dict.rds")) {
-    areacode_dict <- readRDS("~/.canregtools/.cache_dict/areacode_dict.rds")
-  } else {
-    areacode_dict <- data.frame(areacode = character(),
-                                name = character(),
-                                stringsAsFactors = FALSE)
-  }
-  #check if the input area codes existed in the dict.
-  existing_rows <- areacode %in% areacode_dict$areacode
-  #delete the existed rows in the stored area code dict.
-  if(any(existing_rows)) {
-    areacode_dict <- areacode_dict[!areacode_dict$areacode %in% areacode[existing_rows], ]
-  }
-  #add the input area codes to the dict.
-  areacode_dict <- rbind(areacode_dict, data.frame(areacode = areacode,
-                                                   name = name,
-                                                   stringsAsFactors = FALSE))
-  saveRDS(areacode_dict, file = "~/.canregtools/.cache_dict/areacode_dict.rds")
-  print(areacode_dict)
+  if(!file.exists("~/.canregtools/label_areacode.dcf")) {
+    write.dcf(label_areacode, "~/.canregtools/label_areacode.dcf")
+    } else {
+    label_area <- read.dcf("~/.canregtools/label_areacode.dcf")
+    label_area <- as.data.frame(label_area)
+    }
+  # delete the existed rows in the stored area code dict.
+  areacode <- rlang::sym("areacode")
+  label_area <- label_area |> filter(!!areacode %nin% pluck(x, "areacode"))
+  
+  ## modify x
+  x <- x |> filter(!!areacode %nin% paste0(c(91:92, 72:79), "0000"))
+  # add the input area codes label to dict.
+  label_area <- rbind(label_area, x)
+  write.dcf(label_area, "~/.canregtools/label_areacode.dcf")
+  print(label_area)
 }
 
 
@@ -89,8 +78,14 @@ write_registry <- function(areacode, registry){
   # read dict file if it exist or create an empty one.
     if(file.exists("~/.canregtools/.cache_dict/registry_dict.rds")) {
       registry_dict <- readRDS("~/.canregtools/.cache_dict/registry_dict.rds")
-    } 
-    registry_dict[areacode] <- registry
-    saveRDS(registry_dict, file = "~/.canregtools/.cache_dict/registry_dict.rds")
-    print(registry_dict)
+    } else {
+      registry_dict <- list()
+    }
+  areacode <- as.character(areacode)
+  registry <- as.character(registry)
+  registry_dict[areacode] <- registry
+  saveRDS(registry_dict, file = "~/.canregtools/.cache_dict/registry_dict.rds")
+  print(as_tibble(data.frame(areacode = names(registry_dict),
+                             registry = unlist(registry_dict,
+                                               use.names = FALSE))))
 }

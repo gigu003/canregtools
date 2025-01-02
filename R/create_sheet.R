@@ -1,11 +1,10 @@
 #' Create sheet of cancer statistics
 #'
 #' @rdname create_sheet
-#' @param x data with class of 'fbswicd' or 'canreg'.
+#' @inheritParams data
 #' @param sheet_type Character value indicate type of sheet, options are
 #'        'incidence', 'mortality', 'quality', 'population'.
-#' @param cancer_type Type of classification method of ICD10, options are 'big',
-#'        'small', 'system', or 'gco', default is "big". 
+#' @inheritParams cancer_type
 #'
 #' @return A data frame or tibble contains the age standard rates and CIs.
 #' @export

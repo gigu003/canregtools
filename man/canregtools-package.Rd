@@ -4,11 +4,11 @@
 \name{canregtools-package}
 \alias{canregtools}
 \alias{canregtools-package}
-\title{canregtools: Tools for Analyzing Population-Based Cancer Registry (PBCR) Data}
+\title{canregtools: Tools for Analyzing Population-Based Cancer Registry Data}
 \description{
 \if{html}{\figure{logo.png}{options: style='float: right' alt='logo' width='120'}}
 
-This package provides tools for analyzing, visualizing, and generating reports from Population-Based Cancer Registry (PBCR) data.
+Tools designed to streamline data analysis, visualization, and reporting in Population-Based Cancer Registration (PBCR).
 }
 \seealso{
 Useful links:
@@ -18,7 +18,7 @@ Useful links:
 
 }
 \author{
-\strong{Maintainer}: Qiong Chen \email{chenqiong@hnccr.org.cn} (\href{https://orcid.org/0000-0003-2401-0046}{ORCID})
+\strong{Maintainer}: Qiong Chen \email{chenq08@126.com} (\href{https://orcid.org/0000-0003-2401-0046}{ORCID})
 
 }
 \keyword{internal}

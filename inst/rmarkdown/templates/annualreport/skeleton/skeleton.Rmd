@@ -1,9 +1,13 @@
 ---
-title: "Cancer Annual Report"
+title: "`r params$report_title`"
 author: "Qiong Chen"
-date: "2024-08-21"
+date: "`r Sys.Date()`"
+params:
+  report_data: null
+  report_title: "default title"
 output:
-  html_document: default
+  html_document:
+    theme: lumen
 ---
 
 ```{r setup, include=FALSE}
@@ -14,6 +18,13 @@ library(flextable)
 library(showtext)
 showtext_auto()
 ```
+
+```{r}
+data <- params$report_data
+```
+
+
+
 
 ```{r}
 library(canregtools)
@@ -61,7 +72,7 @@ asr |>
 
 ```{r}
 agerate <- create_age_rate(data, sex, cancer) |> 
-  filter(cancer %nin% c(60, 61)) |> 
+  #filter(cancer %nin% c(60, 61)) |> 
   drop_others() |> 
   add_labels(label_type = "abbr")
 agerate <- agerate |> 
@@ -111,7 +122,7 @@ asr |>
 
 ```{r}
 agerate <- create_age_rate(data, event = sws, sex, cancer) |> 
-  filter(cancer %nin% c(60, 61)) |> 
+  #filter(cancer %nin% c(60, 61)) |> 
   drop_others() |> 
   add_labels(label_type = "abbr")
 agerate <- agerate |> 

@@ -19,24 +19,61 @@ cr_merge <- function(data) {
 #' @method cr_merge canregs
 #' @export
 cr_merge.canregs <- function(data){
-  FBcases <- cr_merge(data, nested = "FBcases")
-  SWcases <- cr_merge(data, nested = "SWcases")
-  POP <- cr_merge(data, nested = "POP")
+  byvars <- rlang::syms(c("year", "sex", "agegrp"))
+  sumvar <- rlang::sym("rks")
+  areacode <- unique(unlist(map(data, pluck("areacode"))))
+  fb <- map_dfr(map(data, pluck("FBcases")), bind_rows)
+  sw <- map_dfr(map(data, pluck("SWcases")), bind_rows)
+  pop <- map_dfr(map(data, pluck("POP")), bind_rows) |> 
+    group_by(!!!byvars) |> 
+    reframe(!!sumvar := sum(!!sumvar))
+  class(pop) <- c("population", class(pop))
   res <- list(
-    areacode = names(data)[1],
-    FBcases = FBcases,
-    SWcases = SWcases,
-    POP= POP
-  )
+    areacode = areacode,
+    FBcases = fb,
+    SWcases = sw,
+    POP = pop
+    )
   class(res) <- c("canreg", "list")
   return(res)
 }
+
+
+#' @rdname cr_merge
+#' @method cr_merge fbswicds
+#' @export
+cr_merge.fbswicds <- function(data){
+  areacode <- unique(unlist(map(data, pluck("areacode"))))
+  gvars <- c("year", "sex", "agegrp", "cancer")
+  svars <- c("fbs", "sws", "mv", "ub", "sub", "m8000", "dco")
+  fbswicd <- cmerge(data, nested = "fbswicd")
+  fbswicd <- fbswicd |> group_by(!!!rlang::syms(gvars)) |> 
+    reframe(across(c(!!!rlang::syms(svars)), ~ sum(.x, na.rm = TRUE)))
+  pop <- cmerge(data, nested = "pop")
+  svars2 <- rlang::syms(setdiff(names(pop), setdiff(gvars, "cancer")))
+  pop <- pop |>  group_by(!!!rlang::syms(setdiff(gvars, "cancer"))) |> 
+    reframe(across(c(!!!svars2), ~ sum(.x, na.ram = TRUE)))
+  sitemorp <- cmerge(data, nested = "sitemorp")
+  sitemorp <- sitemorp |> 
+    group_by(!!!rlang::syms(setdiff(gvars, "agegrp"))) |> 
+    reframe(site = list(combine_tp(site)),
+            morp = list(combine_tp(morp)))
+  res <- list(
+    areacode = areacode,
+    fbswicd = fbswicd,
+    sitemorp = sitemorp,
+    pop = pop
+  )
+  class(res) <- c("fbswicd", "list")
+  return(res)
+}
+
 
 #' @rdname cr_merge
 #' @method cr_merge asrs
 #' @export
 cr_merge.asrs <- function(data){
-  res <- cr_merge(data)
+  res <- cmerge(data)
   return(res)
 }
 
@@ -44,9 +81,10 @@ cr_merge.asrs <- function(data){
 #' @method cr_merge qualities
 #' @export
 cr_merge.qualities <- function(data){
-  res <- cr_merge(data)
+  res <- cmerge(data)
   return(res)
 }
+
 
 #' Merge list
 #'
@@ -56,7 +94,7 @@ cr_merge.qualities <- function(data){
 #' @return object
 #' @export
 #'
-cr_merge <- function(data, nested = NULL){
+cmerge <- function(data, nested = NULL){
   areacode <- rlang::sym("areacode")
   purrr::reduce(
     purrr::map(names(data), function(f){

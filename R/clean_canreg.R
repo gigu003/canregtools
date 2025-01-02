@@ -15,8 +15,7 @@
 #'        as a separate group. Default is TRUE.
 #' @param labels Labels for the age groups.
 #' @param label_tail Tail of the labels.
-#' @param cancer_type Specify the grouping method for tumors. Options are 'system',
-#'        'big', or 'small'. Default is 'big'.
+#' @inheritParams cancer_type
 #'
 #' @return Class 'canreg'.
 #' @export
@@ -62,13 +61,13 @@ clean_canreg.FBcases <- function(x,
   x[, age := calc_age(birthda, inciden)]
   x[, basi := as.integer(basi)]
   x[, icd10 := toupper(icd10)]
-  x[, cancer := classify_icd102(icd10, cancer_type = cancer_type)]
+  x[, cancer := classify_icd10(icd10, cancer_type = cancer_type)]
   
   # Step 3: Age group transformation
   x[, agegrp := cutage(age, method = cutage_method, breaks = breaks,
                        length = length, maxage = maxage,
                        label_tail = label_tail, sep_zero = sep_zero)]
-  
+  x <- x[!is.na(cancer)]
   # Step 4: Return only the required columns
   res <- x[, .(year, sex, agegrp, basi, icd10, cancer, morp)]
   
@@ -94,10 +93,11 @@ clean_canreg.SWcases <- function(x,
   x[, sex := tidy_sex(sex)]
   x[, age := calc_age(birthda, deathda)]
   x[, icd10 := toupper(icd10)]
-  x[, cancer := classify_icd102(icd10, cancer_type = cancer_type)]
+  x[, cancer := classify_icd10(icd10, cancer_type = cancer_type)]
   x[, agegrp := cutage(age, method = cutage_method, breaks = breaks,
                        length = length, maxage = maxage,
                        label_tail = label_tail, sep_zero = sep_zero)]
+  x <- x[!is.na(cancer)]
   res <- x[, .(year, sex, agegrp, icd10, cancer)]
   return(res)
 }

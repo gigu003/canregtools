@@ -4,12 +4,11 @@
 \alias{write_areacode}
 \title{Write Six-digit administrative division code to the user defined dict.}
 \usage{
-write_areacode(areacode, name)
+write_areacode(x)
 }
 \arguments{
-\item{areacode}{Six-digit administrative division code.}
-
-\item{name}{Label for the Six-digit administrative division code.}
+\item{x}{A data frame contains areacode, label_cn, label_en, label_abbr_cn
+label_abbr_en}
 }
 \value{
 Null

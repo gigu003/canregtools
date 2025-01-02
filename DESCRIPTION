@@ -1,11 +1,11 @@
 Package: canregtools
-Title: Tools for Analyzing Population-Based Cancer Registry (PBCR) Data
+Title: Tools for Analyzing Population-Based Cancer Registry Data
 Version: 0.2.7
 Authors@R: 
-    person("Qiong", "Chen", , "chenqiong@hnccr.org.cn", role = c("aut", "cre"),
-           comment = c(ORCID = "https://orcid.org/0000-0003-2401-0046"))
-Description: This package provides tools for analyzing, visualizing, and
-        generating reports from Population-Based Cancer Registry (PBCR) data.
+    person("Qiong", "Chen", , "chenq08@126.com", role = c("aut", "cre"),
+           comment = c(ORCID = "0000-0003-2401-0046"))
+Description: Tools designed to streamline data analysis, visualization, and
+    reporting in Population-Based Cancer Registration (PBCR).
 License: MIT + file LICENSE
 URL: https://gigu003.github.io/canregtools/
 Depends: 

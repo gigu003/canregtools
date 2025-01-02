@@ -29,27 +29,28 @@ add_labels <- function(x,
   if ("sex" %in% col_names) {
     res$sex <- tidy_sex(res$sex, lang = lang, as_factor = T) }
   if ("cancer" %in% col_names) {
-    res$site <- tidy_cancer(res$cancer,
-                            label_type = label_type,
-                            lang = lang,
-                            as_factor = T)
+    res$site <- tidy_cancer(res$cancer, label_type = label_type,
+                            lang = lang, as_factor = T)
     res$icd10 <- tidy_cancer(res$cancer, label_type = "icd10")
   }
   
   areacode <- rlang::sym("areacode")
   if ("areacode" %in% col_names) {
     areacodes <- res |> pull(!!areacode)
-    label <- dict_registry |> 
-      filter(!!areacode %in% areacodes)
-    res$county <- factor(res$areacode,
-                           levels = label$areacode,
-                           labels = label$county )
-    res$city <- factor(res$areacode,
-                         levels = label$areacode,
-                         labels = label$city )
+    addr <- "~/.canregtools/label_areacode.dcf"
+    if (file.exists(addr)) {
+      label_area <- read.dcf(addr)
+      label_area <- as.data.frame(label_area)}
+    label_sel <- label_area |> filter(!!areacode %in% areacodes)
+    areacode2 <- label_sel |> pull(!!areacode)
+    label_cn <- label_sel |> pull(label_cn)
+    label_en <- label_sel |> pull(label_en)
+    res$name <- factor(res$areacode, levels = areacode2, labels = label_cn)
   }
+  
   res <- res |> 
-    select(starts_with(c("year", "sex", "cancer", "site", "icd10")),
+    select(starts_with(c("areacode", "name", "year", "sex", "cancer", "site",
+                         "icd10")),
            everything())
   return(res)
 }
@@ -70,6 +71,25 @@ post_sex_specific_cancer <- function(x){
   return(res)
 }
 
+post_vars <- function(data){
+  all_vars <- colnames(data)
+  if ("year" %nin% all_vars){
+    data <- data |> 
+      mutate(year = 9000)
+  }
+  if ("sex" %nin% all_vars){
+    data <- data |> 
+      mutate(sex = 0)
+  }
+  if ("cancer" %nin% all_vars){
+    data <- data |> 
+      mutate(cancer = 60)
+  }
+  
+  data <- data |> 
+    select(starts_with(c("year", "sex", "cancer")), everything())
+  return(data)
+}
 
 #' Drop the total cancer
 #'

@@ -16,22 +16,3 @@ replace_na <- function(x) {
   ifelse(is.na(x), 0, x)
 }
 
-post_vars <- function(data){
-  all_vars <- colnames(data)
-  if ("year" %nin% all_vars){
-    data <- data |> 
-      mutate(year = 9000)
-  }
-  if ("sex" %nin% all_vars){
-    data <- data |> 
-      mutate(sex = 0)
-  }
-  if ("cancer" %nin% all_vars){
-    data <- data |> 
-      mutate(cancer = 60)
-  }
-  
-  data <- data |> 
-    select(starts_with(c("year", "sex", "cancer")), everything())
-  return(data)
-}

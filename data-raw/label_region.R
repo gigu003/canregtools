@@ -1,7 +1,7 @@
 ## code to prepare `label_region` dataset goes here
 
-region_label_cn <- c("华北", "东北", "华东", "中南", "西南", "西北", "港澳台")
-region_label_en <- c("North", "North East", "East", "South", "South West",
+region_label_cn <- c("华北", "东北", "华东", "华中", "华南", "西南", "西北", "港澳台")
+region_label_en <- c("North", "North East", "East", "Middle", "South", "South West",
                      "North West", "GAT")
 prov_label_cn <- 
   c("北京市", "天津市", "河北省", "山西省", "内蒙古自治区",

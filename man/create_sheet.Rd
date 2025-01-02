@@ -16,13 +16,22 @@ create_sheet(x, sheet_type = "incidence", cancer_type = "big")
 \method{create_sheet}{fbswicd}(x, sheet_type = "incidence", cancer_type = "big")
 }
 \arguments{
-\item{x}{data with class of 'fbswicd' or 'canreg'.}
+\item{x}{The input data, object with class of \code{'fbswicd'}, \code{'fbswicds'},
+\code{'canreg'}, or \code{'canregs'}.}
 
 \item{sheet_type}{Character value indicate type of sheet, options are
 'incidence', 'mortality', 'quality', 'population'.}
 
-\item{cancer_type}{Type of classification method of ICD10, options are 'big',
-'small', 'system', or 'gco', default is "big".}
+\item{cancer_type}{A character string specifying the classification method
+used to categorize ICD-10 codes. This determines how ICD-10 codes are
+classified. Options include \code{"big"} (classify ICD-10 codes into 26
+cancer categories), \code{"small"} (classify ICD-10 codes into 59 cancer
+categories, more specific categories), \code{"system"} (classify ICD-10
+codes into organ system), and \code{"gco"} (classify ICD-10 code into
+cancer categories same as classification published by the Global
+Cancer Observatory). This parameter is only available when the
+input data is a vector of ICD-10 codes, or object with class of
+\code{'canreg'} or \code{'canregs'}.}
 }
 \value{
 A data frame or tibble contains the age standard rates and CIs.

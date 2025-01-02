@@ -6,32 +6,67 @@
 \alias{create_quality.canregs}
 \alias{create_quality.fbswicds}
 \alias{create_quality.fbswicd}
-\title{Create quality index from object of class 'fbswicd'.}
+\title{Create quality indicators}
 \usage{
 create_quality(x, ..., decimal = 2)
 
 \method{create_quality}{canreg}(x, ..., cancer_type = "big")
 
-\method{create_quality}{canregs}(x, ..., cancer_type = "big", collapse = TRUE)
+\method{create_quality}{canregs}(x, ..., cancer_type = "big")
 
-\method{create_quality}{fbswicds}(x, ..., decimal = 2, collapse = TRUE)
+\method{create_quality}{fbswicds}(x, ..., decimal = 2)
 
 \method{create_quality}{fbswicd}(x, ..., decimal = 2)
 }
 \arguments{
-\item{x}{An object of class 'fbswicd'.}
+\item{x}{The input data, object with class of \code{'fbswicd'}, \code{'fbswicds'},
+\code{'canreg'}, or \code{'canregs'}.}
 
-\item{...}{Variables used for stratification.}
+\item{...}{One or more variables used for stratification. For example, you
+can stratify by \code{sex}, \code{year}, \code{cancer}, or just by \code{year}. If sex
+is not passed as a parameter, the output will be the result for the
+combined gender.}
 
-\item{decimal}{Decimal digits.}
+\item{decimal}{The number of decimal places to include in the resulting
+quality indicator values. Defaults to 2.}
 
-\item{cancer_type}{Method used to classify ICD10.}
-
-\item{collapse}{Whether the output collapse to tibble.}
+\item{cancer_type}{A character string specifying the classification method
+used to categorize ICD-10 codes. This determines how ICD-10 codes are
+classified. Options include \code{"big"} (classify ICD-10 codes into 26
+cancer categories), \code{"small"} (classify ICD-10 codes into 59 cancer
+categories, more specific categories), \code{"system"} (classify ICD-10
+codes into organ system), and \code{"gco"} (classify ICD-10 code into
+cancer categories same as classification published by the Global
+Cancer Observatory). This parameter is only available when the
+input data is a vector of ICD-10 codes, or object with class of
+\code{'canreg'} or \code{'canregs'}.}
 }
 \value{
-A data frame of cancer registration quality data.
+The function returns a data frame (if applied to a single registry
+object, 'canreg' or 'fbswicd') or a list of data frames (if applied
+to a grouped registry object, 'canregs' or 'fbswicds') with a class
+of either \code{'quality'} or \code{'qualities'}. Each output data frame
+contains the computed quality indicators for the registry or subgroup.
 }
 \description{
-Create quality index from object of class 'fbswicd'.
+This function generates a data frame or a list of data frames containing the
+quality indicators for population-based cancer registries (PBCRs). These indicators
+include various metrics such as:
+\itemize{
+\item \code{fbs}: Number of incident cases.
+\item \code{fbl}: Incidence rate.
+\item \code{sws}: Number of death cases.
+\item \code{swl}: Mortality rate.
+\item \code{mv}: Percentage of cases with microscopic verification.
+\item \code{mi}: Mortality-to-incidence ratio.
+\item And other relevant quality metrics for cancer data evaluation.
+}
+}
+\examples{
+data <- load_canreg()
+qua <- create_quality(data, year, sex, cancer, cancer_type = "big")
+head(qua)
+fbsw <- count_canreg(data, cancer_type = "system")
+qua2 <- create_quality(fbsw, year, sex, cancer)
+head(qua2)
 }

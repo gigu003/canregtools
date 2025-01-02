@@ -12,9 +12,9 @@ source("./data-raw/label_region.R")
 source("./data-raw/registry_dict.R")
 source("./data-raw/ICCC3Rule.R")
 source("./data-raw/label_stat_var.R")
+source("./data-raw/label_areacode.R")
 source("./data-raw/dict_registry.R")
 usethis::use_data(
-  label,
   std_pop,
   ethnic_map,
   label_child,
@@ -26,5 +26,6 @@ usethis::use_data(
   registry_dict,
   ICCC3Rule,
   dict_registry,
+  label_areacode,
   internal = TRUE, overwrite = TRUE)
 

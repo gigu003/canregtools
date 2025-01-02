@@ -4,15 +4,12 @@
 #' Creates a data frame of age-specific rates based on the class of data
 #' (`fbswicd` or `canreg`).
 #' 
-#' @param x The input data. For `create_age_rate`, this could be an object of
-#'        class `canreg` or `fbswicd`.
-#' @param ... Variable name(s) used for stratification.
-#' @param event Event used for calculating age-specific rates.
-#' @param cancer_type Method used to classify ICD10.
-#' @param collapse Whether the output collapse to tibble.
+#' @inheritParams data
+#' @inheritParams strat_vars
+#' @inheritParams event
+#' @inheritParams cancer_type
 #' @param format Format of the output data frame, either "long" or "wide".
-#' @param mp Correction factor, default is 100000.
-#' @param decimal Number of decimal places for rounding, default is 6.
+#' @inheritParams mp_decimal
 #' @param show_pop Logical value whether output population or not.
 #' @return A data frame of age-specific rates.
 #' @export
@@ -30,7 +27,6 @@ create_age_rate <- function(x,
 
 #' @rdname create_age_rate
 #' @method create_age_rate canreg
-
 #' @export
 create_age_rate.canreg <- function(x,
                                    ...,
@@ -47,7 +43,6 @@ create_age_rate.canreg <- function(x,
 create_age_rate.fbswicds <- function(x,
                                      ...,
                                      event = fbs,
-                                     collapse = TRUE,
                                      format = "long",
                                      mp = 100000,
                                      decimal = 6,
@@ -63,9 +58,6 @@ create_age_rate.fbswicds <- function(x,
                     decimal =decimal,
                     show_pop = show_pop,
                     .progress = "Calculating age rate #")
-  if (collapse){
-    res <- cr_merge(res)
-  }
   return(res)
 }
 
@@ -115,8 +107,7 @@ create_age_rate.fbswicd <- function(x,
     left_join(pop_modi, by = c(pop_gvars, "agegrp")) %>%
     mutate(
       cases = {{ event }},
-      rate = round(mp * {{ event }} / !!rks, decimal)
-    ) %>%
+      rate = round(mp * {{ event }} / !!rks, decimal)) %>%
     select(-{{ event }})
   
   if (format == "long") {

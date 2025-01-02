@@ -83,8 +83,16 @@ as a separate group. Default is TRUE.}
 
 \item{label_tail}{Tail of the labels.}
 
-\item{cancer_type}{Specify the grouping method for tumors. Options are 'system',
-'big', or 'small'. Default is 'big'.}
+\item{cancer_type}{A character string specifying the classification method
+used to categorize ICD-10 codes. This determines how ICD-10 codes are
+classified. Options include \code{"big"} (classify ICD-10 codes into 26
+cancer categories), \code{"small"} (classify ICD-10 codes into 59 cancer
+categories, more specific categories), \code{"system"} (classify ICD-10
+codes into organ system), and \code{"gco"} (classify ICD-10 code into
+cancer categories same as classification published by the Global
+Cancer Observatory). This parameter is only available when the
+input data is a vector of ICD-10 codes, or object with class of
+\code{'canreg'} or \code{'canregs'}.}
 }
 \value{
 Class 'canreg'.

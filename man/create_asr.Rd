@@ -6,13 +6,14 @@
 \alias{create_asr.canreg}
 \alias{create_asr.fbswicds}
 \alias{create_asr.fbswicd}
-\title{Calculate age-standardized rate.}
+\title{Calculate Age-Standardized Rate (ASR)}
 \usage{
 create_asr(
   x,
   ...,
   event = fbs,
   std = c("cn2000", "wld85"),
+  cancer_type = "big",
   mp = 1e+05,
   decimal = 2,
   show_var = FALSE,
@@ -48,17 +49,32 @@ create_asr(
 )
 }
 \arguments{
-\item{x}{data with class of 'fbswicd' or 'canreg'.}
+\item{x}{The input data, object with class of \code{'fbswicd'}, \code{'fbswicds'},
+\code{'canreg'}, or \code{'canregs'}.}
 
-\item{...}{Variable names used to stratification.}
+\item{...}{One or more variables used for stratification. For example, you
+can stratify by \code{sex}, \code{year}, \code{cancer}, or just by \code{year}. If sex
+is not passed as a parameter, the output will be the result for the
+combined gender.}
 
-\item{event}{A variable within the input data that corresponds to the cases
-counts.}
+\item{event}{A variable used to specify the type of calculation, options are
+fbs or sws, fbs for cancer incidence, and sws for cancer mortality.}
 
 \item{std}{Specify the standard population structure in the 'std_pop'
 data frame used for calculating standardized rates. When
 calculating standardized rates for multiple standard populations,
 specify std = c(segi, china).}
+
+\item{cancer_type}{A character string specifying the classification method
+used to categorize ICD-10 codes. This determines how ICD-10 codes are
+classified. Options include \code{"big"} (classify ICD-10 codes into 26
+cancer categories), \code{"small"} (classify ICD-10 codes into 59 cancer
+categories, more specific categories), \code{"system"} (classify ICD-10
+codes into organ system), and \code{"gco"} (classify ICD-10 code into
+cancer categories same as classification published by the Global
+Cancer Observatory). This parameter is only available when the
+input data is a vector of ICD-10 codes, or object with class of
+\code{'canreg'} or \code{'canregs'}.}
 
 \item{mp}{A constant to multiply rates by (e.g. mp=1000 for rates per 1000).}
 
@@ -71,14 +87,18 @@ be rounded to two decimal places.}
 \item{show_ci}{Logical value whether output confidence(lower or upper
 bound) or not.}
 
-\item{cancer_type}{Classification type of cancer site, options are "big", "small"
-or "system", default is "big".}
-
 \item{show_pop}{Logical value whether output population or not.}
 }
 \value{
 A data frame or tibble contains the age standard rates and CIs.
 }
 \description{
-Calculate age-standardized rate.
+This function calculates age-standardized rates (ASRs) using PBCR data.
+It supports stratification by multiple variables, allows the specification
+of different standard population structures, and provides flexibility in the
+inclusion of variance, confidence intervals, and population data.
+}
+\seealso{
+\code{\link{ageadjust}} for age-adjusted rate calculations.
+\code{\link{truncrate}} for truncated rate calculations.
 }

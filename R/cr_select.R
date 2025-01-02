@@ -1,19 +1,23 @@
-#' Select elements from objects of class canregs, fbswicds, or asrs
+#' Select elements from objects with class `"canregs"`, or `"fbswicds"`
 #' 
 #' @description
-#' Select elements from object of class 'canregs', 'fbswicds', or 'asrs' based
-#' on provided index or conditions. The class of the returned object will be the
-#' same with the input object.
+#' This function allows you to select specific elements from objects of class 
+#' 'canregs', 'fbswicds', or 'asrs' based on provided indices, logical 
+#' conditions, or expressions. The selected elements are returned while 
+#' preserving the class of the input object.
 #' 
 #' @rdname cr_select
-#' @param data An object of class 'canregs', 'asrs', or 'fbswicds'.
-#' @param index A vector of character strings, logical values, or numeric
-#'        indices to select object elements.
-#' @param ... Conditions or expressions to subset the data within list elements.
+#' @param data An object of class 'canregs', 'fbswicds', or 'asrs' from which 
+#'        elements will be selected.
+#' @param index A vector of indices specifying the elements to select. This can 
+#'        be a character vector (matching element names), a numeric vector 
+#'        (specifying positions), or a logical vector (indicating inclusion).
+#' @param ... Optional conditions or expressions used to filter elements within 
+#'        the list or data frame. Conditions are evaluated for each element of 
+#'        the input object.
+#' @return An object of the same class as the input object, containing only the 
+#'         selected elements that meet the specified indices or conditions.
 #'
-#' @return An object with selected elements from the input object that meet the
-#'          specified conditions or index. The returned object will have the
-#'          same class as the input object.
 #' @export
 #'
 cr_select <- function(data, ..., index = names(data)) {
@@ -24,7 +28,13 @@ cr_select <- function(data, ..., index = names(data)) {
 #' @method cr_select canregs
 #' @export
 cr_select.canregs <- function(data, ..., index = names(data)){
-  res <- data[index]
+  data <- data[index]
+  class(data) <- c("canregs", "list")
+  summ <- summary(data)
+  conds <- rlang::enquos(...)
+  summ1 <- cr_select.summaries(summ, !!!conds)
+  res <- data[names(summ1)]
+  res <- compact(res)
   class(res) <- c("canregs", "list")
   return(res)
 }
@@ -44,7 +54,12 @@ cr_select.asrs <- function(data, ..., index = names(data)) {
 #' @method cr_select fbswicds 
 #' @export
 cr_select.fbswicds <- function(data, ..., index = names(data)){
-  res <- data[index]
+  conds <- rlang::enquos(...)
+  data <- data[index]
+  class(data) <- c("fbswicds", "list")
+  qua <- create_quality(data)
+  qua1 <- purrr::keep(qua, check_conds, !!!conds)
+  res <- data[names(qua1)]
   class(res) <- c("fbswicds", "list")
   return(res)
 }

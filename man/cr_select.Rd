@@ -6,7 +6,7 @@
 \alias{cr_select.asrs}
 \alias{cr_select.fbswicds}
 \alias{cr_select.summaries}
-\title{Select elements from objects of class canregs, fbswicds, or asrs}
+\title{Select elements from objects with class \code{"canregs"}, or \code{"fbswicds"}}
 \usage{
 cr_select(data, ..., index = names(data))
 
@@ -19,20 +19,24 @@ cr_select(data, ..., index = names(data))
 \method{cr_select}{summaries}(data, ..., index = names(data))
 }
 \arguments{
-\item{data}{An object of class 'canregs', 'asrs', or 'fbswicds'.}
+\item{data}{An object of class 'canregs', 'fbswicds', or 'asrs' from which
+elements will be selected.}
 
-\item{...}{Conditions or expressions to subset the data within list elements.}
+\item{...}{Optional conditions or expressions used to filter elements within
+the list or data frame. Conditions are evaluated for each element of
+the input object.}
 
-\item{index}{A vector of character strings, logical values, or numeric
-indices to select object elements.}
+\item{index}{A vector of indices specifying the elements to select. This can
+be a character vector (matching element names), a numeric vector
+(specifying positions), or a logical vector (indicating inclusion).}
 }
 \value{
-An object with selected elements from the input object that meet the
-specified conditions or index. The returned object will have the
-same class as the input object.
+An object of the same class as the input object, containing only the
+selected elements that meet the specified indices or conditions.
 }
 \description{
-Select elements from object of class 'canregs', 'fbswicds', or 'asrs' based
-on provided index or conditions. The class of the returned object will be the
-same with the input object.
+This function allows you to select specific elements from objects of class
+'canregs', 'fbswicds', or 'asrs' based on provided indices, logical
+conditions, or expressions. The selected elements are returned while
+preserving the class of the input object.
 }

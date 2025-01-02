@@ -1,4 +1,4 @@
-#' count canreg data.
+#' Count canreg data.
 #'
 #' @rdname count_canreg
 #' @param x Object data of class 'canreg' or 'canregs'.
@@ -14,7 +14,7 @@
 #'        0 as a separate group. Default is TRUE.
 #' @param labels Labels for age groups. Default is NULL.
 #' @param label_tail Tail label to be added to the labels. Default is NULL.
-#' @param cancer_type Method for classify cancer sites.
+#' @inheritParams cancer_type
 #'
 #' @return data of class fbswicd.
 #' @export
@@ -123,7 +123,8 @@ count_canreg.canreg <- function(x,
   cate <- CJ(year = unique(res$year),
              sex = unique(res$sex),
              cancer = unique(res$cancer),
-             agegrp = as.factor(levels(res$agegrp)), sorted = TRUE)
+             agegrp = factor(levels(res$agegrp), levels = levels(res$agegrp)),
+             sorted = TRUE)
   res <- merge(cate, res, by = c("year", "sex", "agegrp", "cancer"),
                all.x = TRUE)
   
@@ -136,10 +137,10 @@ count_canreg.canreg <- function(x,
     morp = list(count_tp(morp))
   ), by = .(year, sex, cancer)]
     
-    result <- list(areacode = as.character(x$areacode),
-                   fbswicd = res,
-                   sitemorp = sitemorp,
-                   pop = pop)
+  result <- list(areacode = as.character(x$areacode),
+                 fbswicd = res,
+                 sitemorp = sitemorp,
+                 pop = pop)
   attr(result, "class") <- c("fbswicd", class(result))
   return(result)
 }
@@ -164,8 +165,7 @@ reg_count <- function(data, varname = "fbs") {
 # function count sub-sites of icd10 or morphology code in each year, sex, cancer
 count_tp <- function(x) {
   var_name <- rlang::ensym(x)
-    res <- as.data.frame(table(x), stringsAsFactors = FALSE)
-    colnames(res)[1] <- rlang::as_string(var_name)
-    colnames(res)[2] <- "count"
-    return(res)
+  res <- as.data.frame(table(x), stringsAsFactors = FALSE)
+  names(res) <- c(rlang::as_string(var_name), "count")
+  return(res)
 }

@@ -1,15 +1,39 @@
-#' Create quality index from object of class 'fbswicd'.
+#' Create quality indicators
 #'
+#' @description
+#' This function generates a data frame or a list of data frames containing the 
+#' quality indicators for population-based cancer registries (PBCRs). These indicators 
+#' include various metrics such as:
+#' - `fbs`: Number of incident cases.
+#' - `fbl`: Incidence rate.
+#' - `sws`: Number of death cases.
+#' - `swl`: Mortality rate.
+#' - `mv`: Percentage of cases with microscopic verification.
+#' - `mi`: Mortality-to-incidence ratio.
+#' - And other relevant quality metrics for cancer data evaluation.
+#' 
 #' @rdname create_quality
-#' @param x An object of class 'fbswicd'.
-#' @param ... Variables used for stratification.
-#' @param cancer_type Method used to classify ICD10.
-#' @param collapse Whether the output collapse to tibble.
-#' @param decimal Decimal digits.
+#' @inheritParams data
+#' @inheritParams strat_vars
+#' @inheritParams cancer_type
+#' @param decimal The number of decimal places to include in the resulting
+#'        quality indicator values. Defaults to 2.
 #'
-#' @return A data frame of cancer registration quality data.
+#' @return The function returns a data frame (if applied to a single registry
+#'        object, 'canreg' or 'fbswicd') or a list of data frames (if applied
+#'        to a grouped registry object, 'canregs' or 'fbswicds') with a class
+#'        of either `'quality'` or `'qualities'`. Each output data frame
+#'        contains the computed quality indicators for the registry or subgroup.
+#'        
 #' @export
 #' 
+#' @examples
+#' data <- load_canreg()
+#' qua <- create_quality(data, year, sex, cancer, cancer_type = "big")
+#' head(qua)
+#' fbsw <- count_canreg(data, cancer_type = "system")
+#' qua2 <- create_quality(fbsw, year, sex, cancer)
+#' head(qua2)
 create_quality <- function(x, ..., decimal = 2) {
   UseMethod("create_quality", x)
 }
@@ -30,10 +54,9 @@ create_quality.canreg <- function(x,
 #' @export
 create_quality.canregs <- function(x,
                                    ...,
-                                   cancer_type = "big",
-                                   collapse = TRUE) {
+                                   cancer_type = "big") {
   data__ <- count_canreg(x, cancer_type = cancer_type)
-  res <- create_quality.fbswicds(data__, ..., collapse = collapse)
+  res <- create_quality.fbswicds(data__, ...)
   return(res)
 }
 
@@ -42,17 +65,12 @@ create_quality.canregs <- function(x,
 #' @export
 create_quality.fbswicds <- function(x,
                                     ...,
-                                    decimal = 2,
-                                    collapse = TRUE) {
+                                    decimal = 2) {
   res <- purrr::map(x,
                     create_quality.fbswicd,
                     ...,
                     .progress = "Calculating quality indicies #")
-  if (collapse){
-    res <- cr_merge(res)
-  } else {
-    class(res) <- c("qualities", "list")
-  }
+  class(res) <- c("qualities", "list")
   return(res)
 }
 
@@ -70,7 +88,6 @@ create_quality.fbswicd <- function(x, ..., decimal = 2) {
   swl <- rlang::sym("swl")
   rks <- rlang::sym("rks")
   mi <- rlang::sym("mi")
-
   
   group_var <- rlang::enquos(...)
   gvars <- purrr::map_chr(group_var, rlang::as_name)
@@ -108,7 +125,6 @@ create_quality.fbswicd <- function(x, ..., decimal = 2) {
   # Deal with group vars
   output <- output |> 
     post_vars()
-  
   return(output)
 }
 

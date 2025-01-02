@@ -4,12 +4,14 @@
 \alias{tidy_areacode}
 \title{Get attributes affiliated with the areacode}
 \usage{
-tidy_areacode(x, lang = "cn")
+tidy_areacode(x, lang = "cn", as_factor = FALSE)
 }
 \arguments{
 \item{x}{Character vector of six digits areacode.}
 
 \item{lang}{Character string indicate the language.}
+
+\item{as_factor}{Logical value, indicate if output as factor or not.}
 }
 \value{
 List of atttributes of areacode.

@@ -1,18 +1,21 @@
-#' Calculate age-standardized rate.
+#' Calculate Age-Standardized Rate (ASR)
 #'
+#' @description
+#' This function calculates age-standardized rates (ASRs) using PBCR data.
+#' It supports stratification by multiple variables, allows the specification
+#' of different standard population structures, and provides flexibility in the
+#' inclusion of variance, confidence intervals, and population data.
+#' 
 #' @rdname create_asr
-#' @param x data with class of 'fbswicd' or 'canreg'.
-#' @param ... Variable names used to stratification.
-#' @param event A variable within the input data that corresponds to the cases
-#'              counts.
+#' @inheritParams data
+#' @inheritParams strat_vars
+#' @inheritParams event
 #' @param std Specify the standard population structure in the 'std_pop'
 #'            data frame used for calculating standardized rates. When
 #'            calculating standardized rates for multiple standard populations, 
 #'            specify std = c(segi, china).
-#' @param mp A constant to multiply rates by (e.g. mp=1000 for rates per 1000).
-#' @param decimal This parameter specifies the number of decimal places to
-#'                round the results. The default is 2, which means rates will
-#'                be rounded to two decimal places.
+#' @inheritParams cancer_type
+#' @inheritParams mp_decimal
 #' @param show_pop Logical value whether output population or not.
 #' @param show_var Logical value whether output variance or not.
 #' @param show_ci Logical value whether output confidence(lower or upper
@@ -22,10 +25,15 @@
 #' @return A data frame or tibble contains the age standard rates and CIs.
 #' @export
 #'
+#' @seealso
+#' \code{\link{ageadjust}} for age-adjusted rate calculations.
+#' \code{\link{truncrate}} for truncated rate calculations.
+#' 
 create_asr <- function(x,
                        ...,
                        event = fbs,
                        std = c("cn2000", "wld85"),
+                       cancer_type = "big",
                        mp = 100000,
                        decimal = 2,
                        show_var = FALSE,
@@ -35,8 +43,6 @@ create_asr <- function(x,
 
 #' @rdname create_asr
 #' @method create_asr canregs
-#' @param cancer_type Classification type of cancer site, options are "big", "small"
-#'              or "system", default is "big". 
 #' @export
 #'
 create_asr.canregs <- function(x, ..., cancer_type = "big"){
@@ -47,8 +53,6 @@ create_asr.canregs <- function(x, ..., cancer_type = "big"){
 
 #' @rdname create_asr
 #' @method create_asr canreg
-#' @param cancer_type Classification type of cancer site, options are "big", "small"
-#'              or "system", default is "big". 
 #'
 #' @export
 #'
@@ -103,7 +107,7 @@ create_asr.fbswicd <- function(x,
                                show_pop = FALSE,
                                show_var = FALSE,
                                show_ci = FALSE){
-  if (!check_group_vars(x, ...,quiet = FALSE)){
+  if (!check_group_vars(x, ..., quiet = FALSE)){
     stop("group vars not supported.")
   }
   event <- rlang::enquo(event)
