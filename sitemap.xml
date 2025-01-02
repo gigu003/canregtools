@@ -1,171 +1,68 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url>
-    <loc>/404.html</loc>
-  </url>
-  <url>
-    <loc>/LICENSE-text.html</loc>
-  </url>
-  <url>
-    <loc>/LICENSE.html</loc>
-  </url>
-  <url>
-    <loc>/articles/classify_icd10.html</loc>
-  </url>
-  <url>
-    <loc>/articles/index.html</loc>
-  </url>
-  <url>
-    <loc>/authors.html</loc>
-  </url>
-  <url>
-    <loc>/index.html</loc>
-  </url>
-  <url>
-    <loc>/news/index.html</loc>
-  </url>
-  <url>
-    <loc>/reference/ageadjust.html</loc>
-  </url>
-  <url>
-    <loc>/reference/calc_age.html</loc>
-  </url>
-  <url>
-    <loc>/reference/canregtools-package.html</loc>
-  </url>
-  <url>
-    <loc>/reference/check_id.html</loc>
-  </url>
-  <url>
-    <loc>/reference/check_topo.html</loc>
-  </url>
-  <url>
-    <loc>/reference/classify_childhood.html</loc>
-  </url>
-  <url>
-    <loc>/reference/classify_icd10.html</loc>
-  </url>
-  <url>
-    <loc>/reference/clean_canreg.html</loc>
-  </url>
-  <url>
-    <loc>/reference/count_canreg.canreg.html</loc>
-  </url>
-  <url>
-    <loc>/reference/count_canreg.canregs.html</loc>
-  </url>
-  <url>
-    <loc>/reference/count_canreg.html</loc>
-  </url>
-  <url>
-    <loc>/reference/create_age_rate.fbswicd.html</loc>
-  </url>
-  <url>
-    <loc>/reference/create_age_rate.html</loc>
-  </url>
-  <url>
-    <loc>/reference/create_asr.canreg.html</loc>
-  </url>
-  <url>
-    <loc>/reference/create_asr.fbswicd.html</loc>
-  </url>
-  <url>
-    <loc>/reference/create_asr.html</loc>
-  </url>
-  <url>
-    <loc>/reference/create_quality.html</loc>
-  </url>
-  <url>
-    <loc>/reference/cumrate.html</loc>
-  </url>
-  <url>
-    <loc>/reference/cumrisk.html</loc>
-  </url>
-  <url>
-    <loc>/reference/cutage.html</loc>
-  </url>
-  <url>
-    <loc>/reference/draw_bar.html</loc>
-  </url>
-  <url>
-    <loc>/reference/draw_barchart.html</loc>
-  </url>
-  <url>
-    <loc>/reference/draw_dumbbell.html</loc>
-  </url>
-  <url>
-    <loc>/reference/draw_line.html</loc>
-  </url>
-  <url>
-    <loc>/reference/draw_map.html</loc>
-  </url>
-  <url>
-    <loc>/reference/draw_pyramid.fbswicd.html</loc>
-  </url>
-  <url>
-    <loc>/reference/draw_pyramid.html</loc>
-  </url>
-  <url>
-    <loc>/reference/estimate_pop.html</loc>
-  </url>
-  <url>
-    <loc>/reference/expand_age_pop.html</loc>
-  </url>
-  <url>
-    <loc>/reference/expand_lifetable.html</loc>
-  </url>
-  <url>
-    <loc>/reference/icdo3to10.html</loc>
-  </url>
-  <url>
-    <loc>/reference/index.html</loc>
-  </url>
-  <url>
-    <loc>/reference/lt.html</loc>
-  </url>
-  <url>
-    <loc>/reference/pyramid.html</loc>
-  </url>
-  <url>
-    <loc>/reference/read_areacode.html</loc>
-  </url>
-  <url>
-    <loc>/reference/read_canreg.html</loc>
-  </url>
-  <url>
-    <loc>/reference/read_map.html</loc>
-  </url>
-  <url>
-    <loc>/reference/reframe_fbswicd.canregs.html</loc>
-  </url>
-  <url>
-    <loc>/reference/reframe_fbswicd.fbswicds.html</loc>
-  </url>
-  <url>
-    <loc>/reference/reframe_fbswicd.html</loc>
-  </url>
-  <url>
-    <loc>/reference/tidy_address.html</loc>
-  </url>
-  <url>
-    <loc>/reference/tidy_age.html</loc>
-  </url>
-  <url>
-    <loc>/reference/tidy_occu.html</loc>
-  </url>
-  <url>
-    <loc>/reference/tidy_sex.html</loc>
-  </url>
-  <url>
-    <loc>/reference/truncrate.html</loc>
-  </url>
-  <url>
-    <loc>/reference/write_area_type.html</loc>
-  </url>
-  <url>
-    <loc>/reference/write_areacode.html</loc>
-  </url>
-  <url>
-    <loc>/reference/write_registry.html</loc>
-  </url>
+<urlset xmlns = 'http://www.sitemaps.org/schemas/sitemap/0.9'>
+<url><loc>/404.html</loc></url>
+<url><loc>/LICENSE-text.html</loc></url>
+<url><loc>/LICENSE.html</loc></url>
+<url><loc>/authors.html</loc></url>
+<url><loc>/index.html</loc></url>
+<url><loc>/news/index.html</loc></url>
+<url><loc>/reference/add_labels.html</loc></url>
+<url><loc>/reference/ageadjust.html</loc></url>
+<url><loc>/reference/calc_age.html</loc></url>
+<url><loc>/reference/cancer_type.html</loc></url>
+<url><loc>/reference/canregtools-package.html</loc></url>
+<url><loc>/reference/check_canreg.html</loc></url>
+<url><loc>/reference/classify_childhood.html</loc></url>
+<url><loc>/reference/classify_icd10.html</loc></url>
+<url><loc>/reference/clean_canreg.html</loc></url>
+<url><loc>/reference/cmerge.html</loc></url>
+<url><loc>/reference/count_canreg.html</loc></url>
+<url><loc>/reference/cr_merge.html</loc></url>
+<url><loc>/reference/cr_reframe.html</loc></url>
+<url><loc>/reference/cr_select.html</loc></url>
+<url><loc>/reference/create_age_rate.html</loc></url>
+<url><loc>/reference/create_asr.html</loc></url>
+<url><loc>/reference/create_quality.html</loc></url>
+<url><loc>/reference/create_ratio.html</loc></url>
+<url><loc>/reference/create_report.html</loc></url>
+<url><loc>/reference/create_sheet.html</loc></url>
+<url><loc>/reference/cumrate.html</loc></url>
+<url><loc>/reference/cumrisk.html</loc></url>
+<url><loc>/reference/cutage.html</loc></url>
+<url><loc>/reference/data.html</loc></url>
+<url><loc>/reference/draw_bar.html</loc></url>
+<url><loc>/reference/draw_barchart.html</loc></url>
+<url><loc>/reference/draw_dumbbell.html</loc></url>
+<url><loc>/reference/draw_linechart.html</loc></url>
+<url><loc>/reference/draw_pyramid.fbswicd.html</loc></url>
+<url><loc>/reference/draw_pyramid.html</loc></url>
+<url><loc>/reference/drop_others.html</loc></url>
+<url><loc>/reference/drop_total.html</loc></url>
+<url><loc>/reference/estimate_pop.html</loc></url>
+<url><loc>/reference/event.html</loc></url>
+<url><loc>/reference/expand_age_pop.html</loc></url>
+<url><loc>/reference/expand_lifetable.html</loc></url>
+<url><loc>/reference/has_rows.html</loc></url>
+<url><loc>/reference/index.html</loc></url>
+<url><loc>/reference/load_canreg.html</loc></url>
+<url><loc>/reference/ls_reframe_vars.html</loc></url>
+<url><loc>/reference/ls_std_vars.html</loc></url>
+<url><loc>/reference/ls_summary_vars.html</loc></url>
+<url><loc>/reference/lt.html</loc></url>
+<url><loc>/reference/mp_decimal.html</loc></url>
+<url><loc>/reference/pyramid.html</loc></url>
+<url><loc>/reference/read_canreg.html</loc></url>
+<url><loc>/reference/reframe_fbswicd.html</loc></url>
+<url><loc>/reference/show_registry.html</loc></url>
+<url><loc>/reference/strat_vars.html</loc></url>
+<url><loc>/reference/summary.html</loc></url>
+<url><loc>/reference/tidy_age.html</loc></url>
+<url><loc>/reference/tidy_areacode.html</loc></url>
+<url><loc>/reference/tidy_cancer.html</loc></url>
+<url><loc>/reference/tidy_occu.html</loc></url>
+<url><loc>/reference/tidy_sex.html</loc></url>
+<url><loc>/reference/truncrate.html</loc></url>
+<url><loc>/reference/write_area_type.html</loc></url>
+<url><loc>/reference/write_areacode.html</loc></url>
+<url><loc>/reference/write_registry.html</loc></url>
 </urlset>
+
