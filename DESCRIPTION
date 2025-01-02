@@ -1,6 +1,6 @@
 Package: canregtools
 Title: Tools for Analyzing Population-Based Cancer Registry Data
-Version: 0.2.7
+Version: 0.2.8
 Authors@R: 
     person("Qiong", "Chen", , "chenq08@126.com", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0003-2401-0046"))
