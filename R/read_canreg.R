@@ -9,10 +9,6 @@
 #' @return An object of canreg class or a list of objects of canreg class.
 #' @export
 #'
-#' @examples
-#' library(canregtools)
-#' file <- system.file("extdata", "411721.xls", package = "canregtools")
-#' data <- read_canreg(file)
 read_canreg <- function(x, pop_type = "long") {
   if (unique(file.info(x)$isdir)) {
     files <- list.files(x)
@@ -68,7 +64,7 @@ read_file <- function(x, pop_type = "long", pop_var="popu", death_var="death") {
     else if (pop_type == "long") { pop <- read_long_pop(x) }
     attr(fb, "class") <- c("FBcases", class(fb))
     attr(sw, "class") <- c("SWcases", class(sw))
-    attr(pop, "class") <- c("population", class(pop))
+    attr(pop, "class") <- c("POP", class(pop))
     bsname <- tools::file_path_sans_ext(basename(x))
     areacode <- gsub("\\D", "", bsname)
     res <- list(areacode = areacode, FBcases = fb, SWcases = sw, POP = pop)
@@ -105,11 +101,13 @@ read_long_pop <- function(x, pop_var = "popu", age_var= "agegroup") {
   strat_vars <- rlang::syms(c("year", "sex"))
   pop_var <- rlang::sym(pop_var)
   age_var <- rlang::sym(age_var)
+  rks <- rlang::sym("rks")
+  agegrp <- rlang::sym("agegrp")
   pop <- read_excel(x, sheet = "POP") |> 
     mutate(across(c(!!!strat_vars), as.integer),
-           rks = as.integer(round(!!pop_var)),
-           agegrp = factor(!!age_var)) |> 
-    select(c(!!!strat_vars), agegrp, rks)
+           !!rks := as.integer(round(!!pop_var)),
+           !!agegrp := factor(!!age_var)) |> 
+    select(c(!!!strat_vars), !!agegrp, !!rks)
   return(pop)
 }
 

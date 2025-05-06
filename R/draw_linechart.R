@@ -22,12 +22,11 @@
 #'        joined by lines, "o" for overplotted points and lines, "s" and "S"
 #'        for stair steps and "h" for histogram-like vertical lines. Finally,
 #'        "n" does not produce any points or lines.
+#' @param lwd Line width.
 #' @param main Optional. The title of the plot.
 #' @param add Plots to be added.
 #' @param offset Offset of the axis.
 #' @param ... Other parameters in plot.
-
-#'
 #' @return Line chart.
 #' @export
 #' 
@@ -42,9 +41,10 @@ draw_line <- function(data,
                       axis_label = c("Age (years)", "Age specific rate"),
                       cols = c("darkgreen", "darkred", "gray"),
                       line_type = "l",
+                      lwd = 2,
                       main = NULL,
                       add = FALSE,
-                      offset = 0.02,
+                      offset = 0.01,
                        ...) {
   
   x_var <- rlang::enquo(x_var)
@@ -85,8 +85,8 @@ draw_line <- function(data,
   if (is.null(x_axis)) { x_axis <- pretty(c(0, max_xvar)) }
   
   # Calculate axis scaling factors
-  BX <- c(-0.1, 1)
-  BY <- c(-0.1, 1)
+  BX <- c(-0.12, 1)
+  BY <- c(-0.12, 1)
   plot(BX, BY, type = "n", axes = FALSE, xlab = NULL, ylab = NULL, main = main)
   YU <- max(y_axis)
   YL <- min(y_axis)
@@ -108,11 +108,11 @@ draw_line <- function(data,
   text(-offset, (y_axis - YL) / YS, ylabel, pos = 2, srt = 90)
   # Draw X axis tick label
   xlabel <- paste(formatC(x_label, format = "fg"))
-  text((x_axis - XL) / XS, -offset, xlabel, pos = 1)
+  text((x_axis - XL) / XS, -offset+0.01, xlabel, pos = 1)
   
   # draw the axis title labels.
-  text((1 - offset) / 2, -(offset + 0.06), axis_label[1], pos = 1, font = 2)
-  text(-(offset + 0.09), (1 - offset) / 2, axis_label[2], pos = 3, srt = 90,
+  text((1 - offset) / 2, -(offset + 0.07), axis_label[1], pos = 1, font = 2)
+  text(-(offset + 0.07), (1 - offset) / 2, axis_label[2], pos = 3, srt = 90,
        font = 2)
   
   # Check if the group_var is factor or character vector.
@@ -127,9 +127,9 @@ draw_line <- function(data,
     xvar_data <- data |> pull(!!x_var) |> as.numeric()
     yvar_data <- data |> pull(!!y_var) |> as.numeric()
     lines(xvar_data / XS, yvar_data / YS, type = line_type, 
-          col = cols[1], lwd = 3)
+          col = cols[1], lwd = lwd)
     } else {
-      groups <- data |> pull(!!group_var) |> unique()
+      groups <- data |> arrange(!!group_var) |> pull(!!group_var) |> unique()
       group_data <- data |> group_by(!!group_var) |> group_split()
       # plot line for each group.
       for (i in 1:length(groups)) {
@@ -140,11 +140,12 @@ draw_line <- function(data,
         #group_data <- data[data[[group_var]] == group, ]
         if (nrow(gdata) > 1) {
           lines(xvar_data / XS, yvar_data / YS,
-                type = line_type, col = cols[i], lwd = 3) } }
+                type = line_type, col = cols[i], lwd = lwd) } }
     }
+  # draw legends
   if (!quo_is_null(group_var)){
     legend(0.01, 0.95, legend = groups, col = cols,
-           lwd = 2, seg.len = 0.5, bty = "n")  
+           lwd = lwd, seg.len = 0.5, bty = "n")  
   }
   
   if (add){
@@ -163,7 +164,7 @@ draw_line <- function(data,
 #' @export
 #'
 draw_linechart <- function(x, facet_var, grid, ...) {
-  par(mar = c(1, 2, 2, 1))
+  par(mar = c(2, 1, 1, 1))
   # Split the data frame into a list of data frames by the facet_var
   res <- x %>%
     group_by({{facet_var}}) %>%
@@ -172,10 +173,10 @@ draw_linechart <- function(x, facet_var, grid, ...) {
   # Set up the plotting area with the specified grid layout
   par(mfrow = grid)
   
-  sapply(res, function(data) {
-    facet <- data |> 
-      pull({{facet_var}}) |> 
-      unique()
+ mes <-  sapply(res, function(data) {
+   facet <- data |> 
+     pull({{facet_var}}) |> 
+     unique()
     draw_line(data, main = facet, ...)
     })
   

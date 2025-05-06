@@ -3,6 +3,7 @@
 \name{create_age_rate}
 \alias{create_age_rate}
 \alias{create_age_rate.canreg}
+\alias{create_age_rate.canregs}
 \alias{create_age_rate.fbswicds}
 \alias{create_age_rate.fbswicd}
 \title{Create age specific rate}
@@ -10,30 +11,34 @@
 create_age_rate(
   x,
   ...,
-  event = fbs,
+  event = "fbs",
   cancer_type = "big",
   format = "long",
   mp = 1e+05,
   decimal = 6,
-  show_pop = FALSE
+  show_pop = FALSE,
+  collapse = TRUE
 )
 
 \method{create_age_rate}{canreg}(x, ..., cancer_type = "big")
 
+\method{create_age_rate}{canregs}(x, ..., cancer_type = "big", collapse = TRUE)
+
 \method{create_age_rate}{fbswicds}(
   x,
   ...,
-  event = fbs,
+  event = "fbs",
   format = "long",
   mp = 1e+05,
   decimal = 6,
-  show_pop = FALSE
+  show_pop = FALSE,
+  collapse = TRUE
 )
 
 \method{create_age_rate}{fbswicd}(
   x,
   ...,
-  event = fbs,
+  event = "fbs",
   format = "long",
   mp = 1e+05,
   decimal = 6,
@@ -72,11 +77,13 @@ round the results. The default is 2, which means rates will
 be rounded to two decimal places.}
 
 \item{show_pop}{Logical value whether output population or not.}
+
+\item{collapse}{Logical value whether output result as age_rate or age_rates.}
 }
 \value{
 A data frame of age-specific rates.
 }
 \description{
-Creates a data frame of age-specific rates based on the class of data
-(\code{fbswicd} or \code{canreg}).
+Creates a data frame of age-specific rates based on the class of
+data (\code{fbswicd} or \code{canreg}).
 }

@@ -6,10 +6,10 @@
 \usage{
 draw_barchart(
   data,
-  plot_var = cr,
-  cate_var = cancer,
-  group_var = year,
-  side_var = sex,
+  plot_var = NULL,
+  cate_var = NULL,
+  group_var = NULL,
+  side_var = NULL,
   side_label = NULL,
   bar_side = 1,
   topn = 10,
@@ -45,7 +45,8 @@ Bar chart
 Draw group bar chart.
 }
 \examples{
-data <- load_canreg()
-rate <- create_asr(data, year, sex, cancer, event = fbs)
-draw_barchart(rate)
+data("canregs")
+data <- canregs[[1]]
+rate <- create_asr(data, year, sex, cancer, event = "fbs")
+draw_barchart(rate, plot_var = cr, cate_var = cancer, group_var = year, side_var = year)
 }

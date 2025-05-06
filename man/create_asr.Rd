@@ -11,38 +11,40 @@
 create_asr(
   x,
   ...,
-  event = fbs,
+  event = "fbs",
   std = c("cn2000", "wld85"),
   cancer_type = "big",
   mp = 1e+05,
   decimal = 2,
   show_var = FALSE,
-  show_ci = FALSE
+  show_ci = FALSE,
+  collapse = TRUE
 )
 
-\method{create_asr}{canregs}(x, ..., cancer_type = "big")
+\method{create_asr}{canregs}(x, ..., cancer_type = "big", collapse = TRUE)
 
 \method{create_asr}{canreg}(x, ..., cancer_type = "big")
 
 \method{create_asr}{fbswicds}(
   x,
   ...,
-  event = fbs,
+  event = "fbs",
   std = c("cn2000", "wld85"),
   mp = 1e+05,
-  decimal = 6,
+  decimal = 2,
   show_pop = FALSE,
   show_var = FALSE,
-  show_ci = FALSE
+  show_ci = FALSE,
+  collapse = TRUE
 )
 
 \method{create_asr}{fbswicd}(
   x,
   ...,
-  event = fbs,
+  event = "fbs",
   std = c("cn2000", "wld85"),
   mp = 1e+05,
-  decimal = 6,
+  decimal = 2,
   show_pop = FALSE,
   show_var = FALSE,
   show_ci = FALSE
@@ -60,10 +62,10 @@ combined gender.}
 \item{event}{A variable used to specify the type of calculation, options are
 fbs or sws, fbs for cancer incidence, and sws for cancer mortality.}
 
-\item{std}{Specify the standard population structure in the 'std_pop'
-data frame used for calculating standardized rates. When
-calculating standardized rates for multiple standard populations,
-specify std = c(segi, china).}
+\item{std}{Specify the standard population structure in the 'std_pop' data
+frame used for calculating standardized rates. When calculating
+standardized rates for multiple standard populations, specify std = c(segi,
+china).}
 
 \item{cancer_type}{A character string specifying the classification method
 used to categorize ICD-10 codes. This determines how ICD-10 codes are
@@ -84,8 +86,10 @@ be rounded to two decimal places.}
 
 \item{show_var}{Logical value whether output variance or not.}
 
-\item{show_ci}{Logical value whether output confidence(lower or upper
-bound) or not.}
+\item{show_ci}{Logical value whether output confidence(lower or upper bound)
+or not.}
+
+\item{collapse}{Logical value whether output result as asr or asrs.}
 
 \item{show_pop}{Logical value whether output population or not.}
 }
@@ -93,10 +97,40 @@ bound) or not.}
 A data frame or tibble contains the age standard rates and CIs.
 }
 \description{
-This function calculates age-standardized rates (ASRs) using PBCR data.
-It supports stratification by multiple variables, allows the specification
-of different standard population structures, and provides flexibility in the
-inclusion of variance, confidence intervals, and population data.
+\code{create_asr()} calculates age-standardized rates (ASRs) using
+PBCR data. It supports stratification by multiple variables, allows the
+specification of different standard population structures, and provides
+flexibility in the inclusion of variance, confidence intervals, and
+population data.
+}
+\examples{
+
+# calculate ASR based on object with class of `canreg`
+data("canregs")
+data <- canregs[[1]]
+# calculate ASR using default parameter
+asr <- create_asr(data, year, sex, cancer)
+head(asr)
+# calculate ASR using multiple standard population
+asr_multi_std <- create_asr(data, year, sex, cancer,
+                            std = c("cn82", "cn2000", "wld85"))
+head(asr_multi_std)
+# calculate ASR with confidence interval
+asr_with_ci <- create_asr(data, year, sex, cancer, show_ci = TRUE)
+head(asr_with_ci)
+# calculate ASR with population at risk
+asr_with_pop <- create_asr(data, year, sex, cancer, show_pop = TRUE)
+head((asr_with_pop))
+# calculate ASR with variance
+asr_with_var <- create_asr(data, year, sex, cancer, show_var = TRUE)
+head(asr_with_var)
+
+
+# calculate ASR based on object with class of `fbswicd`
+# convert object with class of `canreg` to object with class of `fbswicd`
+fbsw <- count_canreg(data)
+asr <- create_asr(fbsw, event= "sws", year, sex, cancer)
+
 }
 \seealso{
 \code{\link{ageadjust}} for age-adjusted rate calculations.

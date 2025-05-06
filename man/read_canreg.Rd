@@ -21,8 +21,3 @@ An object of canreg class or a list of objects of canreg class.
 Read cancer registration data in the format reported to the National Cancer
 Center.
 }
-\examples{
-library(canregtools)
-file <- system.file("extdata", "411721.xls", package = "canregtools")
-data <- read_canreg(file)
-}

@@ -5,16 +5,16 @@
 \alias{summary.canregs}
 \title{Summary object of class 'canreg'}
 \usage{
-\method{summary}{canreg}(object, ...)
+\method{summary}{canreg}(object, collapse = FALSE, ...)
 
 \method{summary}{canregs}(object, collapse = TRUE, ...)
 }
 \arguments{
 \item{object}{Object data with class of 'canreg', 'canregs'}
 
-\item{...}{Other filter expressions}
-
 \item{collapse}{Collapse data or not.}
+
+\item{...}{Other filter expressions}
 }
 \value{
 A data frame contains summary statistics of canreg data.

@@ -6,6 +6,8 @@
 \alias{cr_merge.fbswicds}
 \alias{cr_merge.asrs}
 \alias{cr_merge.qualities}
+\alias{cr_merge.age_rates}
+\alias{cr_merge.summaries}
 \title{Merge elements from objects of class canregs, fbswicds, or asrs}
 \usage{
 cr_merge(data)
@@ -17,6 +19,10 @@ cr_merge(data)
 \method{cr_merge}{asrs}(data)
 
 \method{cr_merge}{qualities}(data)
+
+\method{cr_merge}{age_rates}(data)
+
+\method{cr_merge}{summaries}(data)
 }
 \arguments{
 \item{data}{An object of class 'canregs', 'asrs', or 'fbswicds'.}

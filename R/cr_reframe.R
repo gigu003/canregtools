@@ -19,7 +19,7 @@ cr_reframe <- function(x, strat = "registry") {
 cr_reframe.canregs <- function(x, strat = "registry") {
   areacodes <- unique(unlist(map(x, pluck("areacode"))))
   new <- map(strat, function(a) {
-    pluck(tidy_areacode(areacodes), a)
+    pluck(classify_areacode(areacodes), a)
   })
   nnew <- map(new, unique)
   res <-  map(1:length(nnew), function(b){
@@ -36,6 +36,7 @@ cr_reframe.canregs <- function(x, strat = "registry") {
   if (length(res1) == 1) {
     res1 <- pluck(res1, 1)
   } else {
+    res1 <- res1[!duplicated(names(res1))]
     class(res1) <- c("canregs", "list")  
   }
   return(res1)
@@ -48,7 +49,7 @@ cr_reframe.canregs <- function(x, strat = "registry") {
 cr_reframe.fbswicds <- function(x, strat = "registry") {
   areacodes <- unique(unlist(map(x, pluck("areacode"))))
   new_code <- map(strat, function(a) {
-    pluck(tidy_areacode(areacodes), a)
+    pluck(classify_areacode(areacodes), a)
   })
   tran_code <- map(new_code, unique)
   res <-  map(1:length(tran_code), function(b){
@@ -70,3 +71,17 @@ cr_reframe.fbswicds <- function(x, strat = "registry") {
   }
   return(output)
 }
+
+full_fbswicd <- function(x) {
+  areacode_info <- as.data.frame(classify_areacode(x[["areacode"]]))
+  fbswicd <- bind_cols(areacode_info, x[["fbswicd"]])
+  sitemorp <- bind_cols(areacode_info, x[["sitemorp"]])
+  pop <- bind_cols(areacode_info, x[["pop"]])
+  res <- list(areacode = x[["areacode"]],
+              fbswicd = fbswicd,
+              sitemorp = sitemorp,
+              pop = pop)
+  class(res) <- c("fbswicd", "list")
+  return(res)
+}
+

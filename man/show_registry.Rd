@@ -2,18 +2,16 @@
 % Please edit documentation in R/show_registry.R
 \name{show_registry}
 \alias{show_registry}
-\title{Title}
+\title{Get the areacodes of the registry}
 \usage{
-show_registry(registry_type = "all", source = "system")
+show_registry(regi_type = c(1:4))
 }
 \arguments{
-\item{registry_type}{registry type}
-
-\item{source}{\code{character} source of areacode}
+\item{regi_type}{Type of registry.}
 }
 \value{
 Character vector
 }
 \description{
-Title
+Get the areacodes of the registry
 }

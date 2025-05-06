@@ -259,21 +259,18 @@ draw_pyramid <- function(x,
 #'
 draw_pyramid.fbswicd <- function(x, ..., grid = NULL){
   pop <- x$pop
+  year <- unique(pop$year)
   pop <- split(pop, pop$year)
-  if (is.null(grid)){
-    grid <- c(1, length(pop))
-  }
-  to_wide <- function(x){
-    res <- x %>%
-      pivot_wider(id_cols = c("agegrp"),
-                  values_from = c("rks"),
-                  names_from = c("sex"),
-                  values_fill = 0) %>%
-      select(where(is.numeric), agegrp)
-    return(res)
-  }
+  if (is.null(grid)) { grid <- c(length(pop), 1) }
   pop <- lapply(pop, to_wide)
   par(mfrow = grid)
-  res <- lapply(pop, pyramid, ...)
+  res <- lapply(1:length(year), function(x) pyramid(pop[[x]], ..., main = year[x]))
 }
 
+to_wide <- function(x){
+  pivot_wider(x, id_cols = c("agegrp"),
+              values_from = c("rks"),
+              names_from = c("sex"),
+              values_fill = 0) |>
+    select(where(is.numeric), !!rlang::sym("agegrp"))
+}

@@ -42,11 +42,33 @@ NULL
 #' @keywords internal
 NULL
 
-
 #' event
 #'
 #' @param event A variable used to specify the type of calculation, options are
 #'        fbs or sws, fbs for cancer incidence, and sws for cancer mortality.
 #' @name event
+#' @keywords internal
+NULL
+
+#' label_type
+#'
+#' @param label_type Type of the label used ("full" or "abbr").
+#' @name label_type
+#' @keywords internal
+NULL
+
+#' lang
+#'
+#' @param lang Character, specify the output language, options are 'cn',
+#'        or 'en', default is 'cn'.
+#' @name lang
+#' @keywords internal
+NULL
+
+
+#' as_factor
+#'
+#' @param as_factor Logical, indicate whether output value as factor.
+#' @name as_factor
 #' @keywords internal
 NULL

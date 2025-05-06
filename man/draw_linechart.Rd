@@ -17,9 +17,10 @@ draw_line(
   axis_label = c("Age (years)", "Age specific rate"),
   cols = c("darkgreen", "darkred", "gray"),
   line_type = "l",
+  lwd = 2,
   main = NULL,
   add = FALSE,
-  offset = 0.02,
+  offset = 0.01,
   ...
 )
 
@@ -56,6 +57,8 @@ following values are possible, for details, see plot: "p" for points,
 joined by lines, "o" for overplotted points and lines, "s" and "S"
 for stair steps and "h" for histogram-like vertical lines. Finally,
 "n" does not produce any points or lines.}
+
+\item{lwd}{Line width.}
 
 \item{main}{Optional. The title of the plot.}
 

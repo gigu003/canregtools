@@ -8,13 +8,13 @@
 \alias{create_quality.fbswicd}
 \title{Create quality indicators}
 \usage{
-create_quality(x, ..., decimal = 2)
+create_quality(x, ..., decimal = 2, collapse = TRUE)
 
 \method{create_quality}{canreg}(x, ..., cancer_type = "big")
 
-\method{create_quality}{canregs}(x, ..., cancer_type = "big")
+\method{create_quality}{canregs}(x, ..., cancer_type = "big", collapse = TRUE)
 
-\method{create_quality}{fbswicds}(x, ..., decimal = 2)
+\method{create_quality}{fbswicds}(x, ..., decimal = 2, collapse = TRUE)
 
 \method{create_quality}{fbswicd}(x, ..., decimal = 2)
 }
@@ -30,6 +30,8 @@ combined gender.}
 \item{decimal}{The number of decimal places to include in the resulting
 quality indicator values. Defaults to 2.}
 
+\item{collapse}{Logical value whether output result as quality or qualites.}
+
 \item{cancer_type}{A character string specifying the classification method
 used to categorize ICD-10 codes. This determines how ICD-10 codes are
 classified. Options include \code{"big"} (classify ICD-10 codes into 26
@@ -43,15 +45,15 @@ input data is a vector of ICD-10 codes, or object with class of
 }
 \value{
 The function returns a data frame (if applied to a single registry
-object, 'canreg' or 'fbswicd') or a list of data frames (if applied
-to a grouped registry object, 'canregs' or 'fbswicds') with a class
-of either \code{'quality'} or \code{'qualities'}. Each output data frame
-contains the computed quality indicators for the registry or subgroup.
+object, 'canreg' or 'fbswicd') or a list of data frames (if applied to a
+grouped registry object, 'canregs' or 'fbswicds') with a class of either
+\code{'quality'} or \code{'qualities'}. Each output data frame contains the computed
+quality indicators for the registry or subgroup.
 }
 \description{
-This function generates a data frame or a list of data frames containing the
-quality indicators for population-based cancer registries (PBCRs). These indicators
-include various metrics such as:
+This function generates a data frame or a list of data frames
+containing the quality indicators for population-based cancer registries
+(PBCRs). These indicators include various metrics such as:
 \itemize{
 \item \code{fbs}: Number of incident cases.
 \item \code{fbl}: Incidence rate.
@@ -63,7 +65,8 @@ include various metrics such as:
 }
 }
 \examples{
-data <- load_canreg()
+data("canregs")
+data <- canregs[[1]]
 qua <- create_quality(data, year, sex, cancer, cancer_type = "big")
 head(qua)
 fbsw <- count_canreg(data, cancer_type = "system")

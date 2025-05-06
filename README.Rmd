@@ -11,25 +11,67 @@ knitr::opts_chunk$set(
   fig.path = "man/figures/README-",
   out.width = "100%"
 )
+options(tibble.print_min = 5, tibble.print_max = 5)
 ```
 
-## canregtools <img src="man/figures/logo.png" align="right" height="120" />
+# canregtools <img src="man/figures/logo.png" align="right" height="120" />
 
 <!-- badges: start -->
 [![R-CMD-check](https://github.com/gigu003/canregtools/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/gigu003/canregtools/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
 
-Canregtools is an R package designed to streamline data analysis, visualization, and reporting in Population-Based Cancer Registration (PBCR). 
 
-It includes five sets of R functions that cover data reading, processing, statistical calculations, visualization, and reporting. The data processing functions carried out tasks such as categorizing age into different groups, classifying ICD-10 (or ICD-O-3) codes into categories using various methods, and tidying variables into a clean format. The statistical calculating functions calculate statistics such as age-standardized rates (ASR), truncated rates, cumulative rates, cumulative risk, lifetime risk, life tables, and other quality indicators. Additionally, it can generate a summary sheet containing some of these statistics.
+## Overview
 
-## Install
+canregtools is an R package designed to streamline data analysis, visualization, and reporting in Population-Based Cancer Registration (PBCR). It includes five sets of R functions that cover data reading, processing, statistical calculations, visualization, and reporting.
+
+- `read_canreg()` read data formats required by the National Cancer Center in China to object with class of `canreg` or `canregs`. The raw data is stored in an Excel file containing three sheets named FB, SW, and POP, where FB represents incidence data, SW represents mortality data, and POP represents population data.
+- `count_canreg()` convert object with class of `canreg` or `canregs` to object with class of `fbswicd` or `fbswicds`.
+- `create_asr()` calculate age-standardized rates (ASR), truncated rates and cumulative rates, `create_quality()` calculate quality indicators such as crude incidence or mortality, mortality to incidence ratio (M:I), percent of pathological verified cases (MV%), and etc. , `create_age_rate()` calculate age specific rate, `create_sheet()` create a summary sheet containing some of these statistics.
+- `draw_pyramid()` draw population pyramid, `draw_linechart()` draw line chart, `draw_barchart()` draw grouped bar chart.
+- `create_report()` generate cancer registry report based on data of class "canreg" or "canregs", the output file type can be Word, HTML, or PDF.
+
+## Installation
 Currently, the package is not available on CRAN, but you can install the development version of canregtools from GitHub. The installation method is as follows:
 
-```r
+```{r, eval = FALSE}
 ## Install the remotes package
 install.packages("remotes")
 
 library(remotes)
 install_github("gigu003/canregtools")
 ```
+
+## Usage
+
+```{r, message=FALSE}
+library(canregtools)
+data("canregs")
+data <- canregs[[1]]
+
+# count `canreg` data to `fbswicd`
+fbsw <- data |>
+  count_canreg(cancer_type = "big")
+
+# calculate age standard rate (ASR) based on `fbswicd`
+fbsw |> 
+  create_asr(year, sex, cancer) |> 
+  add_labels(lang = "en")
+
+# calculate quality indicators based on `fbswicd`
+fbsw |> 
+  create_quality(cancer) |> 
+  add_labels(label_type = "abbr", lang="en")
+
+# calculate age specific rate based on `fbswicd`
+fbsw |> 
+  create_age_rate() |> 
+  add_labels(lang = "en")
+```
+
+
+
+
+
+
+

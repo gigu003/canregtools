@@ -8,12 +8,7 @@
 \usage{
 count_canreg(
   x,
-  cutage_method = "distance",
-  breaks = c(0, 15, 40, 65),
-  length = 5,
-  maxage = 85,
-  sep_zero = TRUE,
-  labels = NULL,
+  age_breaks = c(0, 1, seq(5, 85, 5)),
   label_tail = NULL,
   cancer_type = "big"
 )
@@ -22,12 +17,7 @@ count_canreg(
 
 \method{count_canreg}{canreg}(
   x,
-  cutage_method = "distance",
-  breaks = c(0, 15, 40, 65),
-  length = 5,
-  maxage = 85,
-  sep_zero = TRUE,
-  labels = NULL,
+  age_breaks = c(0, 1, seq(5, 85, 5)),
   label_tail = NULL,
   cancer_type = "big"
 )
@@ -35,22 +25,8 @@ count_canreg(
 \arguments{
 \item{x}{Object data of class 'canreg' or 'canregs'.}
 
-\item{cutage_method}{Methods for Specifying Age Groups. Options are
-"interval", "distance", or "quantile". Default is "distance".}
-
-\item{breaks}{Specify the break points classify age groups when
-cutage_method is 'interval'. Default is 'c(0, 15, 40, 65)'.}
-
-\item{length}{Specify the length of each age group when cutage_method is
-'distance'. Default is 5.}
-
-\item{maxage}{Specify the max age of age group when cutage_method is
-'distance'. Default is 85.}
-
-\item{sep_zero}{Logical value, TRUE or FALSE, specifying whether to treat age
-0 as a separate group. Default is TRUE.}
-
-\item{labels}{Labels for age groups. Default is NULL.}
+\item{age_breaks}{Specify the break points classify age groups. Default is
+\code{c(0, 1, seq(0, 85, 5))}.}
 
 \item{label_tail}{Tail label to be added to the labels. Default is NULL.}
 
@@ -75,8 +51,7 @@ Count canreg data.
 }
 \examples{
 library(canregtools)
-file <- system.file("extdata", "411721.xls", package = "canregtools")
-data <- read_canreg(file)
-fbsw <- count_canreg(data, cutage_method = "interval")
+data("canregs")
+fbsw <- count_canreg(canregs)
 fbsw
 }

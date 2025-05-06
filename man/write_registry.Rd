@@ -2,19 +2,35 @@
 % Please edit documentation in R/write_registry.R
 \name{write_registry}
 \alias{write_registry}
-\title{Write the registry definition to the user defined dict.}
+\alias{write_registry.data.frame}
+\alias{write_registry.list}
+\alias{write_registry.NULL}
+\alias{write_registry.character}
+\title{Write registry attributes to the user-defined dictionary.}
 \usage{
-write_registry(areacode, registry)
+write_registry(x = NULL, dict_type = "registry")
+
+\method{write_registry}{data.frame}(x = NULL, dict_type = "registry")
+
+\method{write_registry}{list}(x = NULL, dict_type = "registry")
+
+\method{write_registry}{`NULL`}(x = NULL, dict_type = "registry")
+
+\method{write_registry}{character}(x = NULL, dict_type = "registry")
 }
 \arguments{
-\item{areacode}{Six-digit administrative division code.}
+\item{x}{A named list where names are six-digit administrative
+division codes, and values are corresponding attributes
+(e.g., registry names or area types such as 'Urban').}
 
-\item{registry}{The name of the registry corresponding to the six-digit
-administrative division code.}
+\item{dict_type}{A string indicating the type of dictionary ('registry' or
+area_type').}
 }
 \value{
-Null
+A tibble containing the updated dictionary.
 }
 \description{
-Write the registry definition to the user defined dict.
+This function stores the mapping between administrative division codes
+(\code{areacode}) and their corresponding attributes (\code{values}) into a specific
+dictionary file, such as \code{registry_dict} or \code{area_type_dict}.
 }

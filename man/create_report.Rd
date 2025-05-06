@@ -11,7 +11,8 @@ create_report(
   template = "annual",
   title = "Cancer Registry Report",
   output_format = "html_document",
-  output_dir = NULL
+  output_dir = NULL,
+  ...
 )
 
 \method{create_report}{canregs}(
@@ -19,7 +20,8 @@ create_report(
   template = "annual",
   title = "Cancer Registry Report",
   output_format = "html_document",
-  output_dir = NULL
+  output_dir = NULL,
+  ...
 )
 
 \method{create_report}{canreg}(
@@ -27,7 +29,8 @@ create_report(
   template = "annual",
   title = "Cancer Registry Report",
   output_format = "html_document",
-  output_dir = NULL
+  output_dir = NULL,
+  ...
 )
 }
 \arguments{
@@ -44,6 +47,8 @@ Report".}
 "html_document".}
 
 \item{output_dir}{Directory of the rendered report.}
+
+\item{...}{Parameters in \code{rmarkdown::render}.}
 }
 \description{
 Create report from report templates

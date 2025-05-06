@@ -152,6 +152,10 @@ calc_age <- function(birth_date, onset_date) {
 #'   39252, 37349, 30507, 26363, 21684, 15362, 11725, 7461, 3260, 915)
 #' expand_age_pop(ages)
 expand_age_pop <- function(x, method = "linear") {
+  x <- replace(x, is.na(x), 0)
+  if (!length(x) == 19){
+    x <- rep(0, 19)
+  }
   x1 <- x
   max <- 92
   x[2] <- x[2] / 4

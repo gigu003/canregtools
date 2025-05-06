@@ -126,7 +126,7 @@ ageadjust <- function(count,
 #' truncrate(dx, px, stdpop, trunc_age=c(35,64))
 truncrate <- function(cases,
                       pop,
-                      stdpop = spop,
+                      stdpop = NULL,
                       trunc_age = c(35, 64),
                       agewidth = 5,
                       sep_zero = TRUE,

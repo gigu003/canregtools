@@ -30,12 +30,16 @@ cr_select <- function(data, ..., index = names(data)) {
 cr_select.canregs <- function(data, ..., index = names(data)){
   data <- data[index]
   class(data) <- c("canregs", "list")
-  summ <- summary(data)
   conds <- rlang::enquos(...)
-  summ1 <- cr_select.summaries(summ, !!!conds)
-  res <- data[names(summ1)]
-  res <- compact(res)
-  class(res) <- c("canregs", "list")
+  if (length(conds) > 0) {
+    summ <- summary(data, collapse = FALSE)
+    summ1 <- cr_select.summaries(summ, !!!conds)
+    res <- data[names(summ1)]
+    res <- compact(res)
+    class(res) <- c("canregs", "list")
+  } else {
+    res <- data
+  }
   return(res)
 }
 
@@ -57,10 +61,15 @@ cr_select.fbswicds <- function(data, ..., index = names(data)){
   conds <- rlang::enquos(...)
   data <- data[index]
   class(data) <- c("fbswicds", "list")
-  qua <- create_quality(data)
-  qua1 <- purrr::keep(qua, check_conds, !!!conds)
-  res <- data[names(qua1)]
-  class(res) <- c("fbswicds", "list")
+  if (length(conds) > 0) {
+    qua <- create_quality(data)
+    qua1 <- purrr::keep(qua, check_conds, !!!conds)
+    res <- data[names(qua1)]
+    class(res) <- c("fbswicds", "list")
+  } else {
+    res <- data
+  }
+
   return(res)
 }
 

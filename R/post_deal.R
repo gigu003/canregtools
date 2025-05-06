@@ -4,48 +4,34 @@
 #' based on the specified language and label type.
 #'
 #' @param x A data frame or tibble to be labeled.
-#' @param label_type Type of label for the cancer variable. Options are:
-#'   \itemize{
-#'     \item "full" - Full descriptive labels.
-#'     \item "abbr" - Shortened labels.
-#'     \item "icd10" - ICD-10 codes only.
-#'   }
-#'   The default is "full".
-#' @param lang Language of the labels. Options are:
-#'   \itemize{
-#'     \item "zh" - Chinese.
-#'     \item "en" - English.
-#'   }
-#'   The default is "zh".
-#'
+#' @inheritParams label_type
+#' @inheritParams lang
+#' @inheritParams as_factor
 #' @return A data frame or tibble with labeled variables.
 #' @export
 #'
 add_labels <- function(x,
                        label_type = "full",
-                       lang = "zh"){
+                       lang = "zh",
+                       as_factor = TRUE){
   col_names <- colnames(x)
   res <- x
   if ("sex" %in% col_names) {
-    res$sex <- tidy_sex(res$sex, lang = lang, as_factor = T) }
+    res$sex <- tidy_var(res$sex, var_name = "sex", label_type = label_type,
+                        lang = lang, as_factor = as_factor)
+    }
   if ("cancer" %in% col_names) {
-    res$site <- tidy_cancer(res$cancer, label_type = label_type,
-                            lang = lang, as_factor = T)
-    res$icd10 <- tidy_cancer(res$cancer, label_type = "icd10")
+    res$site <- tidy_var(res$cancer, var_name = "cancer",
+                         label_type = label_type, lang = lang,
+                         as_factor = as_factor)
+    res$icd10 <- tidy_var(res$cancer, var_name = "cancer", lang = "icd10")
   }
   
   areacode <- rlang::sym("areacode")
   if ("areacode" %in% col_names) {
-    areacodes <- res |> pull(!!areacode)
-    addr <- "~/.canregtools/label_areacode.dcf"
-    if (file.exists(addr)) {
-      label_area <- read.dcf(addr)
-      label_area <- as.data.frame(label_area)}
-    label_sel <- label_area |> filter(!!areacode %in% areacodes)
-    areacode2 <- label_sel |> pull(!!areacode)
-    label_cn <- label_sel |> pull(label_cn)
-    label_en <- label_sel |> pull(label_en)
-    res$name <- factor(res$areacode, levels = areacode2, labels = label_cn)
+    res$name <- tidy_var(res$areacode, var_name = "areacode",
+                         lang = lang, label_type = label_type,
+                         as_factor = as_factor)
   }
   
   res <- res |> 
@@ -56,38 +42,57 @@ add_labels <- function(x,
 }
 
 
+#' post
+#'
+#' @param x asr 
+#'
+#' @returns a
+#'
 post_sex_specific_cancer <- function(x){
+  sex <- rlang::sym("sex")
+  cancer <- rlang::sym("cancer")
   female_cancer <- c(29:37, 114:117, 206, 320:325)
   male_cancer <- c(38:41, 118:119, 207, 326:328)
   sex_specific_cancer <- x |> 
     filter(
-      as.numeric(sex) == 2 & cancer %in% female_cancer |
-        as.numeric(sex) == 1 & cancer %in% male_cancer ) |> 
-    mutate(sex = 0)
+      as.numeric(!!sex) == 2 & !!cancer %in% female_cancer |
+        as.numeric(!!sex) == 1 & !!cancer %in% male_cancer ) |> 
+    mutate(!!sex := 0)
+  
   res <- x |> 
-    filter(!(sex == 0 & cancer %in% c(male_cancer, female_cancer))) |> 
+    filter(!(!!sex == 0 & !!cancer %in% c(male_cancer, female_cancer))) |> 
     bind_rows(sex_specific_cancer) |> 
-    arrange(year, sex, cancer)
+    filter(
+      (!!sex == 1 & !!cancer %nin% female_cancer) |
+        (!!sex == 2 & !!cancer %nin% male_cancer) |
+        !!sex == 0)
+  
+  sex_not_cancer <- x |> 
+    filter((!!sex == 1 & !!cancer %in% female_cancer)|
+             (!!sex == 2 & !!cancer %in% male_cancer)) |> 
+    mutate(across(!starts_with(c("areacode", "name", "year", "sex", "cancer",
+                                 "pop", "site", "type", "icd10", "rks","agegrp")), ~0)
+           )
+  res <- bind_rows(res, sex_not_cancer) 
   return(res)
 }
 
 post_vars <- function(data){
   all_vars <- colnames(data)
+  year <- rlang::sym("year")
+  sex <- rlang::sym("sex")
+  cancer <- rlang::sym("cancer")
   if ("year" %nin% all_vars){
-    data <- data |> 
-      mutate(year = 9000)
+    data <- mutate(data, !!year := 9000L)
   }
   if ("sex" %nin% all_vars){
-    data <- data |> 
-      mutate(sex = 0)
+    data <- mutate(data, !!sex := 0L)
   }
   if ("cancer" %nin% all_vars){
-    data <- data |> 
-      mutate(cancer = 60)
+    data <- mutate(data, !!cancer := "60")
   }
   
-  data <- data |> 
-    select(starts_with(c("year", "sex", "cancer")), everything())
+  data <- select(data, starts_with(c("year", "sex", "cancer")), everything())
   return(data)
 }
 
@@ -99,8 +104,8 @@ post_vars <- function(data){
 #' @export
 #'
 drop_total <- function(x){
-  res <- x |> 
-    filter(cancer %nin% c(60, 61))
+  cancer <- rlang::sym("cancer")
+  res <- filter(x, !!cancer %nin% c("60", "61"))
   return(res)
 }
 
@@ -113,7 +118,7 @@ drop_total <- function(x){
 #' @export
 #'
 drop_others <- function(x){
-  res <- x |> 
-    filter(cancer %nin% c(0, 111, 126, 211))
+  cancer <- rlang::sym("cancer")
+  res <- filter(x, !!cancer %nin% c("0", "111", "126", "211"))
   return(res)
 }

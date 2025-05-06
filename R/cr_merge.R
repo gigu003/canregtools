@@ -43,6 +43,9 @@ cr_merge.canregs <- function(data){
 #' @method cr_merge fbswicds
 #' @export
 cr_merge.fbswicds <- function(data){
+  site <- rlang::sym("site")
+  morp <- rlang::sym("morp")
+  accept_vars <- names(classify_areacode("10302"))
   areacode <- unique(unlist(map(data, pluck("areacode"))))
   gvars <- c("year", "sex", "agegrp", "cancer")
   svars <- c("fbs", "sws", "mv", "ub", "sub", "m8000", "dco")
@@ -50,14 +53,15 @@ cr_merge.fbswicds <- function(data){
   fbswicd <- fbswicd |> group_by(!!!rlang::syms(gvars)) |> 
     reframe(across(c(!!!rlang::syms(svars)), ~ sum(.x, na.rm = TRUE)))
   pop <- cmerge(data, nested = "pop")
-  svars2 <- rlang::syms(setdiff(names(pop), setdiff(gvars, "cancer")))
+  sum_vars <- setdiff(names(pop), c(accept_vars, "year", "sex", "agegrp")) |> 
+    rlang::syms()
   pop <- pop |>  group_by(!!!rlang::syms(setdiff(gvars, "cancer"))) |> 
-    reframe(across(c(!!!svars2), ~ sum(.x, na.ram = TRUE)))
+    reframe(across(c(!!!sum_vars), ~ sum(.x, na.ram = TRUE)))
   sitemorp <- cmerge(data, nested = "sitemorp")
   sitemorp <- sitemorp |> 
     group_by(!!!rlang::syms(setdiff(gvars, "agegrp"))) |> 
-    reframe(site = list(combine_tp(site)),
-            morp = list(combine_tp(morp)))
+    reframe(!!site := list(combine_tp(!!site)),
+            !!morp := list(combine_tp(!!morp)))
   res <- list(
     areacode = areacode,
     fbswicd = fbswicd,
@@ -85,6 +89,34 @@ cr_merge.qualities <- function(data){
   return(res)
 }
 
+#' @rdname cr_merge
+#' @method cr_merge age_rates
+#' @export
+cr_merge.age_rates <- function(data){
+  res <- cmerge(data)
+  return(res)
+}
+
+#' @rdname cr_merge
+#' @method cr_merge summaries
+#' @export
+cr_merge.summaries <- function(data){
+  res <- purrr::map(data, function(f){
+    purrr::map(f, function(x){
+      if (length(x) > 1) {
+        return(paste(x, collapse = ", "))
+      } else if (length(x) == 0) {
+        return(" ")
+      } else{
+        return(x)
+      }
+    }) |> 
+      as.data.frame()
+  })
+  res <- cmerge(res)
+  class(res) <- c("summary", "list")
+  return(res)
+}
 
 #' Merge list
 #'

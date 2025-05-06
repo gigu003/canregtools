@@ -15,18 +15,17 @@ create_ratio <- function(x, ...) {
 #' @method create_ratio fbswicd
 #' @export
 create_ratio.fbswicd <- function(x, ...) {
-  sitemorp <- x$sitemorp 
-  
+  site <- rlang::sym("site")
+  morp <- rlang::sym("morp")
+  sitemorp <- pluck(x, "sitemorp") 
   # Group by the specified variables
-  sitemorp <- sitemorp |> 
-    group_by(...) |> 
+  sitemorp <- group_by(sitemorp, ...) |>
     reframe(
-      site = list(combine_tp(site)),
-      morp = list(combine_tp(morp))
-    )
+      !!site := list(combine_tp(!!site)),
+      !!morp := list(combine_tp(!!morp))
+      )
   return(sitemorp)
 }
-
 
 combine_tp <- function(x){
   res <- purrr::reduce(x, bind_rows)

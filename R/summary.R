@@ -9,11 +9,12 @@
 #' @return A data frame contains summary statistics of canreg data.
 #' @export
 #' 
-summary.canreg <- function(object, ...) {
+summary.canreg <- function(object, collapse = FALSE, ...) {
   r_vars_inci <- c("sex", "birthda", "inciden", "deathda", "basi", "icd10")
-  fb <- purrr::pluck(object, "FBcases")
-  sw <- purrr::pluck(object, "SWcases")
-  pop <- purrr::pluck(object, "POP")
+  object_format <- cr_clean(object)
+  fb <- purrr::pluck(object_format, "FBcases")
+  sw <- purrr::pluck(object_format, "SWcases")
+  pop <- purrr::pluck(object_format, "POP")
 
   basi <- purrr::pluck(fb, "basi")
   basi2 <- basi[basi %in% 5:7]
@@ -24,12 +25,24 @@ summary.canreg <- function(object, ...) {
   mv <- round(length(basi2)/fbs*100, 2)
   dco <- round(length(basi0)/fbs*100, 2)
   rks <- sum(purrr::pluck(pop, "rks"))
+  rks <- ifelse(is.na(rks), 0, rks)
   rks_year <- pop |> pull(!!rlang::sym("year")) |> unique()
-  inci <- round(fbs/rks*100000, 2)
-  mort <- round(sws/rks*100000, 2)
-  if (rks == 0){
+  if (length(rks_year)== 0){
+    rks_year <- 0
+  }
+  
+  if ("death" %in% names(pop)){
+    death <- sum(purrr::pluck(pop, "death"))
+  } else {
+    death <- 0
+  }
+  
+  if (is.na(rks) | rks == 0){
     inci <- 0
     mort <- 0
+  } else {
+    inci <- round(fbs/rks*100000, 2)
+    mort <- round(sws/rks*100000, 2)
   }
   
   inci_vars <- names(fb)
@@ -48,6 +61,7 @@ summary.canreg <- function(object, ...) {
     mi = round(sws / fbs, 2),
     mv = mv,
     dco = dco,
+    death = death,
     rks_year = rks_year,
     inci_vars = inci_vars,
     miss_r_vars_inci = miss_r_vars_inci,
@@ -64,6 +78,10 @@ summary.canreg <- function(object, ...) {
 summary.canregs <- function(object, collapse = TRUE, ...) {
   res <- purrr::map(object, summary.canreg)
   class(res) <- c("summaries", class(res))
+  if (collapse) {
+    res <- cr_merge(res)
+    class(res) <- c("summary", "tibble", "data.frame")
+  }
   return(res)
 }
 

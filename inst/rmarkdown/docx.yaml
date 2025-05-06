@@ -1,3 +1,0 @@
-output:
-  word_document:
-    reference_docx: "custom_reference.docx"

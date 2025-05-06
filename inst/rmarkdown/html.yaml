@@ -1,4 +1,0 @@
-output:
-  prettydoc::html_pretty:
-    toc: true
-    theme: cayman

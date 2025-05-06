@@ -4,7 +4,7 @@
 \name{canregtools-package}
 \alias{canregtools}
 \alias{canregtools-package}
-\title{canregtools: Tools for Analyzing Population-Based Cancer Registry Data}
+\title{canregtools: Analyzing Population-Based Cancer Registry Data}
 \description{
 \if{html}{\figure{logo.png}{options: style='float: right' alt='logo' width='120'}}
 
@@ -14,11 +14,13 @@ Tools designed to streamline data analysis, visualization, and reporting in Popu
 Useful links:
 \itemize{
   \item \url{https://gigu003.github.io/canregtools/}
+  \item \url{https://canregtools.chenq.site}
+  \item Report bugs at \url{https://github.com/gigu003/canregtools/issues}
 }
 
 }
 \author{
-\strong{Maintainer}: Qiong Chen \email{chenq08@126.com} (\href{https://orcid.org/0000-0003-2401-0046}{ORCID})
+\strong{Maintainer}: Qiong Chen \email{chenq08@126.com} (\href{https://orcid.org/0000-0003-2401-0046}{ORCID}) [copyright holder]
 
 }
 \keyword{internal}
