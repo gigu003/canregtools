@@ -56,7 +56,7 @@ esti_fbswicd <- function(obj, pop = NULL) {
     select(-!!rlang::sym("inci"), -!!rlang::sym("mort"), -!!rks)
   structure(
     list(
-      areacode = obj$areacode %||% "410000",
+      areacode = obj$areacode,
       fbswicd = esti,
       sitemorp = pluck(obj, "sitemorp"),
       pop = pop_modi
