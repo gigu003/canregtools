@@ -6,7 +6,7 @@
 \alias{create_quality.canregs}
 \alias{create_quality.fbswicds}
 \alias{create_quality.fbswicd}
-\title{Create quality indicators}
+\title{Calculate quality indicators}
 \usage{
 create_quality(x, ..., decimal = 2, collapse = TRUE)
 
@@ -44,21 +44,20 @@ input data is a vector of ICD-10 codes, or object with class of
 \code{'canreg'} or \code{'canregs'}.}
 }
 \value{
-The function returns a data frame (if applied to a single registry
+A data frame (if applied to a single registry
 object, 'canreg' or 'fbswicd') or a list of data frames (if applied to a
 grouped registry object, 'canregs' or 'fbswicds') with a class of either
-\code{'quality'} or \code{'qualities'}. Each output data frame contains the computed
-quality indicators for the registry or subgroup.
+\code{'quality'} or \code{'qualities'}.
 }
 \description{
-This function generates a data frame or a list of data frames
-containing the quality indicators for population-based cancer registries
-(PBCRs). These indicators include various metrics such as:
+\code{create_quality()}calculate quality indicators from object with class
+of \code{canreg}, \code{canregs}, \code{fbswicd}, or \code{fbswicds}. The quality indicators for
+population-based cancer registries (PBCRs) including:
 \itemize{
 \item \code{fbs}: Number of incident cases.
-\item \code{fbl}: Incidence rate.
+\item \code{inci}: Cancer incidence rate.
 \item \code{sws}: Number of death cases.
-\item \code{swl}: Mortality rate.
+\item \code{mort}: Mortality rate.
 \item \code{mv}: Percentage of cases with microscopic verification.
 \item \code{mi}: Mortality-to-incidence ratio.
 \item And other relevant quality metrics for cancer data evaluation.
@@ -66,10 +65,27 @@ containing the quality indicators for population-based cancer registries
 }
 \examples{
 data("canregs")
+fbsws <- count_canreg(canregs, cancer_type = "system")
+qua2 <- create_quality(fbsws, year, sex, cancer)
+head(qua2)
+
+# Calculate the quality indicators based on object with class of `canreg`
 data <- canregs[[1]]
 qua <- create_quality(data, year, sex, cancer, cancer_type = "big")
 head(qua)
-fbsw <- count_canreg(data, cancer_type = "system")
-qua2 <- create_quality(fbsw, year, sex, cancer)
-head(qua2)
+
+# Calculate the quality indicators based on object with class of `canregs`
+qua <- create_quality(canregs, year, sex, cancer, cancer_type = "big")
+head(qua)
+
+# Calculate the quality indicators based on object with class of `fbswicds`
+fbsws <- count_canreg(canregs, cancer_type = "small")
+qua <- create_quality(fbsws, year, sex, cancer)
+head(qua)
+
+# Calculate the quality indicators based on object with class of `fbswicd`
+fbsw <- count_canreg(canregs[[1]], cancer_type = "big")
+qua <- create_quality(fbsw, year, sex, cancer)
+head(qua)
+
 }

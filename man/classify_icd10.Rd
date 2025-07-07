@@ -2,7 +2,7 @@
 % Please edit documentation in R/classify.R
 \name{classify_icd10}
 \alias{classify_icd10}
-\title{Classify ICD10 Codes to Cancer Categories.}
+\title{Classify ICD10 codes to cancer categories}
 \usage{
 classify_icd10(
   x,
@@ -13,8 +13,8 @@ classify_icd10(
 )
 }
 \arguments{
-\item{x}{The ICD10 codes of cancer part (C00-C98 and D00-D48) collected
-by the Population-Based Cancer Registration (PBCR).}
+\item{x}{The ICD10 codes of cancer part ('C00-C98 and D00-D48') which used in
+by the Population-Based Cancer Registration ('PBCR').}
 
 \item{cancer_type}{A character string specifying the classification method
 used to categorize ICD-10 codes. This determines how ICD-10 codes are
@@ -35,7 +35,7 @@ or 'en', default is 'cn'.}
 \item{as_factor}{Logical, indicate whether output value as factor.}
 }
 \value{
-Cancer code
+Cancer code.
 }
 \description{
 Classify ICD10 codes into Cancer Categories according to the specified
@@ -44,4 +44,7 @@ category type and language.
 \examples{
 icd10 <- c("C15.2", "C33.4", "C80.9", "C26.2", "C16.3")
 classify_icd10(icd10, cancer_type = "big")
+classify_icd10(icd10, cancer_type = "small")
+classify_icd10(icd10, cancer_type = "system")
+classify_icd10(icd10, cancer_type = "gco")
 }

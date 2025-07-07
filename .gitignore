@@ -6,3 +6,4 @@ docs
 .secrets
 .DS_Store
 */.DS_Store
+inst/doc

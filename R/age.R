@@ -1,33 +1,41 @@
-#' Cut age into groups.
+#' Group ages into categories
 #'
-#' @param x Vector contains the ages.
-#' @param method The method to use for age grouping.
-#'        Options are "interval", "distance", or "quantile".
-#' @param length The length of intervals for age grouping when method is
-#'        set to "distance".
-#' @param maxage The maximum age for age grouping.
-#' @param sep_zero A logical value indicating whether to include a separate
-#'        group for age 0.
-#' @param breaks Custom breakpoints for the "interval" method.
-#' @param labels labels for the levels of the resulting category.
-#'        By default, labels are constructed using "(a,b]" interval notation.
-#'        If labels = FALSE, simple integer codes are returned instead of
-#'        a factor.
-#' @param label_tail A string to be appended at the end of each label.
-#' @param right A logical value indicating whether the intervals are
-#'        right-closed or right-open.
-#' @param lang Language used for output. Options are 'cn' or 'en'.
-#'        Default is 'cn.'.
+#' Groups numeric age values into categorized age bands using one of three
+#' methods: fixed interval (`"interval"`), equal distance (`"distance"`),
+#' or quantile-based grouping (`"quantile"`). Supports flexible labeling and
+#' language-specific suffixes.
+#' 
+#' @param x Numeric vector of ages.
+#' @param method Character. Grouping method: `"interval"` (custom breaks), 
+#'   `"distance"` (uniform width), or `"quantile"` (equal-sized groups).
+#' @param length Integer. Width of age bands (used only
+#'    if `method = "distance"`). Default is 5.
+#' @param maxage Numeric. Upper limit of the age range (used in `"distance"`
+#'    method).
+#' @param sep_zero Logical. Whether to separate age 0 into its own group
+#'    (only used if `method = "distance"`). Default is TRUE.
+#' @param breaks Numeric vector of breakpoints (required if
+#'    `method = "interval"`).
+#' @param labels Character vector of labels for resulting age groups.
+#'    If `NULL`, default interval-style labels are generated.
+#' @param label_tail Character string appended to labels, e.g., `"yrs"`.
+#'    Default depends on `lang`.
+#' @param right Logical. Whether intervals are right-closed. Passed to `cut()`.
+#'    Default is FALSE.
+#' @param lang Output language for default labels, `"cn"` (Chinese)
+#'    or `"en"` (English). Default is `"cn"`.
 #'
-#' @return Factor of age groups.
+#' @return A factor variable of age groups with labeled levels.
 #' @export
 #'
 #' @examples
-#' age <- sample(0:101, 200, replace = TRUE)
-#' agegrp <- cutage(age,
-#'   method = "distance", length = 5,
-#'   maxage = 60, sep_zero = TRUE)
-#' agegrp
+#' ages <- sample(0:101, 200, replace = TRUE)
+#' cutage(ages, method = "distance", length = 5, maxage = 60, sep_zero = TRUE)
+#' # Custom breaks
+#' cutage(ages, method = "interval", breaks = c(0, 15, 30, 45, 60, 75, Inf))
+#' # Quantile-based grouping
+#' cutage(ages, method = "quantile")
+#' 
 cutage <- function(x,
                    method = "distance",
                    length = 5,
@@ -89,35 +97,61 @@ cutage <- function(x,
   return(age_groups)
 }
 
-#' Calculate the actual age between two dates
+#' Calculate the actual age in completed years between two dates
 #'
-#' @param birth_date Birth date.
-#' @param onset_date Event date.
+#' Computes the exact age in full years at the time of an event
+#' (e.g., diagnosis, death, or survey) by comparing a person's birth date
+#' to the date of the event.
 #'
-#' @return Vector of ages.
+#' @param birth_date A vector of birth dates in `Date` format.
+#' @param onset_date A vector of corresponding event dates in `Date` format
+#'    (e.g., date of diagnosis).
+#'
+#' @details
+#' This function calculates age in *completed years*, taking into account
+#' whether the birthday has occurred before the event date in the given year.
+#' If `birth_date` or `onset_date` contains `NA`,
+#' the corresponding result will be `NA`.
+#'
+#' @return A numeric vector of ages in years, with the same length
+#'    as `birth_date` and `onset_date`.
+#' 
 #' @export
 #'
 #' @examples
+#' # Generate random birth dates
+#' set.seed(123)
 #' sdate <- as.Date("1960-01-01")
 #' edate <- as.Date("1980-12-31")
 #' bdate <- sample(seq(sdate, edate, by = "1 day"), 100, replace = TRUE)
-#' event <- sample(seq(as.Date("2020-01-01"),
-#'                     as.Date("2023-07-08"),
-#'                     by = "1 day"),
-#'                 100, replace = TRUE)
+#'
+#' # Generate random event dates
+#' sdate <- as.Date("2020-01-01")
+#' edate <- as.Date("2023-07-08")
+#' event <- sample(seq(sdate, edate, by = "1 day"), 100, replace = TRUE)
+#'
+#' # Calculate ages
 #' ages <- calc_age(bdate, event)
-#' ages
+#' head(ages)
+#' # Handle missing values
+#' bdate[1] <- NA
+#' event[2] <- NA
+#' calc_age(bdate, event)[1:5]
+#' 
 calc_age <- function(birth_date, onset_date) {
   # Ensure both inputs are Date objects
   birth_date <- as.Date(birth_date)
   onset_date <- as.Date(onset_date)
-  
+  # Check for length mismatch
+  if (length(birth_date) != length(onset_date)) {
+    stop("Length of 'birth_date' and 'onset_date' must be equal.")
+  }
   # Initialize age as NA for missing values
   age <- rep(NA, length(birth_date))
-  
+
   # Identify non-NA values
   valid_idx <- !(is.na(birth_date) | is.na(onset_date))
-  
+
   # Calculate age for non-missing values
   birth_year <- as.numeric(format(birth_date[valid_idx], "%Y"))
   onset_year <- as.numeric(format(onset_date[valid_idx], "%Y"))
@@ -125,35 +159,56 @@ calc_age <- function(birth_date, onset_date) {
   onset_month <- as.numeric(format(onset_date[valid_idx], "%m"))
   birth_day <- as.numeric(format(birth_date[valid_idx], "%d"))
   onset_day <- as.numeric(format(onset_date[valid_idx], "%d"))
-  
+
   age[valid_idx] <- onset_year - birth_year
-  age[valid_idx][onset_month < birth_month | 
-                   (onset_month == birth_month & onset_day < birth_day)] <- 
-    age[valid_idx][onset_month < birth_month | 
-                     (onset_month == birth_month & onset_day < birth_day)] - 1
-  
-  return(age)
+  age[valid_idx][onset_month < birth_month |
+                   (onset_month == birth_month & onset_day < birth_day)] <-
+    age[valid_idx][onset_month < birth_month |
+                   (onset_month == birth_month & onset_day < birth_day)] - 1
+  age
 }
 
-#' Expand age groups population.
+#' Expand population data from 5-year age groups to single-year ages
+#' 
+#' `expand_age_pop` transforms population data aggregated in age groups into
+#' estimates for single-year ages. It utilizes interpolation methods to
+#' distribute the grouped data across individual ages, ensuring consistency
+#' with the original totals.
 #'
-#' @param x Vector, population for each age group.
-#' @param method Method for expanding, options are 'linear', 'constant',
-#'        'periodic', or 'natural'. Default is 'linear'.
-#'
+#' @param x A numeric vector representing the population counts for each age
+#'    group. The vector should have 19 elements corresponding to the following
+#'    age groups: 0, 1–4, 5–9, ..., 85+.
+#' @param method A character string specifying the interpolation method to use.
+#'    Options include:
+#' \itemize{
+#'   \item \code{"linear"}: Linear interpolation.
+#'   \item \code{"constant"}: Constant interpolation.
+#'   \item \code{"periodic"}: Periodic spline interpolation.
+#'   \item \code{"natural"}: Natural spline interpolation.
+#' }
+#' The default is \code{"linear"}.
+#' 
 #' @importFrom stats aggregate approx quantile spline
 #'
-#' @return Vector contain the expanded age population.
+#' @return A data frame with two columns:
+#' \describe{
+#'   \item{\code{x}}{Integer ages from 0 to 92.}
+#'   \item{\code{y}}{Estimated population counts for each single-year age.}
+#' }
+#' 
 #' @export
 #'
 #' @examples
+#' # Example population data for 19 age groups: 0, 1–4, 5–9, ..., 85+
 #' ages <- c(
 #'   5053, 17743, 25541, 32509, 30530, 34806, 36846, 38691, 40056,
-#'   39252, 37349, 30507, 26363, 21684, 15362, 11725, 7461, 3260, 915)
-#' expand_age_pop(ages)
+#'   39252, 37349, 30507, 26363, 21684, 15362, 11725, 7461, 3260, 915
+#' )
+#' eages <- expand_age_pop(ages)
+#' head(eages)
 expand_age_pop <- function(x, method = "linear") {
   x <- replace(x, is.na(x), 0)
-  if (!length(x) == 19){
+  if (!length(x) == 19) {
     x <- rep(0, 19)
   }
   x1 <- x

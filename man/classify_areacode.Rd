@@ -2,29 +2,50 @@
 % Please edit documentation in R/classify.R
 \name{classify_areacode}
 \alias{classify_areacode}
-\title{Classify Area Codes}
+\title{Classify codes for the administrative divisions of China}
 \usage{
 classify_areacode(x)
 }
 \arguments{
-\item{x}{A vector of six-digit Chinese administrative area codes as numeric
-or character.}
+\item{x}{A vector of six-digit Chinese administrative area codes, either as numeric
+or character strings.}
 }
 \value{
-A list containing the following elements:
+A list with the following named elements:
 \itemize{
-\item \code{areacode}: The input area code with invalid codes replaced by NA.
-\item \code{registry}: The registry code corresponding to the area code.
-\item \code{province}: The province-level area code (first two digits + "0000").
-\item \code{city}: The city-level area code (first four digits + "00").
-\item \code{area_type}: The area type classification ("910000" for urban, "920000" for rural).
-\item \code{region}: The regional classification code.
+\item \code{areacode}: Validated area codes. Invalid entries are replaced with \code{NA}.
+\item \code{registry}: Registry codes corresponding to each area, using a built-in
+or cached dictionary.
+\item \code{province}: Province-level codes formed by taking the first two digits and
+appending \code{"0000"}.
+\item \code{city}: City-level codes formed by taking the first four digits and
+appending \code{"00"}.
+\item \code{area_type}: Urban-rural classification codes: \code{"910000"} for urban,
+\code{"920000"} for rural. This can be updated using \code{\link[=write_registry]{write_registry()}}
+function which stored the dictionary in (\code{area_type_dict.rds})
+\item \code{region}: Region classification codes derived from province codes,
+ending in \code{"0000"}.
 }
 }
 \description{
-Classifies Chinese administrative area codes into different categories,
-including province, city, area type, and registry information.
+Categorizes six-digit administrative division codes of the People's Republic
+of China (as per GB/T 2260-2007) into several structured components,
+including province, city, area type (urban/rural), registry code, and
+regional classification.
+}
+\details{
+This function standardizes and validates area codes, identifies their
+administrative levels, and attaches metadata used in cancer registration
+systems. It also supports external dictionaries (from the \code{canregtools}
+configuration folder) to provide more accurate classification of area types
+and registry mapping. Classify Codes for the administrative divisions of
+the People's Republic of China(GB/T 2260-2007) into different categories,
+including 'province', city', 'area_type', and 'registry' attributes.
 }
 \examples{
 classify_areacode(c("110000", "320500", "440300"))
+
+}
+\seealso{
+\code{\link[=write_registry]{write_registry()}}
 }

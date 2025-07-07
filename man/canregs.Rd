@@ -14,12 +14,14 @@ Henan Province Cancer Registry, China.
 canregs
 }
 \description{
-This dataset provides example data from population-based cancer registries (PBCRs),
-structured using the \code{canregs} class. It can be used for demonstration, testing,
-or development purposes within the \code{canregtools} package.
+This dataset provides example data from population-based cancer registries
+(PBCRs), structured using the \code{canregs} class. It can be used for
+demonstration, testing, or development purposes within the \code{canregtools}
+package.
 }
 \examples{
-data(canregs)
+
+data("canregs")
 summary(canregs[[1]])
 }
 \keyword{datasets}

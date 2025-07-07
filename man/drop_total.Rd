@@ -7,11 +7,19 @@
 drop_total(x)
 }
 \arguments{
-\item{x}{A data frame.}
+\item{x}{A data frame containing a \code{cancer} variable created by
+\code{\link[=classify_icd10]{classify_icd10()}}.}
 }
 \value{
-A data frame.
+A filtered data frame excluding \code{cancer} in \code{c("60", "61")}.
 }
 \description{
-Drop the total cancer
+Filter out cases that summarized as \code{total} when using \code{\link[=create_asr]{create_asr()}},
+\code{\link[=create_quality]{create_quality()}}, or \code{\link[=create_age_rate]{create_age_rate()}}.
+}
+\examples{
+data("canregs")
+qua <- create_quality(canregs, year, sex, cancer)
+qua2 <- qua |> drop_total()
+
 }

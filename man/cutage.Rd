@@ -2,7 +2,7 @@
 % Please edit documentation in R/age.R
 \name{cutage}
 \alias{cutage}
-\title{Cut age into groups.}
+\title{Group ages into categories}
 \usage{
 cutage(
   x,
@@ -18,44 +18,50 @@ cutage(
 )
 }
 \arguments{
-\item{x}{Vector contains the ages.}
+\item{x}{Numeric vector of ages.}
 
-\item{method}{The method to use for age grouping.
-Options are "interval", "distance", or "quantile".}
+\item{method}{Character. Grouping method: \code{"interval"} (custom breaks),
+\code{"distance"} (uniform width), or \code{"quantile"} (equal-sized groups).}
 
-\item{length}{The length of intervals for age grouping when method is
-set to "distance".}
+\item{length}{Integer. Width of age bands (used only
+if \code{method = "distance"}). Default is 5.}
 
-\item{maxage}{The maximum age for age grouping.}
+\item{maxage}{Numeric. Upper limit of the age range (used in \code{"distance"}
+method).}
 
-\item{sep_zero}{A logical value indicating whether to include a separate
-group for age 0.}
+\item{sep_zero}{Logical. Whether to separate age 0 into its own group
+(only used if \code{method = "distance"}). Default is TRUE.}
 
-\item{breaks}{Custom breakpoints for the "interval" method.}
+\item{breaks}{Numeric vector of breakpoints (required if
+\code{method = "interval"}).}
 
-\item{labels}{labels for the levels of the resulting category.
-By default, labels are constructed using "(a,b]" interval notation.
-If labels = FALSE, simple integer codes are returned instead of
-a factor.}
+\item{labels}{Character vector of labels for resulting age groups.
+If \code{NULL}, default interval-style labels are generated.}
 
-\item{lang}{Language used for output. Options are 'cn' or 'en'.
-Default is 'cn.'.}
+\item{lang}{Output language for default labels, \code{"cn"} (Chinese)
+or \code{"en"} (English). Default is \code{"cn"}.}
 
-\item{label_tail}{A string to be appended at the end of each label.}
+\item{label_tail}{Character string appended to labels, e.g., \code{"yrs"}.
+Default depends on \code{lang}.}
 
-\item{right}{A logical value indicating whether the intervals are
-right-closed or right-open.}
+\item{right}{Logical. Whether intervals are right-closed. Passed to \code{cut()}.
+Default is FALSE.}
 }
 \value{
-Factor of age groups.
+A factor variable of age groups with labeled levels.
 }
 \description{
-Cut age into groups.
+Groups numeric age values into categorized age bands using one of three
+methods: fixed interval (\code{"interval"}), equal distance (\code{"distance"}),
+or quantile-based grouping (\code{"quantile"}). Supports flexible labeling and
+language-specific suffixes.
 }
 \examples{
-age <- sample(0:101, 200, replace = TRUE)
-agegrp <- cutage(age,
-  method = "distance", length = 5,
-  maxage = 60, sep_zero = TRUE)
-agegrp
+ages <- sample(0:101, 200, replace = TRUE)
+cutage(ages, method = "distance", length = 5, maxage = 60, sep_zero = TRUE)
+# Custom breaks
+cutage(ages, method = "interval", breaks = c(0, 15, 30, 45, 60, 75, Inf))
+# Quantile-based grouping
+cutage(ages, method = "quantile")
+
 }

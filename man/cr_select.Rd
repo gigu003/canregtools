@@ -40,3 +40,20 @@ This function allows you to select specific elements from objects of class
 conditions, or expressions. The selected elements are returned while
 preserving the class of the input object.
 }
+\examples{
+data("canregs")
+# Select elements which mi greather than 0.5 from `canregs`
+canregs_mi <- cr_select(canregs, mi > 0.5)
+
+# Select elements from obejct with class of `fbswicds`
+fbsws <- count_canreg(canregs)
+# Select elements which `inci` greater than 250 per 100000 population
+fbsws_inci <- cr_select(fbsws, inci > 250)
+
+# Select elements from object with class of `summaries`
+summ <- summary(canregs, collapse = FALSE)
+# Select elements for whcih `mi` greater than 0.5
+summ_mi <- cr_select(summ, mi > 0.5)
+names(summ_mi)
+
+}

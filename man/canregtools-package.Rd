@@ -8,11 +8,12 @@
 \description{
 \if{html}{\figure{logo.png}{options: style='float: right' alt='logo' width='120'}}
 
-Tools designed to streamline data analysis, visualization, and reporting in Population-Based Cancer Registration (PBCR).
+Tools for cleaning, analyzing, visualizing, and reporting data from Population-Based Cancer Registries (PBCRs), with standardized workflows for filtering, selecting, and restructuring data, designed for routine registry operations.
 }
 \seealso{
 Useful links:
 \itemize{
+  \item \url{https://github.com/gigu003/canregtools}
   \item \url{https://gigu003.github.io/canregtools/}
   \item \url{https://canregtools.chenq.site}
   \item Report bugs at \url{https://github.com/gigu003/canregtools/issues}
@@ -20,7 +21,7 @@ Useful links:
 
 }
 \author{
-\strong{Maintainer}: Qiong Chen \email{chenq08@126.com} (\href{https://orcid.org/0000-0003-2401-0046}{ORCID}) [copyright holder]
+\strong{Maintainer}: Qiong Chen \email{chenq08@126.com} (\href{https://orcid.org/0000-0003-2401-0046}{ORCID}) (Department of Cancer Epidemiology, The Affiliated Cancer Hospital of Zhengzhou University & Henan Cancer Hospital, Henan Cancer Registry in China) [copyright holder]
 
 }
 \keyword{internal}

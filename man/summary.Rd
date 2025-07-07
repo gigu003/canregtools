@@ -22,3 +22,12 @@ A data frame contains summary statistics of canreg data.
 \description{
 Summary object of class 'canreg'
 }
+\examples{
+data("canregs")
+data <- canregs[[1]]
+summary(data)
+
+
+summary(canregs)
+
+}

@@ -2,51 +2,100 @@
 % Please edit documentation in R/draw_barchart.R
 \name{draw_barchart}
 \alias{draw_barchart}
-\title{Draw group bar chart.}
+\title{Draw Grouped Bar Charts with Facets}
 \usage{
 draw_barchart(
   data,
-  plot_var = NULL,
-  cate_var = NULL,
-  group_var = NULL,
-  side_var = NULL,
-  side_label = NULL,
-  bar_side = 1,
-  topn = 10,
-  grid = c(1, 1),
-  ...
+  x,
+  y,
+  group = NULL,
+  facet = NULL,
+  facet_label = NULL,
+  y_label = NULL,
+  rev_group = FALSE,
+  grid = NULL,
+  topn = NULL,
+  axis = NULL,
+  bar_side = NULL,
+  bar_way = NULL,
+  gap = NULL,
+  csize = 0.8,
+  space = 0.9,
+  adj = -0.01,
+  gl = NULL,
+  cols = NULL,
+  palette = "Peach",
+  x_label_side = 1,
+  legend = FALSE,
+  legend_label = NULL,
+  legend_pos = c(0.4, 0.2),
+  dens = c(-1, -1),
+  overlay = FALSE
 )
 }
 \arguments{
-\item{data}{A data frame or tibble.}
+\item{data}{A \code{data.frame} or tibble containing the input data.}
 
-\item{plot_var}{Var to be plotted.}
+\item{x}{The categorical variable (unquoted) for the x-axis.}
 
-\item{cate_var}{Category variable name.}
+\item{y}{The numerical variable (unquoted) for the y-axis (bar height).}
 
-\item{group_var}{Group variable name.}
+\item{group}{Optional grouping variable (unquoted) used for color/fill aesthetics.}
 
-\item{side_var}{Panel variable name.}
+\item{facet}{Optional faceting variable (unquoted) for splitting the data into panels.}
 
-\item{side_label}{Labels for each side.}
+\item{facet_label}{Optional character vector of labels corresponding to each facet.}
 
-\item{bar_side}{Orientation of the bar chart: 1 for left and 2 for right.}
+\item{y_label}{Optional y-axis label or vector of labels for facets.}
 
-\item{topn}{Top n 'plot_var' in each 'group_var' and 'side_var'.}
+\item{rev_group}{Reverse the bar position of group variables.}
 
-\item{grid}{The number of rows and columns in the plot area.}
+\item{grid}{A numeric vector of length 2 indicating the layout (rows, columns) of the plot grid.}
 
-\item{...}{Other options in draw_bar.}
+\item{topn}{Number of top \code{x} categories to display in each group/panel.}
+
+\item{axis}{Optional vector of breaks for the y-axis. If \code{NULL}, computed automatically.}
+
+\item{bar_side}{Integer indicating the side of bars: 1 = left, 2 = right.}
+
+\item{bar_way}{Integer for bar layout: 1 = one-sided, 2 = mirrored.}
+
+\item{gap}{Horizontal spacing between bars and y-axis (default depends on \code{x_label_side}).}
+
+\item{csize}{Character size scaling factor (default = 0.8).}
+
+\item{space}{Vertical space between bars (default = 0.9).}
+
+\item{adj}{Vertical adjustment of x-label text (default = -0.01).}
+
+\item{gl}{Integer. Indicating the line type of the grids.}
+
+\item{cols}{Optional vector of colors for bars.}
+
+\item{palette}{Character. Name of palette colors.}
+
+\item{x_label_side}{Side to place x-labels: 1 = inside, 2 = outside (default = 1).}
+
+\item{legend}{Logical. Whether to show a legend (default = FALSE).}
+
+\item{legend_label}{Optional character vector for legend labels.}
+
+\item{legend_pos}{Optional, numeric vector of length 2 for legend position.}
+
+\item{dens}{A numeric vector of two density values for bar shading (default = c(-1, -1)).}
+
+\item{overlay}{Logical. Whether to overlay bars from two groups in the same panel.}
 }
 \value{
-Bar chart
+A base R plot with grouped bar charts, optionally faceted.
 }
 \description{
-Draw group bar chart.
+This function creates grouped bar charts with optional faceting. It is useful
+for comparing category-specific values across different groups and panels.
 }
 \examples{
 data("canregs")
-data <- canregs[[1]]
-rate <- create_asr(data, year, sex, cancer, event = "fbs")
-draw_barchart(rate, plot_var = cr, cate_var = cancer, group_var = year, side_var = year)
+asr <- create_asr(canregs[[1]], year, sex, cancer, event = "fbs")
+asr <- cr_filter(asr, drop = c("total", "others"))
+draw_barchart(asr, x = cancer, y = cr, group =  year, facet = sex)
 }

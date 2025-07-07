@@ -1,11 +1,14 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# canregtools <img src="man/figures/logo.png" align="right" height="120" />
+# canregtools <img src="man/figures/logo.png" align="right" height="139" alt="" />
 
 <!-- badges: start -->
 
+[![CRAN
+status](https://www.r-pkg.org/badges/version/canregtools)](https://CRAN.R-project.org/package=canregtools)
 [![R-CMD-check](https://github.com/gigu003/canregtools/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/gigu003/canregtools/actions/workflows/R-CMD-check.yaml)
+[![codecov](https://codecov.io/gh/gigu003/canregtools/branch/main/graph/badge.svg)](https://codecov.io/gh/gigu003/canregtools)
 <!-- badges: end -->
 
 ## Overview
@@ -26,8 +29,7 @@ processing, statistical calculations, visualization, and reporting.
   and cumulative rates, `create_quality()` calculate quality indicators
   such as crude incidence or mortality, mortality to incidence ratio
   (M:I), percent of pathological verified cases (MV%), and etc. ,
-  `create_age_rate()` calculate age specific rate, `create_sheet()`
-  create a summary sheet containing some of these statistics.
+  `create_age_rate()` calculate age specific rate.
 - `draw_pyramid()` draw population pyramid, `draw_linechart()` draw line
   chart, `draw_barchart()` draw grouped bar chart.
 - `create_report()` generate cancer registry report based on data of
@@ -51,56 +53,53 @@ install_github("gigu003/canregtools")
 ## Usage
 
 ``` r
+# Load sample data
 library(canregtools)
 data("canregs")
 data <- canregs[[1]]
 
-# count `canreg` data to `fbswicd`
-fbsw <- data |>
-  count_canreg(cancer_type = "big")
+# Convert `canreg` to `fbswicd`
+fbsw <- count_canreg(data, cancer_type = "big")
 
-# calculate age standard rate (ASR) based on `fbswicd`
-fbsw |> 
-  create_asr(year, sex, cancer) |> 
+# 1. Age-standardized rate (ASR)
+create_asr(fbsw, year, sex, cancer) |>
   add_labels(lang = "en")
 #> # A tibble: 84 × 14
 #>    year sex   cancer site              icd10 no_cases    cr asr_cn2000 asr_wld85
 #>   <int> <fct> <chr>  <fct>             <chr>    <dbl> <dbl>      <dbl>     <dbl>
-#> 1  2021 Total 101    Oral Cavity & Ph… C00-…       27  3.95       3.23      3.32
-#> 2  2021 Total 102    Nasopharynx       C11          7  1.02       0.78      0.83
-#> 3  2021 Total 103    Esophagus         C15         65  9.52       6.88      6.65
-#> 4  2021 Total 104    Stomach           C16        101 14.8       11.2      11.2 
-#> 5  2021 Total 105    Conlon, Rectum &… C18-…      180 26.4       19.8      19.9 
+#> 1  2021 Total 101    Oral Cavity & Ph… C00-…       38  5.53       3.74      3.79
+#> 2  2021 Total 102    Nasopharynx       C11          5  0.73       0.71      0.71
+#> 3  2021 Total 103    Esophagus         C15         59  8.58       4.53      4.85
+#> 4  2021 Total 104    Stomach           C16        123 17.9       11.1      11.2 
+#> 5  2021 Total 105    Conlon, Rectum &… C18-…      236 34.3       20.6      20.2 
 #> # ℹ 79 more rows
 #> # ℹ 5 more variables: truncr_cn2000 <dbl>, truncr_wld85 <dbl>, cumur <dbl>,
 #> #   prop <dbl>, rank <int>
 
-# calculate quality indicators based on `fbswicd`
-fbsw |> 
-  create_quality(cancer) |> 
-  add_labels(label_type = "abbr", lang="en")
+# 2. Quality indicators
+create_quality(fbsw, cancer) |>
+  add_labels(label_type = "abbr", lang = "en")
 #> # A tibble: 28 × 16
 #>    year sex   cancer site       icd10    rks   fbs  inci   sws  mort    mi    mv
-#>   <int> <fct> <chr>  <fct>      <chr>  <int> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl>
-#> 1  9000 Total 101    Oral Cavi… C00-… 683110    27  3.95    13  1.9   0.48  55.6
-#> 2  9000 Total 102    Nasophary… C11   683110     7  1.02     5  0.73  0.71  57.1
-#> 3  9000 Total 103    Esophagus  C15   683110    65  9.52    46  6.73  0.71  86.2
-#> 4  9000 Total 104    Stomach    C16   683110   101 14.8     79 11.6   0.78  71.3
-#> 5  9000 Total 105    Colorectum C18-… 683110   180 26.4    103 15.1   0.57  81.7
+#>   <int> <fct> <chr>  <fct>      <chr>  <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl>
+#> 1  9000 Total 101    Oral Cavi… C00-… 687356    38  5.53    13  1.89  0.34  73.7
+#> 2  9000 Total 102    Nasophary… C11   687356     5  0.73     0  0     0     40  
+#> 3  9000 Total 103    Esophagus  C15   687356    59  8.58    50  7.27  0.85  74.6
+#> 4  9000 Total 104    Stomach    C16   687356   123 17.9     82 11.9   0.67  71.5
+#> 5  9000 Total 105    Colorectum C18-… 687356   236 34.3    103 15.0   0.44  77.5
 #> # ℹ 23 more rows
 #> # ℹ 4 more variables: dco <dbl>, ub <dbl>, sub <dbl>, m8000 <dbl>
 
-# calculate age specific rate based on `fbswicd`
-fbsw |> 
-  create_age_rate() |> 
+# 3. Age-specific rates
+create_age_rate(fbsw) |>
   add_labels(lang = "en")
 #> # A tibble: 19 × 8
 #>    year sex   cancer site        icd10 agegrp   cases  rate
-#>   <int> <fct> <chr>  <fct>       <chr> <fct>    <int> <dbl>
-#> 1  9000 Total 60     All Cancers ALL   0 岁         6  79.1
-#> 2  9000 Total 60     All Cancers ALL   1-4 岁      12  42.0
-#> 3  9000 Total 60     All Cancers ALL   5-9 岁      14  46.5
-#> 4  9000 Total 60     All Cancers ALL   10-14 岁     6  18.5
-#> 5  9000 Total 60     All Cancers ALL   15-19 岁     6  16.1
+#>   <int> <fct> <chr>  <fct>       <chr> <fct>    <dbl> <dbl>
+#> 1  9000 Total 60     All Cancers ALL   0 岁         3  44.3
+#> 2  9000 Total 60     All Cancers ALL   1-4 岁      12  31.4
+#> 3  9000 Total 60     All Cancers ALL   5-9 岁       9  16.4
+#> 4  9000 Total 60     All Cancers ALL   10-14 岁    13  32.5
+#> 5  9000 Total 60     All Cancers ALL   15-19 岁     8  26.2
 #> # ℹ 14 more rows
 ```

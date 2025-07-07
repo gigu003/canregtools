@@ -4,7 +4,7 @@
 \alias{count_canreg}
 \alias{count_canreg.canregs}
 \alias{count_canreg.canreg}
-\title{Count canreg data.}
+\title{Count and classify \code{canreg} data}
 \usage{
 count_canreg(
   x,
@@ -23,12 +23,13 @@ count_canreg(
 )
 }
 \arguments{
-\item{x}{Object data of class 'canreg' or 'canregs'.}
+\item{x}{Object with class of 'canreg' or 'canregs'.}
 
-\item{age_breaks}{Specify the break points classify age groups. Default is
-\code{c(0, 1, seq(0, 85, 5))}.}
+\item{age_breaks}{A numeric vector specifying the breakpoints for age
+grouping. Defaults to \code{c(0, 1, seq(5, 85, 5))}.}
 
-\item{label_tail}{Tail label to be added to the labels. Default is NULL.}
+\item{label_tail}{Optional. A string to append to age group labels
+(e.g., \code{"+"} for open-ended intervals). Defaults to \code{NULL}.}
 
 \item{cancer_type}{A character string specifying the classification method
 used to categorize ICD-10 codes. This determines how ICD-10 codes are
@@ -41,17 +42,31 @@ Cancer Observatory). This parameter is only available when the
 input data is a vector of ICD-10 codes, or object with class of
 \code{'canreg'} or \code{'canregs'}.}
 
-\item{...}{Parameters.}
+\item{...}{Additional arguments passed to the method for individual
+\code{canreg} objects.}
 }
 \value{
-data of class fbswicd.
+Object with class of 'fbswicd' or 'fbswicds'.
 }
 \description{
-Count canreg data.
+The \code{count_canreg()} function is a generic method used to summarize
+population-based cancer registry data. It supports both single (\code{canreg})
+and multiple (\code{canregs}) registry objects. The function aggregates cancer
+cases by age group and classifies cancer types using standardized coding
+systems.
 }
 \examples{
-library(canregtools)
 data("canregs")
-fbsw <- count_canreg(canregs)
-fbsw
+fbsw <- count_canreg(canregs, age_breaks = c(0, 15, 65), cancer_type = "big")
+fbsw <- count_canreg(canregs, cancer_type = "gco")
+
+# Count object with class of `canregs`
+fbsw <- count_canreg(canregs, cancer_type = "small")
+
+# Count object with class of `canreg`
+fbsw <- count_canreg(canregs[[1]], cancer_type = "big")
+
+}
+\seealso{
+\code{\link[=cr_clean]{cr_clean()}}, \code{\link[=classify_icd10]{classify_icd10()}}, \code{\link[=create_asr]{create_asr()}}
 }

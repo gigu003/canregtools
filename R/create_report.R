@@ -1,21 +1,28 @@
-#' Create report from report templates
+#' Render standardized cancer registry reports from built-in templates
 #'
+#' The `create_report()` function generates a report from objects with class of 
+#' `canreg` or `canregs` using pre-defined rmarkdown templates.
+#' 
 #' @rdname create_report
+#' @param data An object of class `canreg` or `canregs`.
+#' @param template Character string specifying the report template to use.
+#'   Options include `"annual"`, `"quality"`, or `"CI5"`. Default is `"annual"`.
+#' @param title Character. Title of the generated report. Default is 
+#'   `"Cancer Registry Report"`.
+#' @param output_format Character. Format of the rendered report. 
+#'   Options are `"html_document"`, `"word_document"`, or `"pdf_document"`. 
+#'   Default is `"html_document"`.
+#' @param output_dir  Character. Directory where the report will be saved.
+#' @param ... Additional arguments passed to `rmarkdown::render()`.
 #'
-#' @param data Object with class of 'canreg' or 'fbswicd'.
-#' @param template Name of the template used to render report, options are
-#'        "annual", "quality", or "CI5", default is "annual".
-#' @param title Title of the report to be rendered, default is "Cancer Registry
-#'        Report".
-#' @param output_format File type of the render result, options are
-#'        "html_document", "word_document" or "pdf_document", default is
-#'        "html_document".
-#' @param output_dir Directory of the rendered report.
-#' @param ... Parameters in `rmarkdown::render`.
-#'
-#' @return NULL
+#' @return No return value; generates a report as a side effect.
 #' @export
-#'
+#' @examples
+#' \dontrun{
+#' data("canregs")
+#' create_report(canregs, template = "quality", title = "QC Report")
+#' }
+#' 
 create_report <- function(data,
                           template = "annual",
                           title = "Cancer Registry Report",
@@ -27,46 +34,57 @@ create_report <- function(data,
 #' @rdname create_report
 #' @method create_report canregs
 #' @export
-#'
+#' @examples
+#' \dontrun{
+#' create_report(canregs, template = "annual", title = "Annual Report")
+#' }
+#' 
 create_report.canregs <- function(data,
                                   template = "annual",
                                   title = "Cancer Registry Report",
                                   output_format = "html_document",
-                                  output_dir = NULL, ...){
-  if (template == "quality-list-city"){
+                                  output_dir = NULL, ...) {
+  if (template == "quality-list-city") {
     template <- paste0(template, ".Rmd")
     tempath <- system.file("rmarkdown", template, package = "canregtools")
     if (is.null(tempath) || !file.exists(tempath)) {
       stop("Template not found: ", template)
     }
-    rmarkdown::render(input = tempath, 
-                      output_format = output_format,
-                      output_dir = output_dir,
-                      output_file = "index",
-                      params = list(
-                        report_data = data,
-                        report_title = title
-                      ),...)
+    rmarkdown::render(
+      input = tempath,
+      output_format = output_format,
+      output_dir = output_dir,
+      output_file = "index",
+      params = list(
+        report_data = data,
+        report_title = title
+      ), ...
+    )
   } else {
     purrr::map(data,
-               create_report.canreg,
-               template = template,
-               title = title,
-               output_format = output_format,
-               output_dir = output_dir)
+      create_report.canreg,
+      template = template,
+      title = title,
+      output_format = output_format,
+      output_dir = output_dir
+    )
   }
-
 }
 
 #' @rdname create_report
 #' @method create_report canreg
 #' @export
-#'
+#' @examples
+#' \dontrun{
+#' data <- canregs[[1]]
+#' create_report(data, template = "annual", title = "Annual Report")
+#' }
+#' 
 create_report.canreg <- function(data,
                                  template = "annual",
                                  title = "Cancer Registry Report",
                                  output_format = "html_document",
-                                 output_dir = NULL, ...){
+                                 output_dir = NULL, ...) {
   # Query the template path
   template <- paste0(template, ".Rmd")
   tempath <- system.file("rmarkdown", template, package = "canregtools")
@@ -78,17 +96,19 @@ create_report.canreg <- function(data,
   if (is.null(output_dir)) {
     output_dir <- getwd()
   }
-  author = tidy_var(areacode, var_name = "areacode", lang = "cn")
+  author <- tidy_var(areacode, var_name = "areacode", lang = "cn")
   # render report using rmarkdown
-  rmarkdown::render(input = tempath, 
-                    output_format = output_format,
-                    output_dir = output_dir,
-                    output_file = output_file,
-                    params = list(
-                      report_data = data,
-                      report_title = title,
-                      report_author = author
-                    ), ...)
-  
+  rmarkdown::render(
+    input = tempath,
+    output_format = output_format,
+    output_dir = output_dir,
+    output_file = output_file,
+    params = list(
+      report_data = data,
+      report_title = title,
+      report_author = author
+    ), ...
+  )
+
   cat("Report generated at:", file.path(output_dir, output_file), "\n")
 }

@@ -1,15 +1,21 @@
 #' Get the areacodes of the registry
 #'
-#' @param regi_type  Type of registry.
+#' Query the area codes corresponding to a given registry type.
 #'
-#' @return Character vector
+#' @param regi_type Numeric or character vector indicating registry types.
+#'   Defaults to 1:4.
+#'
+#' @return A character vector of area codes.
 #' @export
 #'
-#'
-show_registry <- function(regi_type = c(1:4)) {
-  regi_type <- as.character(regi_type)
+#' @examples
+#' show_registry(1:4)
+#' show_registry(c("1", "2"))
+show_registry <- function(regi_type = 1:4) {
   registry_category <- dict_maps[["registry_type"]]
-  areacodes <- names(registry_category[registry_category %in% regi_type])
-  return(areacodes)
+  
+  # Coerce both input and dict values to character for comparison
+  regi_type <- as.character(regi_type)
+  reg_cat_values <- as.character(registry_category)
+  names(registry_category)[reg_cat_values %in% regi_type]
 }
-

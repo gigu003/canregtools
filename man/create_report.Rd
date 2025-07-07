@@ -4,7 +4,7 @@
 \alias{create_report}
 \alias{create_report.canregs}
 \alias{create_report.canreg}
-\title{Create report from report templates}
+\title{Render standardized cancer registry reports from built-in templates}
 \usage{
 create_report(
   data,
@@ -34,22 +34,42 @@ create_report(
 )
 }
 \arguments{
-\item{data}{Object with class of 'canreg' or 'fbswicd'.}
+\item{data}{An object of class \code{canreg} or \code{canregs}.}
 
-\item{template}{Name of the template used to render report, options are
-"annual", "quality", or "CI5", default is "annual".}
+\item{template}{Character string specifying the report template to use.
+Options include \code{"annual"}, \code{"quality"}, or \code{"CI5"}. Default is \code{"annual"}.}
 
-\item{title}{Title of the report to be rendered, default is "Cancer Registry
-Report".}
+\item{title}{Character. Title of the generated report. Default is
+\code{"Cancer Registry Report"}.}
 
-\item{output_format}{File type of the render result, options are
-"html_document", "word_document" or "pdf_document", default is
-"html_document".}
+\item{output_format}{Character. Format of the rendered report.
+Options are \code{"html_document"}, \code{"word_document"}, or \code{"pdf_document"}.
+Default is \code{"html_document"}.}
 
-\item{output_dir}{Directory of the rendered report.}
+\item{output_dir}{Character. Directory where the report will be saved.}
 
-\item{...}{Parameters in \code{rmarkdown::render}.}
+\item{...}{Additional arguments passed to \code{rmarkdown::render()}.}
+}
+\value{
+No return value; generates a report as a side effect.
 }
 \description{
-Create report from report templates
+The \code{create_report()} function generates a report from objects with class of
+\code{canreg} or \code{canregs} using pre-defined rmarkdown templates.
+}
+\examples{
+\dontrun{
+data("canregs")
+create_report(canregs, template = "quality", title = "QC Report")
+}
+
+\dontrun{
+create_report(canregs, template = "annual", title = "Annual Report")
+}
+
+\dontrun{
+data <- canregs[[1]]
+create_report(data, template = "annual", title = "Annual Report")
+}
+
 }

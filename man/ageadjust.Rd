@@ -2,7 +2,7 @@
 % Please edit documentation in R/ageadjust.R
 \name{ageadjust}
 \alias{ageadjust}
-\title{Calculate the age standardized rate using the direct method.}
+\title{Calculate the age standardized rate using the direct method}
 \usage{
 ageadjust(
   count,
@@ -37,7 +37,13 @@ intervals, value between 0 and 1, default is 0.95.}
 Age standardized rate and its confidence interval.
 }
 \description{
-Calculate the age standardized rate using the direct method.
+This function calculates the \strong{age-standardized rate (ASR)} using
+the \strong{direct method} of standardization. It allows for adjustment of crude
+disease or mortality rates to a standard population structure, enabling
+valid comparisons across populations with different age distributions. The
+function also supports computation of confidence intervals
+using gamma, normal, or log-normal methods, and returns both crude
+rate (CR) and ASR with associated variances and interval estimates.
 }
 \examples{
 cases <- c(50, 60, 45, 70)

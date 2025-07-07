@@ -2,16 +2,23 @@
 % Please edit documentation in R/post_deal.R
 \name{drop_others}
 \alias{drop_others}
-\title{Drop other cancer in cancer categories.}
+\title{Drop “other” cancer codes}
 \usage{
 drop_others(x)
 }
 \arguments{
-\item{x}{A data frame.}
+\item{x}{A data frame containing a \code{cancer} variable created by
+\code{\link[=classify_icd10]{classify_icd10()}}.}
 }
 \value{
-A data frame.
+A filtered data frame excluding non-specific cancer codes.
 }
 \description{
-Drop other cancer in cancer categories.
+Filters out cases classified as "other" cancer types based on specific codes.
+}
+\examples{
+data("canregs")
+asr <- create_quality(canregs, year, sex, cancer)
+asr2 <- asr |> drop_others()
+
 }

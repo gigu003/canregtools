@@ -76,3 +76,21 @@ Class 'canreg'.
 \description{
 Clean canreg data.
 }
+\examples{
+data("canregs")
+data <- cr_clean(canregs)
+
+data <- cr_clean(canregs, cancer_type = "small")
+
+data <- cr_clean(canregs[[1]], cancer_type = "big")
+
+fbcases <- purrr::pluck(canregs[[1]], "FBcases")
+fbcases <- cr_clean(fbcases)
+
+swcases <- purrr::pluck(canregs[[1]], "SWcases")
+swcases <- cr_clean(swcases)
+
+pop <- purrr::pluck(canregs[[1]], "POP")
+pop <- cr_clean(pop)
+
+}

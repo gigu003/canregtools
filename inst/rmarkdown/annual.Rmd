@@ -21,11 +21,10 @@ output:
     fig_height: 4
     fig_caption: true
     highlight: pygments
-    reference_docx: chinese-article.docx
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = FALSE, message = FALSE,fig.align = "center",
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(echo = FALSE, message = FALSE, 
                       fig.height = 8)
 library(canregtools)
 library(dplyr)
@@ -52,7 +51,9 @@ female <- sum(pop$rks[20:36])
 
 
 ```{r pyramid-plot, fig.cap = "肿瘤登记地区人口金字塔", fig.height = 5}
-draw_pyramid(fbsw, show_value=F, csize=0.8, grid = c(1, 1), cgap = 0.2,
+
+draw_pyramid(fbsw$pop, agegrp, rks, sex, year,
+             show_value = FALSE, csize = 0.8, cgap = 0.2,
              labs = c("男性", "年龄", "女性"))
 ```
 
@@ -61,10 +62,10 @@ draw_pyramid(fbsw, show_value=F, csize=0.8, grid = c(1, 1), cgap = 0.2,
 ## 质量控制指标
 
 ```{r}
-qua <- create_quality(data, decimal = 2, year, cancer) |> 
-  filter(!cancer == 0) |> 
-  add_labels(label_type = "abbr") |> 
-  select(cancer, site, icd10, mi, mv, ub, dco) 
+qua <- create_quality(data, decimal = 2, year, cancer) |>
+  filter(!cancer == 0) |>
+  add_labels(label_type = "abbr") |>
+  select(cancer, site, icd10, mi, mv, ub, dco)
 mi <- qua |> filter(cancer == 60) |> pull(mi)
 mv <- qua |> filter(cancer == 60) |> pull(mv)
 dco <- qua |> filter(cancer == 60) |> pull(dco)
@@ -77,12 +78,12 @@ mv_max <- qua1 |> arrange(desc(mv))
 
 ```{r quality, tab.cap = "肿瘤登记处质量控制指标情况"}
 qua |>
-  select(-cancer) |> 
-  flextable() |> 
-  set_header_labels(site = "部位", 
-    icd10 = "ICD0", mi = "M:I",
-    mv = "MV%", dco = "DCO%", ub = "UB%" ) |> 
-  theme_zebra() |>  
+  select(-cancer) |>
+  flextable() |>
+  set_header_labels(site = "部位",
+                    icd10 = "ICD0", mi = "M:I",
+                    mv = "MV%", dco = "DCO%", ub = "UB%") |>
+  theme_zebra() |>
   width(width = 1)
 ```
 
@@ -90,34 +91,36 @@ qua |>
 ### 总体发病情况
 
 ```{r}
-asr <- create_asr(data, year, sex, decimal=2) |> 
+asr <- create_asr(data, year, sex, decimal = 2) |>
   add_labels(label_type = "abbr") |>
   arrange(sex)
 ```
 
 ```{r inci_total, tab.cap= "肿瘤登记地区总体癌症发病情况"}
-asr |> 
-  select(sex, no_cases, cr, asr_cn2000, asr_wld85, truncr_cn2000, cumur) |> 
-  flextable() |> 
+asr |>
+  select(sex, no_cases, cr, asr_cn2000, asr_wld85, truncr_cn2000, cumur) |>
+  flextable() |>
   set_header_labels(sex = "性别", no_cases = "病例数", cr = "粗率\n(1/10万)",
-    asr_cn2000 = "中标率\n(1/10万)", asr_wld85 = "世标率\n(1/10万)",truncr_cn2000="截缩率\n35-64岁(1/10万)", cumur = "累积率\n(0-74岁, %)" ) |>
-  theme_zebra() |>  
+                    asr_cn2000 = "中标率\n(1/10万)",
+                    asr_wld85 = "世标率\n(1/10万)",
+                    truncr_cn2000 = "截缩率\n35-64岁(1/10万)",
+                    cumur = "累积率\n(0-74岁, %)") |>
+  theme_zebra() |>
   width(width = 1)
 ```
 
 ### 年龄别发病情况
 
 ```{r}
-agerate <- create_age_rate(data, year, sex, cancer) |> 
-  drop_others() |> 
-  filter(cancer %in% c(103:106, 110,114,115,118,122,123),!sex==0) |> 
+agerate <- create_age_rate(data, year, sex, cancer) |>
+  drop_others() |>
+  filter(cancer %in% c(103:106, 110, 114, 115, 118, 122, 123), !sex == 0) |>
   add_labels(label_type = "abbr")
-
 ```
 
 ```{r agerate,  fig.width=10, fig.height=8}
-draw_linechart(agerate, x_var = agegrp, y_var = rate, facet_var = site,
-               grid = c(3, 4), group_var = sex,
+draw_linechart(agerate, x = agegrp, y = rate, group = sex, facet = site,
+               grid = c(3, 4), x_label = c(0, 1, seq(5, 85, 5)),
                axis_label = c("年龄", "年龄别率"))
 ```
 
@@ -126,20 +129,16 @@ draw_linechart(agerate, x_var = agegrp, y_var = rate, facet_var = site,
 ### 前十位癌症发病情况
 
 ```{r}
-asr <- create_asr(data, year, sex, cancer) |> 
+asr <- create_asr(data, year, sex, cancer) |>
   filter(!sex == 0) |>
-  drop_others() |> 
-  drop_total() |> 
+  drop_others() |>
+  drop_total() |>
   add_labels(label_type = "abbr")
 ```
+
 ```{r top10_inci, fig.height=6, fig.cap="肿瘤登记地区前10位恶性肿瘤发病率"}
-draw_barchart(asr,
-              plot_var = asr_cn2000,
-              cate_var=site,
-              group_var = year,
-              side_var = sex,
-              side_label = c("男性(1/10万)", "女性(1/10万)"),
-              )
+draw_barchart(asr, y = asr_cn2000, x = site, group = year,
+              facet = sex, y_label = c("男性(1/10万)", "女性(1/10万)"))
 ```
 
 
@@ -148,18 +147,21 @@ draw_barchart(asr,
 ### 总体死亡情况
 
 ```{r}
-asr <- create_asr(data, event = sws, year, sex, decimal = 2) |>
+asr <- create_asr(data, event = "sws", year, sex, decimal = 2) |>
   add_labels() |>
   arrange(sex)
 ```
 
 ```{r}
-asr |> 
-  select(sex, no_cases, cr, asr_cn2000, asr_wld85, truncr_cn2000, cumur) |> 
-  flextable() |> 
+asr |>
+  select(sex, no_cases, cr, asr_cn2000, asr_wld85, truncr_cn2000, cumur) |>
+  flextable() |>
   set_header_labels(sex = "性别", no_cases = "病例数", cr = "粗率\n(1/10万)",
-    asr_cn2000 = "中标率\n(1/10万)", asr_wld85 = "世标率\n(1/10万)",truncr_cn2000="截缩率\n35-64岁(1/10万)", cumur = "累积率\n(0-74岁, %)" ) |>
-  theme_zebra() |>  
+                    asr_cn2000 = "中标率\n(1/10万)",
+                    asr_wld85 = "世标率\n(1/10万)",
+                    truncr_cn2000 = "截缩率\n35-64岁(1/10万)",
+                    cumur = "累积率\n(0-74岁, %)") |>
+  theme_zebra() |>
   width(width = 1)
 ```
 
@@ -167,35 +169,36 @@ asr |>
 
 
 ```{r}
-agerate <- create_age_rate(data, event = sws, year, sex, cancer) |> 
+agerate <- create_age_rate(data, event = "sws", year, sex, cancer) |>
   drop_others() |>
-  filter(cancer %in% c(103:106, 110,114,115,118,122,123), !sex==0) |> 
+  filter(cancer %in% c(103:106, 110, 114, 115, 118, 122, 123), !sex == 0) |>
   add_labels(label_type = "abbr")
 ```
 
-```{r, fig.align = 'center', fig.width = 10, fig.height = 8}
-draw_linechart(agerate,facet_var=site,grid=c(3,4),
-              x_var=agegrp,y_var=rate,group_var=sex,axis_label=c("年龄","年龄别率"))
+```{r, fig.width = 10, fig.height = 8}
+draw_linechart(agerate, x = agegrp, y = rate, group = sex, facet = site,
+               grid = c(3, 4),x_label = c(0, 1, seq(5, 85, 5)),
+               axis_label = c("年龄", "年龄别率"))
 ```
 
 
 ### 前十位癌症死亡情况
 
 ```{r}
-asr <- create_asr(data, event = sws, year, sex, cancer) |> 
-  drop_total() |> 
-  drop_others() |> 
-  filter(!sex==0) |> 
+asr <- create_asr(data, event = "sws", year, sex, cancer) |>
+  drop_total() |>
+  drop_others() |>
+  filter(!sex == 0) |>
   add_labels(label_type = "abbr")
 ```
 
 ```{r,fig.height=6}
 draw_barchart(asr,
-              plot_var = asr_cn2000,
-              cate_var = site,
-              group_var = year,
-              side_var = sex,
-              side_label = c("男性(1/10万)", "女性(1/10万)"),
-              cols = c("darkred", "darkgreen"), gap=0.1)
+              y = asr_cn2000,
+              x = site,
+              group = year,
+              facet = sex,
+              y_label = c("男性(1/10万)", "女性(1/10万)"),
+              cols = c("darkred", "darkgreen"), gap = 0.1)
 ```
 

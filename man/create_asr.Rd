@@ -6,7 +6,7 @@
 \alias{create_asr.canreg}
 \alias{create_asr.fbswicds}
 \alias{create_asr.fbswicd}
-\title{Calculate Age-Standardized Rate (ASR)}
+\title{Calculate age-standardized rate (ASR)}
 \usage{
 create_asr(
   x,
@@ -60,7 +60,8 @@ is not passed as a parameter, the output will be the result for the
 combined gender.}
 
 \item{event}{A variable used to specify the type of calculation, options are
-fbs or sws, fbs for cancer incidence, and sws for cancer mortality.}
+"fbs" or "sws", "fbs" for cancer incidence, and "sws" for cancer
+mortality.}
 
 \item{std}{Specify the standard population structure in the 'std_pop' data
 frame used for calculating standardized rates. When calculating
@@ -97,23 +98,29 @@ or not.}
 A data frame or tibble contains the age standard rates and CIs.
 }
 \description{
-\code{create_asr()} calculates age-standardized rates (ASRs) using
-PBCR data. It supports stratification by multiple variables, allows the
-specification of different standard population structures, and provides
-flexibility in the inclusion of variance, confidence intervals, and
-population data.
+\code{create_asr()} calculate age-standardized rates (ASRs) from object with
+class of \code{canreg}, \code{canregs}, \code{fbswicd}, or \code{fbswicds}. It supports
+stratification by multiple variables, allows the specification of different
+standard population structures, and provides flexibility in the inclusion
+of variance, confidence intervals, and population data.
 }
 \examples{
+data("canregs")
+asr_inci <- create_asr(canregs, event = "fbs", year, sex, cancer)
+asr_mort <- create_asr(canregs, event = "sws", year, sex, cancer)
+
+# calculate ASR based on object with class of `canregs`
+asr <- create_asr(canregs, event = "sws", year, sex, cancer)
 
 # calculate ASR based on object with class of `canreg`
-data("canregs")
 data <- canregs[[1]]
 # calculate ASR using default parameter
 asr <- create_asr(data, year, sex, cancer)
 head(asr)
 # calculate ASR using multiple standard population
 asr_multi_std <- create_asr(data, year, sex, cancer,
-                            std = c("cn82", "cn2000", "wld85"))
+  std = c("cn82", "cn2000", "wld85")
+)
 head(asr_multi_std)
 # calculate ASR with confidence interval
 asr_with_ci <- create_asr(data, year, sex, cancer, show_ci = TRUE)
@@ -125,11 +132,15 @@ head((asr_with_pop))
 asr_with_var <- create_asr(data, year, sex, cancer, show_var = TRUE)
 head(asr_with_var)
 
+# calculate ASR based on object with class of `fbswicds`
+# convert object with class of `canregs` to object with class of `fbswicds`
+fbsws <- count_canreg(canregs)
+asrs <- create_asr(fbsws, event = "sws", year, sex, cancer)
 
 # calculate ASR based on object with class of `fbswicd`
 # convert object with class of `canreg` to object with class of `fbswicd`
-fbsw <- count_canreg(data)
-asr <- create_asr(fbsw, event= "sws", year, sex, cancer)
+fbsw <- count_canreg(canregs[[1]])
+asr <- create_asr(fbsw, event = "sws", year, sex, cancer)
 
 }
 \seealso{

@@ -1,301 +1,326 @@
-#' Draw bar chart.
+#' Draw Grouped Bar Charts with Facets
 #'
-#' @param values List of values to be draw.
-#' @param cates Categories for the groups.
-#' @param axis Axis values.
-#' @param groups Groups of the bar chart, default is length of the values list.
-#' @param bar_side Orientation of the bar chart: 1 for left and 2 for right.
-#' @param bar_way Draw the bar chart unidirectionally or bidirectionally, 1 for
-#'                unidirectionally and 2 for bidirectionally.
-#' @param gap The width of center gap. Default is 0.1.
-#' @param csize The font size to write the labels on sides. Default is 1.
-#' @param space Space between bars.
-#' @param adj The vertical adjustment factor for the labels of age classes.
-#'            Default is -0.01.
-#' @param gl Logical value to draw the vertical dotted lines. Default is TRUE.
-#' @param label Labels for the two sides.
-#' @param cols The colors of the bars.
-#' @param dens The density of hatching lines (/inch).
-#' @param overlay Logical value, TRUE for overlay plot, FALSE for not.
-#' @param side_label Draw the side label on the left or right. 1 for left and
-#'                    2 for right. 
-#' @param legend Logical value indicates plot legend or not.
-#' @param legend_label Character for the legend label. 
-#' @param ... Other options.
-#' 
-#' @return A bar chart.
+#' This function creates grouped bar charts with optional faceting. It is useful
+#' for comparing category-specific values across different groups and panels.
+#'
+#' @param data A `data.frame` or tibble containing the input data.
+#' @param x The categorical variable (unquoted) for the x-axis.
+#' @param y The numerical variable (unquoted) for the y-axis (bar height).
+#' @param group Optional grouping variable (unquoted) used for color/fill aesthetics.
+#' @param facet Optional faceting variable (unquoted) for splitting the data into panels.
+#' @param facet_label Optional character vector of labels corresponding to each facet.
+#' @param y_label Optional y-axis label or vector of labels for facets.
+#' @param rev_group Reverse the bar position of group variables.
+#' @param grid A numeric vector of length 2 indicating the layout (rows, columns) of the plot grid.
+#' @param topn Number of top `x` categories to display in each group/panel.
+#' @param axis Optional vector of breaks for the y-axis. If `NULL`, computed automatically.
+#' @param bar_side Integer indicating the side of bars: 1 = left, 2 = right.
+#' @param bar_way Integer for bar layout: 1 = one-sided, 2 = mirrored.
+#' @param gap Horizontal spacing between bars and y-axis (default depends on `x_label_side`).
+#' @param csize Character size scaling factor (default = 0.8).
+#' @param space Vertical space between bars (default = 0.9).
+#' @param adj Vertical adjustment of x-label text (default = -0.01).
+#' @param gl Integer. Indicating the line type of the grids.
+#' @param cols Optional vector of colors for bars.
+#' @param palette Character. Name of palette colors.
+#' @param x_label_side Side to place x-labels: 1 = inside, 2 = outside (default = 1).
+#' @param legend Logical. Whether to show a legend (default = FALSE).
+#' @param legend_label Optional character vector for legend labels.
+#' @param legend_pos Optional, numeric vector of length 2 for legend position.
+#' @param dens A numeric vector of two density values for bar shading (default = c(-1, -1)).
+#' @param overlay Logical. Whether to overlay bars from two groups in the same panel.
+#'
+#' @return A base R plot with grouped bar charts, optionally faceted.
 #' @export
-#' 
-draw_bar <- function(values, cates = NULL, axis = NULL, groups = length(values),
-                     bar_side = 1, bar_way = 1, gap = ifelse(side_label==1, 0.6, 0.1),
-                     csize = 0.8, space = 0.9, adj = -0.01,  gl = TRUE,
-                     label = c("Male","Female"),
-                     cols = c("#006400", "#b32134"),
-                     side_label = 1,
-                     legend = FALSE,
-                     legend_label = NULL,
-                     dens = c(-1, -1), overlay = FALSE, ...){
-  par(mar = c(0, 0, 1, 0))
+#'
+#' @examples
+#' data("canregs")
+#' asr <- create_asr(canregs[[1]], year, sex, cancer, event = "fbs")
+#' asr <- cr_filter(asr, drop = c("total", "others"))
+#' draw_barchart(asr, x = cancer, y = cr, group =  year, facet = sex)
+draw_barchart <- function(
+    data,
+    x,
+    y,
+    group = NULL,
+    facet = NULL,
+    facet_label = NULL,
+    y_label = NULL,
+    rev_group = FALSE,
+    grid = NULL,
+    topn = NULL,
+    axis = NULL,
+    bar_side = NULL,
+    bar_way = NULL,
+    gap = NULL,
+    csize = 0.8, space = 0.9, adj = -0.01, gl = NULL,
+    cols = NULL,
+    palette = "Peach",
+    x_label_side = 1,
+    legend = FALSE,
+    legend_label = NULL,
+    legend_pos = c(0.4, 0.2),
+    dens = c(-1, -1), overlay = FALSE
+    ) {
+  x_var <- rlang::enquo(x)
+  y_var <- rlang::enquo(y)
+  group_var <- rlang::enquo(group)
+  facet_var <- rlang::enquo(facet)
   
-  if (is.null(axis)){
-    axis <- pretty(c(0, 1.005*max(unlist(values))))
-  }
-  if (is.null(cates)){
-    cates <- seq(1, length(values[[1]]))
+  if (!quo_is_null(facet_var)) {
+    data_splited <- data |>
+      arrange(!!facet_var) |>
+      group_split(!!facet_var)
+    if (is.null(facet_label)) {
+      facet_value <- dplyr::pull(data, !!facet_var) |> unique()
+      facet_label <- facet_value
+    }
+  } else {
+    data_splited <- list(data)
+    facet_label <- names(data_splited)
   }
   
-  if(!overlay == TRUE){
-    side <- ifelse(side_label == 1, 1.1, 1.3)
-    if (bar_way == 2) {
-      bx <- c(-side - gap / 2, side + gap / 2)  
+  facet_length <- length(data_splited)
+  if (facet_length == 2 & is.null(bar_side)) x_label_side <- 2
+  
+  if (is.null(gap)) gap <- ifelse(x_label_side == 1, 0.6, 0.1)
+  max_y <- max(dplyr::pull(data, {{ y }}))
+  axis <- pretty(c(0, max_y))
+  way <- ifelse(facet_length == 2 & is.null(bar_side), 2, 1)
+  
+  if (length(facet_label) == 2) {
+    if (is.null(bar_side)) {
+      sides <- c(1, 2)
+      over_lay <- c(FALSE, TRUE)
     } else {
-      if(bar_side == 1) {
+      sides <- rep(bar_side, facet_length)
+      over_lay <- c(FALSE, FALSE)
+    }
+    } else {
+    sides <- rep(bar_side, facet_length)
+    over_lay <- rep(FALSE, facet_length)
+  }
+  
+  plotbar <- function(i) {
+    # arrange data by group_var and plot_var.
+    facet_data <- data_splited[[i]]
+    if (is.null(topn)) topn <- nrow(facet_data)
+    draw_bar(
+      facet_data,
+      x = !!x_var,
+      y = !!y_var,
+      group = !!group_var,
+      rev_group = rev_group,
+      topn = topn,
+      axis = axis,
+      bar_side = sides[i],
+      x_label_side = x_label_side,
+      bar_way = way,
+      overlay = over_lay[i],
+      gap = gap,
+      csize = csize, space = space, adj = adj, gl = gl,
+      cols = cols,
+      palette = palette,
+      legend = ifelse(i == 1, TRUE, FALSE),
+      legend_label = legend_label,
+      legend_pos = legend_pos,
+      dens = dens,
+      y_label = facet_label[i]
+    )
+  }
+  
+  if (is.null(grid) & !quo_is_null(facet_var) & !facet_length == 2) {
+    grid <- c(1, facet_length)
+  }
+  par(mfrow = grid)
+  
+  for (i in 1:facet_length) {
+    plotbar(i)
+  }
+  
+  par(mfrow = c(1, 1))
+}
+
+#' Draw bar chart
+#' @noRd
+draw_bar <- function(
+    data,
+    x,
+    y,
+    group = NULL,
+    rev_group = FALSE,
+    axis = NULL,
+    topn = 10,
+    y_label = NULL,
+    bar_side = NULL,
+    x_label_side = 1,
+    bar_way = 1,
+    gap = ifelse(x_label_side == 1, 0.6, 0.1),
+    csize = 0.8, space = 0.9, adj = -0.004, gl = NULL,
+    cols = NULL,
+    palette = "Peach",
+    legend = FALSE,
+    legend_label = NULL,
+    legend_pos = c(0.4, 0.15),
+    dens = c(-1, -1), overlay = FALSE, ...
+    ) {
+  par(mar = c(0, 0, 1, 0))
+  x_var <- rlang::enquo(x)
+  y_var <- rlang::enquo(y)
+  if (is.null(y_label)) y_label <- rlang::as_name(y_var)
+  group_var <- rlang::enquo(group)
+  if (quo_is_null(group_var)) {
+    data <- dplyr::arrange(data, !!y_var) |>
+      slice_tail(n = topn)
+    if (is.null(bar_side)) bar_side <- 1
+  } else {
+    if (is.null(bar_side)) bar_side <- 1
+    group_value <- unique(dplyr::pull(data, !!group_var))
+    x_order <- dplyr::filter(data, !!group_var == group_value[1]) |>
+      arrange(!!y_var) |>
+      slice_tail(n = topn) |>
+      pull(!!x_var)
+    data <- dplyr::mutate(data, !!x_var := factor(!!x_var, levels = x_order)) |>
+      filter(!!x_var %in% x_order) |>
+      arrange(!!group_var, !!x_var)
+  }
+  
+  if (quo_is_null(group_var)) {
+    y_value <- list(
+      dplyr::pull(data, !!y_var)
+      )
+    if (quo_is_null(x_var)) {
+      x_value <- seq(1, length(y_value[[1]]))
+    } else {
+      x_value <- dplyr::pull(data, !!x_var)
+    }
+  } else {
+    y_value <- lapply(
+      group_split(data, !!group_var), function(x) {
+        dplyr::pull(x, !!y_var)
+      })
+    if (rev_group) y_value <- rev(y_value)
+    if (quo_is_null(x_var)) {
+      x_value <- seq(1, length(y_value[[1]]))
+    } else {
+      x_value <- lapply(
+        group_split(data, !!group_var), function(x) {
+          dplyr::pull(x, !!x_var)
+        })[[1]]
+    }
+  }
+  
+  if (is.null(axis)) {
+    axis <- pretty(c(0, 1.005 * max(unlist(y_value))))
+  }
+
+  if (!overlay == TRUE) {
+    side <- ifelse(x_label_side == 1, 1.1, 1.3)
+    if (bar_way == 2) {
+      bx <- c(-side - gap / 2, side + gap / 2)
+    } else {
+      if (bar_side == 1) {
         bx <- c(-side - gap / 2, 0)
-      } else{
+      } else {
         bx <- c(0, side + gap / 2)
       }
     }
     by <- c(0, 1.10)
     plot(bx, by, type = "n", axes = FALSE, xlab = "", ylab = "", ...)
   }
-  
-  if (groups > length(cols)){
-    cols <- c("#4C00FF", "#0019FF", "#0080FF", "#00E5FF", "#00FF4D", "#E6FF00",
-              "#FFFF00", "#FFDE59")
-    }
+
+  if (is.null(cols)) {
+    cols <- hcl.colors(length(y_value), palette)
+  } else if (length(y_value) > length(cols)) {
+    cols <- rep(cols, length.out = length(y_value))
+  } else {
+    cols <- cols[1:length(y_value)]
+  }
   
   max_axis <- max(axis)
   min_axis <- min(axis)
-  range_axis <- max_axis-min_axis
-  ticks <- length(axis)
+  range_axis <- max_axis - min_axis
   # draw axis ticks
-  ticks_loc <- (axis-min_axis)/range_axis+gap/2
+  ticks_loc <- (axis - min_axis) / range_axis + gap / 2
   axis_loc <- c(1 + gap / 2, gap / 2)
   axis_label_loc <- 0.5 + gap / 2
-  if (bar_side == 1){
+  if (bar_side == 1) {
     ticks_loc <- -ticks_loc
     axis_loc <- -axis_loc
     axis_label_loc <- -axis_label_loc
   }
-  
+
   # draw axis ticks
   segments(ticks_loc, 1.02, ticks_loc, 1.03)
-  #segments((laxis - LR) / LS + gap / 2, 1.02, (laxis - LR) / LS + gap / 2, 1.03)
+
   # draw axis line
   lines(axis_loc, c(1.02, 1.02), lty = 1)
   # draw axis tick label
   text(ticks_loc, rep(1.02, length(ticks_loc)),
-       paste(formatC(axis, format = "g")), pos = 3, cex= csize*0.9)
+    paste(formatC(axis, format = "g")),
+    pos = 3, cex = csize * 0.9
+  )
   # draw axis label
   text(axis_label_loc, 1.08,
-       paste(ifelse(bar_side == 1, label[1], label[2])),
-       pos = 3, cex = csize, font = 2)
-  
+    #paste(ifelse(bar_side == 1, y_label[1], y_label[2])),
+    y_label,
+    pos = 3, cex = csize, font = 2
+  )
+
   # draw grid lines
-  if (gl) {
-    segments(ticks_loc, 0, ticks_loc, 1, lty = 3, col = "gray")
+  if (!is.null(gl)) {
+    segments(ticks_loc, 0, ticks_loc, 1, lty = gl, col = "gray")
   }
-  
-  Ci <- length(values[[1]])        #calculate groups number
-  VB <- 0:(Ci - 1) / Ci    #calculate vertical start position for each group
-  VT <- 1:Ci / Ci          #calculate vertical end position fro each group
+
+  Ci <- length(y_value[[1]]) # calculate groups number
+  VB <- 0:(Ci - 1) / Ci # calculate vertical start position for each group
+  VT <- 1:Ci / Ci # calculate vertical end position fro each group
   # draw the side label
-  if (side_label == 1){
-    text(ifelse(bar_side == 1, -gap/2, gap/2), (VB + VT) / 2 + adj,
-         as.character(cates), pos = ifelse(bar_side==1,4,2), cex = csize*0.9)
+  if (x_label_side == 1) {
+    text(ifelse(bar_side == 1, -gap / 2, gap / 2), (VB + VT) / 2 + adj,
+      as.character(x_value),
+      pos = ifelse(bar_side == 1, 4, 2), cex = csize * 0.9
+    )
   } else {
     text(axis_loc[1], (VB + VT) / 2 + adj,
-         as.character(cates), pos = ifelse(bar_side==1,2,4), cex = csize*0.9)
-  }
-
-  VT <- (VT - (VT - VB) * (1 - space))
-  h <- (VT - VB) / groups
-  
-  
-  # draw the left bar
-  left_ <- lapply(values, function(x) -(x - min_axis) / range_axis - gap / 2)
-  bottom_ <- lapply(1:length(values), function(i) VB + (i-1)*h)
-  top_ <- lapply(1:length(values), function(i) VB + i*h)
-  
-  if (bar_side == 1){
-    for(i in 1:length(values)){
-      rect(left_[[i]], bottom_[[i]], rep(-gap / 2, Ci), top_[[i]],
-           col = cols[i], border = cols[i], density = dens[1])
-    }
-  } else {
-    for(i in 1:length(values)){
-      rect(-rep(-gap / 2, Ci), bottom_[[i]], -left_[[i]], top_[[i]],
-           col = cols[i], border = cols[i], density = dens[1])
-    }
-  }
-  if (legend & length(values)>1){
-    if(is.null(legend_label)){ legend_label <- names(values) }
-    legend(ifelse(bar_side == 1,-0.4-gap/2, 0.4+gap/2), 0.15,
-           legend = legend_label, border = "transparent",
-           bty = "n", fill = cols, cex = csize*0.8)  
-  }
-}
-
-
-
-#' Draw group bar chart.
-#'
-#' @param data A data frame or tibble.
-#' @param plot_var Var to be plotted.
-#' @param cate_var Category variable name.
-#' @param group_var Group variable name.
-#' @param side_var Panel variable name.
-#' @param side_label Labels for each side.
-#' @param bar_side Orientation of the bar chart: 1 for left and 2 for right.
-#' @param topn Top n 'plot_var' in each 'group_var' and 'side_var'. 
-#' @param grid The number of rows and columns in the plot area.
-#' @param ... Other options in draw_bar.
-#'
-#' @return Bar chart
-#' @export
-#'
-#' @examples
-#' data("canregs")
-#' data <- canregs[[1]]
-#' rate <- create_asr(data, year, sex, cancer, event = "fbs")
-#' draw_barchart(rate, plot_var = cr, cate_var = cancer, group_var = year, side_var = year)
-draw_barchart <- function(data,
-                          plot_var = NULL,
-                          cate_var = NULL,
-                          group_var = NULL,
-                          side_var = NULL,
-                          side_label = NULL,
-                          bar_side = 1,
-                          topn = 10,
-                          grid = c(1, 1),
-                          ...) {
-  data <- data |> arrange({{side_var}})
-  data_pre <- data %>% group_split({{side_var}})
-  side_value <- data %>% pull({{side_var}}) %>% unique()
-  max_plot_var <- data %>% pull({{plot_var}}) %>% max()
-  axis <- pretty(c(0, max_plot_var))
-  way <- ifelse(length(data_pre) == 2, 2, 1)
-  if(length(data_pre) == 2){
-    sides <- c(1, 2)
-    over_lay <-  c(FALSE, TRUE)
-  } else {
-    sides <- rep(bar_side, length(data_pre))
-    over_lay <- c(rep(FALSE, length(data_pre)))
-  }
-  
-  if (!is.null(side_label)){
-    side_value <- side_label
-  }
-  
-  plotbar <- function(i){
-    #arrange data by group_var and plot_var.
-    yy <- data_pre[[i]] %>% arrange({{group_var}}, desc({{plot_var}}))
-    cates <- yy %>% slice_head(n=topn) %>% pull({{cate_var}})
-    cates <- rev(cates)
-    yy2 <- yy %>% filter({{cate_var}} %in% cates) %>% pull({{plot_var}})
-    group_name <- yy %>% pull({{group_var}}) %>% unique()
-    values <- as.list(as.data.frame(array(yy2, dim = c(topn, length(group_name)))))
-    values <- lapply(values, rev)
-    values <- rev(values)
-    names(values) <- group_name
-    draw_bar(values, cates, axis,
-             bar_way = way,
-             bar_side = sides[i],
-             overlay = over_lay[i],
-             label = c(rep(side_value[i], 2)),
-             side_label = ifelse(length(data_pre)==2, 2, 1),
-             legend = ifelse(i == 1, TRUE, FALSE),
-             ...)
-  }
-
-  par(mfrow = grid)
-  
-  for(i in 1:length(side_value)){
-    plotbar(i)
-  }
-  
-  par(mfrow=c(1, 1))
-}
-
-
-#' Plot dumbbell chart.
-#'
-#' @param data A data frame contains data to be plotted.
-#' @param x A category variable in data.
-#' @param y1 Variable indicate start point.
-#' @param y2 Variable indicate end point.
-#' @param topn Top n values to be plotted.
-#' @param sort Sort options.
-#' @param legend Legends.
-#' @param cols Colors of the start and end points.
-#' @param main Main title of the plot.
-#'
-#' @importFrom utils tail
-#'
-#' @return A dumbbell plot.
-#' @export
-#'
-draw_dumbbell <- function(data,
-                           x = NULL,
-                           y1 = NULL,
-                           y2 = NULL,
-                           topn = 20,
-                           sort = "insc",
-                           legend = NULL,
-                           cols = c("#006400", "#b32134"),
-                           main = "") {
-  x <- enquo(x)
-  y1 <- enquo(y1)
-  y2 <- enquo(y2)
-
-  cate <- data %>% pull(!!x)
-  left <- data %>% pull(!!y1)
-  right <- data %>% pull(!!y2)
-
-  order <- order(left)
-  cate <- tail(cate[order], topn)
-  left <- tail(left[order], topn)
-  right <- tail(right[order], topn)
-
-  if (sort == "desc") {
-    order <- order(left, decreasing = TRUE)
-    cate <- cate[order]
-    left <- left[order]
-    right <- right[order]
-  }
-
-  axis <- pretty(c(0, max(c(left, right))))
-  BX <- c(-0.2, 1.0)
-  BY <- c(-0.1, 1.0)
-  plot(BX, BY, type = "n", axes = FALSE, xlab = "", ylab = "", main = main)
-  max_axis <- max(axis)
-  min_axis <- min(axis)
-  r_axis <- max_axis - min_axis
-  long <- length(axis)
-
-  ll <- (left - min_axis) / r_axis
-  rr <- (right - min_axis) / r_axis
-  Ci <- length(left)
-
-  segments((axis - min_axis) / r_axis, -0.02, (axis - min_axis) / r_axis, -0.03)
-  lines(c(0, 1), c(-0.02, -0.02))
-  text((axis - min_axis) / r_axis, rep(-0.03, long),
-    paste(formatC(axis, format = "g")),
-    pos = 1
-  )
-  gl <- TRUE
-  if (gl) {
-    segments((axis - min_axis) / r_axis, 0, (axis - min_axis) / r_axis, 1,
-      lty = 3, col = "blue"
+      as.character(x_value),
+      pos = ifelse(bar_side == 1, 2, 4), cex = csize * 0.9
     )
   }
 
-  text(-.03, 0:(Ci - 1) / Ci, cate, pos = 2, cex = 1)
+  VT <- (VT - (VT - VB) * (1 - space))
+  h <- (VT - VB) / length(y_value)
+  
+  # draw the left bar
+  left_ <- lapply(y_value, function(x) -(x - min_axis) / range_axis - gap / 2)
+  bottom_ <- lapply(1:length(y_value), function(i) VB + (i - 1) * h)
+  top_ <- lapply(1:length(y_value), function(i) VB + i * h)
 
-  segments(ll, 0:(Ci - 1) / Ci, rr, 0:(Ci - 1) / Ci, lwd = 1.7, col = cols[1])
-  points(ll, 0:(Ci - 1) / Ci, pch = 16, col = cols[1])
-  points(rr, 0:(Ci - 1) / Ci, pch = 16, col = cols[2])
-  if (!is.null(legend)) {
-    legend(0.7, 0.15, legend = legend, bty = "n", fill = cols)
+  if (bar_side == 1) {
+    for (i in 1:length(y_value)) {
+      rect(left_[[i]], bottom_[[i]], rep(-gap / 2, Ci), top_[[i]],
+        col = rev(cols)[i], border = rev(cols)[i], density = dens[1]
+      )
+    }
+  } else {
+    for (i in 1:length(y_value)) {
+      rect(-rep(-gap / 2, Ci), bottom_[[i]], -left_[[i]], top_[[i]],
+        col = rev(cols)[i], border = rev(cols)[i], density = dens[1]
+      )
+    }
+  }
+  if (legend & length(y_value) > 1) {
+    if (is.null(legend_label) && !rlang::quo_is_null(group_var)) {
+      legend_label <- rev(levels(factor(dplyr::pull(data, !!group_var))))
+    }
+    if (rev_group) legend_label <- rev(legend_label)
+    legend(
+      ifelse(bar_side == 1,
+             -legend_pos[1] - gap / 2,
+             legend_pos[1] + gap / 2
+             ), legend_pos[2],
+      legend = legend_label, border = "transparent",
+      bty = "n", fill = cols, cex = csize * 0.8
+    )
   }
 }

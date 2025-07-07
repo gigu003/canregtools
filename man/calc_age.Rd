@@ -2,29 +2,49 @@
 % Please edit documentation in R/age.R
 \name{calc_age}
 \alias{calc_age}
-\title{Calculate the actual age between two dates}
+\title{Calculate the actual age in completed years between two dates}
 \usage{
 calc_age(birth_date, onset_date)
 }
 \arguments{
-\item{birth_date}{Birth date.}
+\item{birth_date}{A vector of birth dates in \code{Date} format.}
 
-\item{onset_date}{Event date.}
+\item{onset_date}{A vector of corresponding event dates in \code{Date} format
+(e.g., date of diagnosis).}
 }
 \value{
-Vector of ages.
+A numeric vector of ages in years, with the same length
+as \code{birth_date} and \code{onset_date}.
 }
 \description{
-Calculate the actual age between two dates
+Computes the exact age in full years at the time of an event
+(e.g., diagnosis, death, or survey) by comparing a person's birth date
+to the date of the event.
+}
+\details{
+This function calculates age in \emph{completed years}, taking into account
+whether the birthday has occurred before the event date in the given year.
+If \code{birth_date} or \code{onset_date} contains \code{NA},
+the corresponding result will be \code{NA}.
 }
 \examples{
+# Generate random birth dates
+set.seed(123)
 sdate <- as.Date("1960-01-01")
 edate <- as.Date("1980-12-31")
 bdate <- sample(seq(sdate, edate, by = "1 day"), 100, replace = TRUE)
-event <- sample(seq(as.Date("2020-01-01"),
-                    as.Date("2023-07-08"),
-                    by = "1 day"),
-                100, replace = TRUE)
+
+# Generate random event dates
+sdate <- as.Date("2020-01-01")
+edate <- as.Date("2023-07-08")
+event <- sample(seq(sdate, edate, by = "1 day"), 100, replace = TRUE)
+
+# Calculate ages
 ages <- calc_age(bdate, event)
-ages
+head(ages)
+# Handle missing values
+bdate[1] <- NA
+event[2] <- NA
+calc_age(bdate, event)[1:5]
+
 }

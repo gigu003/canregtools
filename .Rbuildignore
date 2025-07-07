@@ -12,3 +12,5 @@
 ^data-raw$
 ^vignettes/articles$
 ^\.secrets$
+^cran-comments\.md$
+^man-roxygen$

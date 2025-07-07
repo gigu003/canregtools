@@ -6,20 +6,33 @@
 \alias{check_canreg.canreg}
 \title{Check the class of 'canreg'}
 \usage{
-check_canreg(data, pop_type = "single")
+check_canreg(data, pop_type = "long")
 
-\method{check_canreg}{canregs}(data, pop_type = "single")
+\method{check_canreg}{canregs}(data, pop_type = "long")
 
-\method{check_canreg}{canreg}(data, pop_type = "single")
+\method{check_canreg}{canreg}(data, pop_type = "long")
 }
 \arguments{
-\item{data}{Object of classs 'canreg'}
+\item{data}{Object with class of 'canreg' or 'canregs'.}
 
-\item{pop_type}{Population data structure of class 'canreg'}
+\item{pop_type}{Type of population data, either "single" or "long".
+Defaults to "long".}
 }
 \value{
-Logical value
+A list of class "check" (or "checks" for canregs objects) containing
+results of data structure validation.
 }
 \description{
-Check the class of 'canreg'
+Provides data structure validation tools for cancer registry objects.
+Includes the generic function \code{check_canreg()} and its methods for objects
+of class \code{canreg} and \code{canregs}, which check for essential components in
+cancer incidence and population data. Supporting functions \code{check_FBcases()},
+\code{check_SWcases()}, and \code{check_pop()} assess the presence of
+required variables, structural completeness, and validity of data values
+such as age groups, sex codes, and population counts.
+}
+\examples{
+data("canregs")
+check <- check_canreg(canregs)
+check <- check_canreg(canregs[[1]])
 }

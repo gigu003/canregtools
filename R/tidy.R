@@ -1,9 +1,24 @@
 #' Tidy gender variable
 #'
-#' @param x Vector contains gender information.
-#' @inheritParams lang
-#' @inheritParams as_factor
-#' @return A factor vector contains gender information.
+#' Standardizes gender-related values into consistent numeric codes or factors.
+#' This function maps various gender-related character strings (e.g., "male",
+#' "female", "man", "woman", "1", "2", etc.) to standardized numeric values:
+#' `1` for male, `2` for female, and `0` for total. It supports both Chinese
+#' and English labels. Optionally, the result can be returned as a factor with
+#' appropriate labels.
+#' 
+#' @param x A character or numeric vector containing gender information.
+#' @template lang
+#' @template as_factor
+#' @return A numeric vector or a factor representing gender:
+#' \describe{
+#'   \item{0}{Total}
+#'   \item{1}{Male}
+#'   \item{2}{Female}
+#' }
+#' If `as_factor = TRUE`, a factor is returned with labels in the specified
+#' language (`lang`).
+#'
 #' @export
 #'
 #' @examples
@@ -13,7 +28,7 @@ tidy_sex <- function(x, lang = "cn", as_factor = FALSE) {
   x <- tolower(x)
   m_des <- c("\u7537", "male", "man", "men")
   f_des <- c("\u5973", "female", "women", "woman")
-  t_des <- c( "\u5408", "total", "\u5408\u8ba1")
+  t_des <- c("\u5408", "total", "\u5408\u8ba1")
   x[grepl(paste(f_des, collapse = "|"), x)] <- 2
   x[grepl(paste(m_des, collapse = "|"), x)] <- 1
   x[grepl(paste(t_des, collapse = "|"), x)] <- 0
@@ -28,151 +43,148 @@ tidy_sex <- function(x, lang = "cn", as_factor = FALSE) {
   }
   valid_values <- sort(unique(na.omit(as.integer(x))))
   if (as_factor) {
-    factor(as.integer(x), levels = valid_values, labels = labels[valid_values + 1])  
+    factor(as.integer(x), levels = valid_values,
+           labels = labels[valid_values + 1])
   } else {
     return(as.integer(x))
   }
 }
 
 
-#' Tidy age description.
-#' 
+#' Tidy age description
 #'
-#' @param x Vector contains age description in Chinese.
-#' @param unit Character, unit of values return, options are "year", "month",
-#'        or "day", default is "year".
+#' Parses age descriptions written in Chinese and converts them into numeric
+#' values expressed in years, months, or days. It interprets age strings
+#' containing Chinese characters such as (years), (months), and (days), and
+#' converts them to a numeric vector representing age in the specified unit.
 #'
-#' @return Numeric vector contains age.
+#' @param x A character vector containing age descriptions in Chinese.
+#' @param unit A character string specifying the unit of the returned values.
+#'   Options are `"year"` (default), `"month"`, or `"day"`.
+#'
+#' @return A numeric vector representing ages in the specified unit:
+#' * year: Truncated age in years.
+#' * month: Truncated age in months.
+#' * day: Rounded age in days.
+#'
 #' @export
 #'
 #' @examples
-#' agedes <- c("50\u5c8110\u67083\u6708", "19\u5c815\u6708",
-#'             "1\u5c8130\u6708", "3\u670820\u6708","30\u6708")
+#' agedes <- c(
+#'   "50\u5c8110\u67083\u6708", "19\u5c815\u6708",
+#'   "1\u5c8130\u6708", "3\u670820\u6708", "30\u6708"
+#' )
 #' tidy_age(agedes, unit = "year")
 #' tidy_age(agedes, unit = "month")
 #' tidy_age(agedes, unit = "day")
 tidy_age <- function(x, unit = "year") {
   x <- tolower(x)
   calc_age <- function(age_des) {
-    #set initial value
+    # set initial value
     years <- 0
     months <- 0
     days <- 0
-    #extract numeric value for years.
+    # extract numeric value for years.
     if (grepl("\u5c81", age_des)) {
       years <- as.numeric(sub(".*?(\\d+)\\s*\u5c81.*", "\\1", age_des))
     }
-    #extract numeric value for months.
+    # extract numeric value for months.
     if (grepl("\u6708", age_des)) {
       months <- as.numeric(sub(".*?(\\d+)\\s*\u6708.*", "\\1", age_des))
     }
-    #extract numeric value for days.
+    # extract numeric value for days.
     if (grepl("\u5929", age_des)) {
       days <- as.numeric(sub(".*?(\\d+)\\s*\u5929.*", "\\1", age_des))
     }
-    #convert year,month,and days to days.
-    total_days <- (years * 365.25) + (months * 30.44) + days
-    return(total_days)
+    # convert year,month,and days to days.
+    tdays <- (years * 365.25) + (months * 30.44) + days
+    tdays
   }
-  #apply function to vector.
+  # apply function to vector.
   days <- unlist(lapply(x, calc_age))
   days[is.na(days)] <- 0
-  #convert days to another unit.
+  # convert days to another unit.
   if (unit == "year") {
-    res <-trunc(days / 365.25)
+    trunc(days / 365.25)
   } else if (unit == "month") {
-    res <- trunc(days / 30.44)
+    trunc(days / 30.44)
   } else if (unit == "day") {
-    res <- round(days, 0)
+    round(days, 0)
   } else {
     print("unit not supported")
   }
-  return(res)
 }
 
 
-#' Convert variable according to the Standard for dataset of CR in China
+#' Reformat variable values for Cancer Registration in China
 #'
-#' @param x Character values of variable to be converted.
-#' @param var_name Character value indicate name of the variable.
-#' @inheritParams label_type
-#' @inheritParams lang
-#' @inheritParams as_factor
+#' Standardizes and labels values of a specified variable according to the
+#' national cancer registration standard of China: T/CHIA 18-2021.
 #'
-#' @returns A formatted value.
+#' `tidy_var()` converts raw character inputs into standardized labels, codes,
+#' or abbreviations based on reference mappings defined for each variable (e.g.,
+#' occupation, basis of diagnosis, etc.). It supports both Chinese and English
+#' outputs and can return values as factors with labeled levels.
+#'
+#' @param x A character vector containing raw values of a variable used in
+#'   cancer registry data.
+#' @param var_name A character string indicating the name of the variable to
+#'   reformat (e.g., `"occu"` for occupation). Must be one of the variable
+#'   names defined in `tidy_var_maps`.
+#' @template label_type
+#' @template lang
+#' @template as_factor
+#'
+#' @returns A character or factor vector of reformatted values. The output
+#'    depends on the settings for `label_type`, `lang`, and `as_factor`:
+#' * If `as_factor = FALSE`, returns a character vector.
+#' * If `as_factor = TRUE`, returns a factor with sorted unique levels.
+#' * The labels used depend on `lang` (`"cn"`, `"en"`, `"code"`, or `"icd10"`)
+#'   and `label_type` (`"full"` or `"abbr"`).
+#'
 #' @export
 #'
-tidy_var <- function(x,
-                     var_name = "occu",
-                     label_type = "full",
-                     lang = "code",
-                     as_factor = FALSE){
-  supported_vars <- c("areacode", "province", "region",
-                      "cancer",
-                      "sex", "edu", "trib", "occu", "marri",
-                      "grad", "beha", "basi", "treat",
-                      "status", "caus", "deadplace", "lost",
-                      "stats")
+#' @examples
+#' occu <- c("11", "13", "17", "21", "24", "27", "31", "37", "51", "80", "90")
+#' tidy_var(occu, var_name = "occu", lang = "cn")
+#' tidy_var(occu, var_name = "occu", lang = "en")
+#' tidy_var(occu, var_name = "occu", lang = "cn", label_type = "abbr")
+#' tidy_var(occu, var_name = "occu", lang = "en", label_type = "abbr")
+#'
+tidy_var <- function(
+    x,
+    var_name = "occu",
+    label_type = "full",
+    lang = "code",
+    as_factor = FALSE
+    ) {
+  # Get the supported variable names from tidy_var_maps dictionary.
+  supported_vars <- names(tidy_var_maps)
   var_name <- tolower(var_name)
   if (!var_name %in% supported_vars) {
     stop("The variable name is not supported.")
   }
-  
+
   var_map <- tidy_var_maps[[var_name]]
   x_lower <- tolower(x)
   idx <- match(x_lower, var_map[["code"]])
-  
+
   # Handle language settings
   lang_code <- std_lang(lang)
-  label_col <- switch(
-    lang_code,
+  label_col <- switch(lang_code,
     "en" = if (label_type == "full") "ename" else "abbr_en",
     "cn" = if (label_type == "full") "cname" else "abbr_cn",
     "code" = "code",
     "icd10" = "icd10"
   )
-  
+
   res <- var_map[idx, label_col]
   res <- unname(unlist(res))
-  
-  if (as_factor){
+
+  if (as_factor) {
     levels <- var_map[[label_col]][sort(na.omit(idx))]
     res <- factor(res, levels = levels, labels = levels)
   }
-  
+
   return(res)
 }
-
-#' Standardize language input
-#'
-#' @inheritParams lang
-#' @return Standardized language code: "en", "cn", or "code".
-std_lang <- function(lang) {
-  lang <- tolower(lang)
-  if (lang %in% c("en", "eng", "english")) "en" else
-    if (lang %in% c("cn", "zh-cn", "zh", "chinese", "zh_cn")) "cn" else
-      if (lang == "code") "code" else
-        if (lang == "icd10") "icd10" else
-        stop("Invalid language specification")
-}
-
-#' Generate variable mapping list
-#'
-#' @param var_name Character value indicating the name of the variable.
-#' @return A list where each code corresponds to a vector of possible values.
-var_map_list <- function(var_name) {
-  var_map <- tidy_var_maps[[var_name]]
-  code_map <- split(var_map, var_map["code"])
-  code_map <- lapply(code_map, function(b) {
-    p_values <- b[, c("code","cname","ename","abbr_cn","abbr_en")]
-    values <- as.character(unname(unlist(p_values)))
-    if ("other_des" %in% names(b)) {
-        additional_values <- unlist(strsplit(unname(unlist(b[, "other_des"])), split = ","))
-        values <- c(values, additional_values)
-      }
-    return(values)
-  })
-  names(code_map) <- var_map[["code"]]
-  return(code_map)
-}
-

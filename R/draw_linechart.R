@@ -1,185 +1,239 @@
-#' Draw line chart
+#' Draw a Custom Line Chart Using Base R
 #'
-#' @rdname draw_linechart
+#' This function draws a line chart from a data frame, optionally grouped by a
+#' categorical variable. It uses base R graphics and supports custom axis
+#' ticks, labels, and styles.
 #'
-#' @param data The input data frame.
-#' @param x_var The variable for the x-axis.
-#' @param y_var The variable for the y-axis.
-#' @param group_var The variable used to group the data for multiple lines.
-#' @param x_axis Optional, the custom X-axis tick values. If not provided, the
-#'        function generates them.
-#' @param y_axis Optional, the custom Y-axis tick values. If not provided, the
-#'        function generates them.
-#' @param x_label Optional, label for X-axis ticks.
-#' @param y_label Optional, label for Y-axis ticks.
-#' @param axis_label Labels for the axis title, it should be character vector
-#'        length 2.
-#' @param cols Optional. The colors for the lines. If not provided, the function
-#'        uses default colors.
+#' @param data A data frame containing the variables to plot.
+#' @param x,y Bare column names for the x and y axis variables.
+#' @param group Optional bare column name used to group and color lines.
+#' @param facet Optional bare column name used for faceting. If provided,
+#'   the data will be split by this variable and plotted in a multi-panel
+#'   layout.
+#' @param grid A vector of length 2 specifying number of rows and columns for
+#'    facets. Default is c(1, 1).
+#' @param x_axis Optional numeric vector specifying x-axis tick locations.
+#' @param y_axis Optional numeric vector specifying y-axis tick locations.
+#' @param x_label,y_label Optional labels for x and y axis ticks. If `NULL`,
+#'   defaults are used.
+#' @param axis_title Character vector of length 2 giving the axis titles:
+#'    c("x axis label", "y axis label").
+#' @param cols Character vector of line colors. Defaults to c("darkgreen",
+#'    "darkred", "gray").
 #' @param line_type 1-character string giving the type of plot desired. The
 #'        following values are possible, for details, see plot: "p" for points,
 #'        "l" for lines, "b" for both points and lines, "c" for empty points
 #'        joined by lines, "o" for overplotted points and lines, "s" and "S"
 #'        for stair steps and "h" for histogram-like vertical lines. Finally,
 #'        "n" does not produce any points or lines.
-#' @param lwd Line width.
-#' @param main Optional. The title of the plot.
-#' @param add Plots to be added.
-#' @param offset Offset of the axis.
-#' @param ... Other parameters in plot.
-#' @return Line chart.
+#' @param palette Character, palette name indicate group of colors.
+#' @param lwd Line width. Default is 2.
+#' @param main,sub Main title and subtitle of the plot.
+#' @param adj Adjustment for axis text placement. Default is 0.02.
+#' @param srt String rotation angle for x-axis labels. Default is 90 degrees.
+#' @param add Logical. If `TRUE`, restores original graphics parameters after
+#'    plotting.
+#' @param mar Margin of the sub plot.
+#' @param offset Axis offset used for spacing ticks. Default is 0.01.
+#' @param ... Additional arguments (currently unused).
 #' @export
+#' @examples
+#' data("canregs")
+#' fbsw <- count_canreg(canregs[[1]], label_tail="yrs")
+#' agerate <- create_age_rate(fbsw, year, sex)
+#' agerate <- add_labels(agerate, lang = "en")
+#' draw_linechart(agerate, agegrp, rate, sex)
+#' agerate <- create_age_rate(fbsw, year, sex, cancer)
+#' agerate <- add_labels(agerate, lang = "en")
+#' agerate <- dplyr::filter(agerate, cancer %in% as.character(c(103:106)))
+#' draw_linechart(agerate, agegrp, rate, sex, cancer, grid = c(2, 2))
+draw_linechart <- function(data,
+                           x,
+                           y,
+                           group = NULL,
+                           facet = NULL,
+                           grid = c(1, 1),
+                           x_axis = NULL,
+                           y_axis = NULL,
+                           x_label = NULL,
+                           y_label = NULL,
+                           axis_title = c("Age (years)", "Age specific rate"),
+                           cols = NULL,
+                           palette = "Peach",
+                           line_type = "l",
+                           lwd = 2,
+                           adj = 0.02,
+                           srt = 60,
+                           main = NULL,
+                           sub = NULL,
+                           mar = c(1, 0, 1, 0),
+                           add = TRUE,
+                           offset = 0.01,
+                           ...) {
+  x_var <- rlang::enquo(x)
+  y_var <- rlang::enquo(y)
+  group_var <- rlang::enquo(group)
+  facet_var <- rlang::enquo(facet)
+  
+  if (rlang::quo_is_null(facet_var)) {
+    draw_line(data, !!x_var, !!y_var, !!group_var,
+              x_axis = x_axis, y_axis = y_axis,
+              x_label = x_label, y_label = y_label, axis_title = axis_title,
+              cols = cols, palette = palette, line_type = line_type, lwd = lwd,
+              main = main, sub = sub,
+              add = add, offset = offset, adj = adj, srt = srt, mar = mar)
+  } else {
+    oldpar <- par(no.readonly = TRUE)
+    on.exit(par(oldpar))
+    par(mfrow = grid, mar = c(2, 0, 2, 0))
+    res <- dplyr::group_by(data, !!facet_var) |> dplyr::group_split()
+    
+    for (df in res) {
+      facet_value <- unique(dplyr::pull(df, !!facet_var))
+      draw_line(df,
+                !!x_var, !!y_var, !!group_var,
+                x_axis = x_axis, y_axis = y_axis,
+                x_label = x_label, y_label = y_label, axis_title = axis_title,
+                cols = cols, palette = palette, line_type = line_type,
+                lwd = lwd, main = facet_value, sub = sub,
+                add = add, offset = offset, adj = adj, srt = srt, mar = mar)
+    }
+  }
+}
+
+#' @noRd
 #' 
 draw_line <- function(data,
-                      x_var,
-                      y_var,
-                      group_var,
+                      x,
+                      y,
+                      group = NULL,
                       x_axis = NULL,
                       y_axis = NULL,
                       x_label = NULL,
                       y_label = NULL,
-                      axis_label = c("Age (years)", "Age specific rate"),
-                      cols = c("darkgreen", "darkred", "gray"),
+                      axis_title = c("Age (years)", "Age specific rate"),
+                      cols = NULL,
+                      palette = "Peach",
                       line_type = "l",
                       lwd = 2,
                       main = NULL,
-                      add = FALSE,
+                      sub = NULL,
+                      adj = 0.02,
+                      srt = 60,
+                      add = TRUE,
+                      legend_pos = c(0.01, 0.95),
+                      mar = c(2, 0, 2, 0),
                       offset = 0.01,
-                       ...) {
+                      ...) {
+  x_var <- rlang::enquo(x)
+  y_var <- rlang::enquo(y)
+  group_var <- rlang::enquo(group)
+  oldpar <- par(no.readonly = TRUE)
+  par(mar = mar)
   
-  x_var <- rlang::enquo(x_var)
-  y_var <- rlang::enquo(y_var)
-  group_var <- rlang::enquo(group_var)
+  line_type <- match.arg(line_type,
+                         choices = c("p", "l", "b", "c", "o", "s",
+                                     "S", "h", "n"))
   
-  if (is.null(cols)) cols <- palette()
-  # Check if the input data is a data frame.
-  if (!is.data.frame(data)) {
-    stop("The input data must be a data frame.")
-  }
-  # Names of the variables in the dataset
+  if (!is.data.frame(data)) stop("`data` must be a data frame.")
   d_vars <- names(data)
-  # Check if x_var, y_var, and group_var are present in the data frame.
-  if (!(as_name(x_var) %in% d_vars) || !(as_name(y_var) %in% d_vars)) {
-    stop("The specified variables do not exist in the data frame.")
+  for (var in c(rlang::as_name(x_var), rlang::as_name(y_var))) {
+    if (!var %in% d_vars) stop(sprintf("Variable `%s` not in data.", var))
   }
   
-  xvar <- data |> pull(!!x_var)
-  if (is.factor(xvar))
+  if (!rlang::quo_is_null(group_var) && !(rlang::as_name(group_var) %in% d_vars)) {
+    stop(sprintf("Grouping variable `%s` not in data.", rlang::as_name(group_var)))
+  }
   
-  if (!quo_is_null(group_var)) {
-    if (!(as_name(group_var) %in% d_vars)){
-      stop(paste("The specified variable", as_name(group_var),
-                 "not exist in the data frame"))  
+  
+  xvalue <- dplyr::pull(data, !!x_var)
+  yvalue <- dplyr::pull(data, !!y_var)
+  # Type coercion
+  if (is.character(xvalue)) xvalue <- factor(xvalue)
+  if (is.factor(xvalue)) {
+    if (is.null(x_axis)) {
+      x_axis <- seq(0, length(levels(xvalue)) - 1)
+    }
+    if (is.null(x_label)) {
+      x_label <- levels(xvalue)
+    }
+    xvalue <- as.integer(xvalue) - 1
+  }
+  
+  if (!is.numeric(yvalue)) yvalue <- as.numeric(yvalue)
+  
+  if (is.null(y_axis)) {
+    y_axis <- pretty(range(yvalue, na.rm = TRUE))
+  } else {
+    y_min <- min(yvalue, na.rm = TRUE)
+    y_max <- max(yvalue, na.rm = TRUE)
+    if (min(y_axis) > y_min || max(y_axis) < y_max) {
+      warning("Specified y_axis does not fully cover the data range. Expanding it.")
+      y_axis <- pretty(range(c(y_axis, yvalue), na.rm = TRUE))
     }
   }
-  
-  # Set up the plotting area
-  opar <- par(no.readonly = TRUE)
-  par(mar = c(1, 1, 1, 1))
-
-  max_yvar <- data |> pull(!!y_var) |> max()
-  max_xvar <- data |> pull(!!x_var) |> as.numeric(na.rm = TRUE) |>  max()
-    
-  # Set up axis values
-  if (is.null(y_axis)) { y_axis <- pretty(c(0, max_yvar)) }
-  if (is.null(x_axis)) { x_axis <- pretty(c(0, max_xvar)) }
-  
-  # Calculate axis scaling factors
-  BX <- c(-0.12, 1)
-  BY <- c(-0.12, 1)
-  plot(BX, BY, type = "n", axes = FALSE, xlab = NULL, ylab = NULL, main = main)
-  YU <- max(y_axis)
-  YL <- min(y_axis)
-  YS <- YU - YL
-  XU <- max(x_axis)
-  XL <- min(x_axis)
-  XS <- XU - XL
-  segments(-offset, (y_axis - YL) / YS, -(offset + 0.01), (y_axis - YL) / YS)
-  segments((x_axis - XL) / XS, -offset, (x_axis - XL) / XS, -(offset + 0.01))
-  lines(c(-offset, -offset), c(-offset, 1), lty = 1)
-  lines(c(-offset, 1), c(-offset, -offset), lty = 1)
-  
-  # draw axis ticks label
-  if (is.null(x_label)) { x_label <- x_axis }
-  if (is.null(y_label)) { y_label <- y_axis }
-  
-  # Draw Y axis tick label
-  ylabel <- paste(formatC(y_label, format = "fg"))
-  text(-offset, (y_axis - YL) / YS, ylabel, pos = 2, srt = 90)
-  # Draw X axis tick label
-  xlabel <- paste(formatC(x_label, format = "fg"))
-  text((x_axis - XL) / XS, -offset+0.01, xlabel, pos = 1)
-  
-  # draw the axis title labels.
-  text((1 - offset) / 2, -(offset + 0.07), axis_label[1], pos = 1, font = 2)
-  text(-(offset + 0.07), (1 - offset) / 2, axis_label[2], pos = 3, srt = 90,
-       font = 2)
-  
-  # Check if the group_var is factor or character vector.
-  if (!quo_is_null(group_var)) {
-    gvar_data <- data |> pull(!!group_var) 
-    if (!is.factor(gvar_data) && !is.character(gvar_data)) {
-      stop("group_var must be factor or character.")
+  if (is.null(x_axis)) {
+    x_axis <- pretty(range(xvalue, na.rm = TRUE))
+  } else {
+    x_min <- min(xvalue, na.rm = TRUE)
+    x_max <- max(xvalue, na.rm = TRUE)
+    if (min(x_axis) > x_min || max(x_axis) < x_max) {
+      warning("Specified x_axis does not fully cover the data range. Expanding it.")
+      x_axis <- pretty(range(c(x_axis, xvalue), na.rm = TRUE))
     }
   }
+  if (is.null(x_label)) x_label <- x_axis
+  if (is.null(y_label)) y_label <- y_axis
+
+  max_y <- max(y_axis)
+  min_y <- min(y_axis)
+  range_y <- max_y - min_y
+  max_x <- max(x_axis)
+  min_x <- min(x_axis)
+  range_x <- max_x - min_x
+  plot(c(-0.12, 1), c(-0.17, 1), type = "n", axes = FALSE, xlab = "", ylab = "")
+  segments(-offset, (y_axis - min_y) / range_y, -(offset + 0.01), (y_axis - min_y) / range_y)
+  segments((x_axis - min_x) / range_x, -offset, (x_axis - min_x) / range_x, -(offset + 0.01))
+  lines(c(-offset, -offset), c(-offset, 1.02))
+  lines(c(-offset, 1.02), c(-offset, -offset))
   
-  if (quo_is_null(group_var)) {
-    xvar_data <- data |> pull(!!x_var) |> as.numeric()
-    yvar_data <- data |> pull(!!y_var) |> as.numeric()
-    lines(xvar_data / XS, yvar_data / YS, type = line_type, 
-          col = cols[1], lwd = lwd)
-    } else {
-      groups <- data |> arrange(!!group_var) |> pull(!!group_var) |> unique()
-      group_data <- data |> group_by(!!group_var) |> group_split()
-      # plot line for each group.
-      for (i in 1:length(groups)) {
-        group <- groups[i]
-        gdata <- group_data[[i]]
-        xvar_data <- gdata |> pull(!!x_var) |> as.numeric()
-        yvar_data <- gdata |> pull(!!y_var) |> as.numeric()
-        #group_data <- data[data[[group_var]] == group, ]
-        if (nrow(gdata) > 1) {
-          lines(xvar_data / XS, yvar_data / YS,
-                type = line_type, col = cols[i], lwd = lwd) } }
+  text((x_axis - min_x) / range_x, -offset - adj, labels = x_label, srt = srt, pos = 1)
+  text(-offset, (y_axis - min_y) / range_y, labels = y_label, pos = 2, srt = 90)
+  
+  text((1 - offset) / 2, -offset - 0.08 - adj, axis_title[1], pos = 1, font = 2)
+  text(-offset - 0.09, (1 - offset) / 2, axis_title[2], pos = 3, srt = 90, font = 2)
+
+  if (!rlang::quo_is_null(group_var)) {
+    data <- dplyr::mutate(data, !!group_var := as.factor(!!group_var))
+    groups <- levels(dplyr::pull(data, !!group_var))
+    if (is.null(cols)) {
+      cols <- hcl.colors(length(groups), palette)
     }
-  # draw legends
-  if (!quo_is_null(group_var)){
-    legend(0.01, 0.95, legend = groups, col = cols,
-           lwd = lwd, seg.len = 0.5, bty = "n")  
+    if (length(cols) < length(groups)) {
+      warning("Not enough colors provided. Colors will be recycled.")
+      cols <- rep(cols, length.out = length(groups))
+    }
+    group_data <- dplyr::group_by(data, !!group_var) |> dplyr::group_split()
+    for (i in seq_along(groups)) {
+      df <- group_data[[i]]
+      xv <- dplyr::pull(df, !!x_var)
+      if (is.factor(xv)) xv <- as.integer(xv) - 1
+      yv <- dplyr::pull(df, !!y_var)
+      if (nrow(df) > 1) {
+        lines((xv - min_x) / range_x, (yv - min_y) / range_y,
+              type = line_type, col = cols[i], lwd = lwd)
+      }
+    }
+    legend(legend_pos[1], legend_pos[2],
+           legend = groups, col = cols, lwd = lwd, bty = "n", seg.len = 0.5)
+  } else {
+    lines((xvalue - min_x) / range_x, (yvalue - min_y) / range_y,
+          type = line_type, col = cols[1], lwd = lwd)
   }
-  
-  if (add){
-    par(opar) 
+ 
+  title(main = main, font = 2)
+  if (!is.null(sub)) {
+    mtext(sub, side = 1, line = 1, adj = 1)
   }
-  
-}
-
-
-#' @rdname draw_linechart
-#' @param x The input data frame.
-#' @param facet_var Facet var
-#' @param grid Grid
-#' @param ... Parameters
-#'
-#' @export
-#'
-draw_linechart <- function(x, facet_var, grid, ...) {
-  par(mar = c(2, 1, 1, 1))
-  # Split the data frame into a list of data frames by the facet_var
-  res <- x %>%
-    group_by({{facet_var}}) %>%
-    group_split()
-  
-  # Set up the plotting area with the specified grid layout
-  par(mfrow = grid)
-  
- mes <-  sapply(res, function(data) {
-   facet <- data |> 
-     pull({{facet_var}}) |> 
-     unique()
-    draw_line(data, main = facet, ...)
-    })
-  
-  # Reset graphical parameters to default
-  par(mfrow = c(1, 1))
+  if (!add) graphics::par(oldpar)
 }

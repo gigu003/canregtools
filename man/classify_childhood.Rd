@@ -2,31 +2,44 @@
 % Please edit documentation in R/classify.R
 \name{classify_childhood}
 \alias{classify_childhood}
-\title{Classify pediatric tumors according to the ICCC3 standards.}
+\title{Classify childhood cancer according to the ICCC3 standards}
 \usage{
 classify_childhood(topo, morp, beha, type = "sub", version = "v2005")
 }
 \arguments{
-\item{topo}{Topography codes of ICDO3, it could be in the format of 'C15.6'
-or C156'.}
+\item{topo}{A character vector of ICD-O-3 topography codes
+(e.g., \code{"C15.6"} or \code{"C156"}).}
 
-\item{morp}{Morphology codes of ICDO3, it could be in the format of '8000' or
-'M8140'.}
+\item{morp}{A character vector of ICD-O-3 morphology codes
+(e.g., \code{"8000"} or \code{"M8140"}).}
 
-\item{beha}{Behaviour code of ICDO3.}
+\item{beha}{A numeric or character vector representing ICD-O-3 behavior
+codes.}
 
-\item{type}{Type of Classification for the output, options are 'main' or
-'sub', default is 'main'.}
+\item{type}{A string specifying the type of classification to return:
+\code{"main"} for main groups or \code{"sub"} for subgroups. Defaults to \code{"main"}.}
 
-\item{version}{The ICCC3 standards, "v2005" or "v2017".}
+\item{version}{A string specifying the version of the ICCC-3 rules to use:
+either \code{"v2005"} or \code{"v2017"}. Defaults to \code{"v2005"}.}
 }
 \value{
-Recode of ICCC3 classification.
+A numeric vector of ICCC-3 classification codes. If \code{type = "sub"},
+returns subgroup codes; if \code{type = "main"}, returns main group codes.
 }
 \description{
-Classify pediatric tumors according to the ICCC3 standards.
+\code{classify_childhood()}classifies childhood cancer based on ICD-O-3 codes,
+which include topography, morphology, and behavior codes, using the
+International Classification of Childhood Cancer, Third Edition (ICCC3).
 }
-\details{
-This function classify the 'topo' and 'morp' parts of ICDO3 codes into
-ICCC3 (International Classification of Childhood Cancer, Third edition).
+\examples{
+topo <- c("C15.2", "C16.2", "C34.2")
+morp <- c("8000", "8040", "8170")
+beha <- c("3", "3", "3")
+child_code <- classify_childhood(topo, morp, beha, type = "main")
+
+}
+\references{
+Steliarova-Foucher, E., Stiller, C., Lacour, B. and Kaatsch, P. (2005),
+International Classification of Childhood Cancer, third edition†‡. Cancer,
+103: 1457-1467. \doi{10.1002/cncr.20910}
 }

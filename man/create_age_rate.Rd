@@ -6,7 +6,7 @@
 \alias{create_age_rate.canregs}
 \alias{create_age_rate.fbswicds}
 \alias{create_age_rate.fbswicd}
-\title{Create age specific rate}
+\title{Calculate age specific rate}
 \usage{
 create_age_rate(
   x,
@@ -55,7 +55,8 @@ is not passed as a parameter, the output will be the result for the
 combined gender.}
 
 \item{event}{A variable used to specify the type of calculation, options are
-fbs or sws, fbs for cancer incidence, and sws for cancer mortality.}
+"fbs" or "sws", "fbs" for cancer incidence, and "sws" for cancer
+mortality.}
 
 \item{cancer_type}{A character string specifying the classification method
 used to categorize ICD-10 codes. This determines how ICD-10 codes are
@@ -84,6 +85,24 @@ be rounded to two decimal places.}
 A data frame of age-specific rates.
 }
 \description{
-Creates a data frame of age-specific rates based on the class of
-data (\code{fbswicd} or \code{canreg}).
+\code{create_age_rate()} computes age-specific rates from object with class of
+\code{canreg},\code{fbswicd}, or \code{canregs}, \code{fbswicds}. It calculates the rates for
+specified events (e.g., \code{fbs}) across age groups, stratified by variables
+such as year, sex, or cancer type.
+}
+\examples{
+data("canregs")
+agerate <- create_age_rate(canregs, year, sex, cancer)
+
+data <- canregs[[1]]
+agerate <- create_age_rate(data, year, sex)
+
+agerate <- create_age_rate(canregs, year, cancer_type = "system")
+
+fbsws <- count_canreg(canregs)
+agerate <- create_age_rate(fbsws, year, sex)
+
+data <- canregs[[2]]
+fbsw <- count_canreg(data, cancer_type = "small")
+agerate <- create_age_rate(fbsw, year, sex, cancer)
 }

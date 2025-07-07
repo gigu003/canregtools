@@ -2,17 +2,33 @@
 % Please edit documentation in R/write_registry.R
 \name{write_areacode}
 \alias{write_areacode}
-\title{Write Six-digit administrative division code to the user defined dict.}
+\title{Write custom six-digit administrative division codes to dictionary}
 \usage{
-write_areacode(x = NULL)
+write_areacode(x = NULL, cache_refresh = FALSE)
 }
 \arguments{
-\item{x}{A data frame contains \code{areacode}, \code{cname}, \code{ename}, \code{abbr_cn}
-\code{abbr_en}}
+\item{x}{A data frame containing at least the following columns:
+\code{areacode}, \code{cname}, \code{ename}, \code{abbr_cn}, and \code{abbr_en}.}
+
+\item{cache_refresh}{Logical. If TRUE, refresh the dictionary to default values
+before updating.}
 }
 \value{
-Null
+Invisibly returns \code{NULL}. The function is called for its side effect.
 }
 \description{
-Write Six-digit administrative division code to the user defined dict.
+Saves user-defined administrative division codes and their associated labels
+(in both Chinese and English) to the local dictionary used by \code{canregtools}.
+}
+\examples{
+\dontrun{
+dict <- data.frame(
+  areacode = c("410302"),
+  cname = c("\u8001\u57CE\u533A"),
+  ename = c("Laocheng District"),
+  abbr_cn = c("\u8001\u57CE"),
+  abbr_en = c("Laocheng")
+)
+write_areacode(dict)
+}
 }

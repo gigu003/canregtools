@@ -2,25 +2,44 @@
 % Please edit documentation in R/age.R
 \name{expand_age_pop}
 \alias{expand_age_pop}
-\title{Expand age groups population.}
+\title{Expand population data from 5-year age groups to single-year ages}
 \usage{
 expand_age_pop(x, method = "linear")
 }
 \arguments{
-\item{x}{Vector, population for each age group.}
+\item{x}{A numeric vector representing the population counts for each age
+group. The vector should have 19 elements corresponding to the following
+age groups: 0, 1–4, 5–9, ..., 85+.}
 
-\item{method}{Method for expanding, options are 'linear', 'constant',
-'periodic', or 'natural'. Default is 'linear'.}
+\item{method}{A character string specifying the interpolation method to use.
+Options include:
+\itemize{
+\item \code{"linear"}: Linear interpolation.
+\item \code{"constant"}: Constant interpolation.
+\item \code{"periodic"}: Periodic spline interpolation.
+\item \code{"natural"}: Natural spline interpolation.
+}
+The default is \code{"linear"}.}
 }
 \value{
-Vector contain the expanded age population.
+A data frame with two columns:
+\describe{
+\item{\code{x}}{Integer ages from 0 to 92.}
+\item{\code{y}}{Estimated population counts for each single-year age.}
+}
 }
 \description{
-Expand age groups population.
+\code{expand_age_pop} transforms population data aggregated in age groups into
+estimates for single-year ages. It utilizes interpolation methods to
+distribute the grouped data across individual ages, ensuring consistency
+with the original totals.
 }
 \examples{
+# Example population data for 19 age groups: 0, 1–4, 5–9, ..., 85+
 ages <- c(
   5053, 17743, 25541, 32509, 30530, 34806, 36846, 38691, 40056,
-  39252, 37349, 30507, 26363, 21684, 15362, 11725, 7461, 3260, 915)
-expand_age_pop(ages)
+  39252, 37349, 30507, 26363, 21684, 15362, 11725, 7461, 3260, 915
+)
+eages <- expand_age_pop(ages)
+head(eages)
 }

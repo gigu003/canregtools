@@ -4,14 +4,19 @@
 \alias{show_registry}
 \title{Get the areacodes of the registry}
 \usage{
-show_registry(regi_type = c(1:4))
+show_registry(regi_type = 1:4)
 }
 \arguments{
-\item{regi_type}{Type of registry.}
+\item{regi_type}{Numeric or character vector indicating registry types.
+Defaults to 1:4.}
 }
 \value{
-Character vector
+A character vector of area codes.
 }
 \description{
-Get the areacodes of the registry
+Query the area codes corresponding to a given registry type.
+}
+\examples{
+show_registry(1:4)
+show_registry(c("1", "2"))
 }

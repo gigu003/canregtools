@@ -24,3 +24,23 @@ Reframed canregs or fbswicds.
 \description{
 Reframe data of class canregs or fbswicds
 }
+\examples{
+# list reframe vars that could be used in `strat` parameter
+ls_vars("reframe")
+data("canregs")
+# Reframe the `canregs` data according to `area_type` attribute
+city <- cr_reframe(canregs, strat = "area_type")
+
+# Reframe object with class of `canregs`
+# Reframe the `canregs` according to the `province` attribute
+province <- cr_reframe(canregs, strat = "province")
+class(province)
+names(province)
+
+# Reframe object with class of `fbswicds`
+# Convert object with class of `canregs` into object with class of `fbswicds`
+fbsw <- count_canreg(canregs, cancer_type = "small")
+# Reframe the `fbswicds` according to the `city` attribute
+city <- cr_reframe(fbsw, strat = "city")
+
+}

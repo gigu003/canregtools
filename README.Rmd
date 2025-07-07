@@ -14,10 +14,13 @@ knitr::opts_chunk$set(
 options(tibble.print_min = 5, tibble.print_max = 5)
 ```
 
-# canregtools <img src="man/figures/logo.png" align="right" height="120" />
+
+# canregtools <img src="man/figures/logo.png" align="right" height="139" alt="" />
 
 <!-- badges: start -->
+[![CRAN status](https://www.r-pkg.org/badges/version/canregtools)](https://CRAN.R-project.org/package=canregtools)
 [![R-CMD-check](https://github.com/gigu003/canregtools/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/gigu003/canregtools/actions/workflows/R-CMD-check.yaml)
+[![codecov](https://codecov.io/gh/gigu003/canregtools/branch/main/graph/badge.svg)](https://codecov.io/gh/gigu003/canregtools)
 <!-- badges: end -->
 
 
@@ -27,7 +30,7 @@ canregtools is an R package designed to streamline data analysis, visualization,
 
 - `read_canreg()` read data formats required by the National Cancer Center in China to object with class of `canreg` or `canregs`. The raw data is stored in an Excel file containing three sheets named FB, SW, and POP, where FB represents incidence data, SW represents mortality data, and POP represents population data.
 - `count_canreg()` convert object with class of `canreg` or `canregs` to object with class of `fbswicd` or `fbswicds`.
-- `create_asr()` calculate age-standardized rates (ASR), truncated rates and cumulative rates, `create_quality()` calculate quality indicators such as crude incidence or mortality, mortality to incidence ratio (M:I), percent of pathological verified cases (MV%), and etc. , `create_age_rate()` calculate age specific rate, `create_sheet()` create a summary sheet containing some of these statistics.
+- `create_asr()` calculate age-standardized rates (ASR), truncated rates and cumulative rates, `create_quality()` calculate quality indicators such as crude incidence or mortality, mortality to incidence ratio (M:I), percent of pathological verified cases (MV%), and etc. , `create_age_rate()` calculate age specific rate.
 - `draw_pyramid()` draw population pyramid, `draw_linechart()` draw line chart, `draw_barchart()` draw grouped bar chart.
 - `create_report()` generate cancer registry report based on data of class "canreg" or "canregs", the output file type can be Word, HTML, or PDF.
 
@@ -44,28 +47,25 @@ install_github("gigu003/canregtools")
 
 ## Usage
 
-```{r, message=FALSE}
+```{r, message = FALSE}
+# Load sample data
 library(canregtools)
 data("canregs")
 data <- canregs[[1]]
 
-# count `canreg` data to `fbswicd`
-fbsw <- data |>
-  count_canreg(cancer_type = "big")
+# Convert `canreg` to `fbswicd`
+fbsw <- count_canreg(data, cancer_type = "big")
 
-# calculate age standard rate (ASR) based on `fbswicd`
-fbsw |> 
-  create_asr(year, sex, cancer) |> 
+# 1. Age-standardized rate (ASR)
+create_asr(fbsw, year, sex, cancer) |>
   add_labels(lang = "en")
 
-# calculate quality indicators based on `fbswicd`
-fbsw |> 
-  create_quality(cancer) |> 
-  add_labels(label_type = "abbr", lang="en")
+# 2. Quality indicators
+create_quality(fbsw, cancer) |>
+  add_labels(label_type = "abbr", lang = "en")
 
-# calculate age specific rate based on `fbswicd`
-fbsw |> 
-  create_age_rate() |> 
+# 3. Age-specific rates
+create_age_rate(fbsw) |>
   add_labels(lang = "en")
 ```
 

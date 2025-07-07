@@ -2,7 +2,7 @@
 % Please edit documentation in R/cumrate.R
 \name{cumrate}
 \alias{cumrate}
-\title{Calculate the cumulative rate.}
+\title{Calculate the cumulative incidence or mortality rate}
 \usage{
 cumrate(
   count,
@@ -16,33 +16,49 @@ cumrate(
 )
 }
 \arguments{
-\item{count}{Number of cases number.}
+\item{count}{Numeric vector, number of incident cases or deaths in each age
+group.}
 
-\item{pop}{Number of population at risk.}
+\item{pop}{Numeric vector, corresponding population at risk for each age
+group.}
 
-\item{rate}{Age specific incidence or mortality rate.}
+\item{rate}{Numeric vector, age-specific incidence or mortality rates. If not
+supplied, it will be calculated as \code{count / pop}.}
 
-\item{eage}{The defined age limit of the calculated cumulative rate.}
+\item{eage}{Integer, the upper age limit (e.g., 70) up to which the cumulative
+rate is calculated.}
 
-\item{agewidth}{The age band width of the age specific rate.}
+\item{agewidth}{Integer, width of the age intervals (e.g., 5 for 5-year
+bands).}
 
-\item{sep_zero}{Logical value, if the 0 age group was separate.}
+\item{sep_zero}{Logical, whether the 0–1 age group is separated (i.e.,
+age groups are 0, 1–4, 5–9, ...). Default is \code{TRUE}.}
 
-\item{mp}{A multiplier used to scale the calculated rates. Default is 1.}
+\item{mp}{Numeric. A multiplier used to scale the final cumulative rate
+(e.g., 100,000 or 1). Default is \code{1}.}
 
-\item{decimal}{Decimals of the calculated rates.}
+\item{decimal}{Integer, number of decimal places to round the result.
+Default is \code{6}.}
 }
 \value{
-Cumulative rate.
+A named numeric value representing the cumulative rate, scaled
+by \code{mp}.
 }
 \description{
-It was used to calculate the cumulative rate up to a defined age limit.
+Computes the cumulative rate up to a specified age limit, typically used in
+cancer epidemiology to estimate the probability of developing or dying from
+a disease over a lifetime or up to a target age.
 }
 \examples{
-px <- c(20005, 86920, 102502, 151494, 182932, 203107, 240289, 247076, 199665,
-        163820, 145382, 86789, 69368, 51207, 39112, 20509, 12301, 6586, 1909)
-dx <- c(156, 58, 47, 49, 48, 68, 120, 162, 160, 294, 417, 522, 546, 628,
-        891, 831, 926, 731, 269)
+px <- c(
+  20005, 86920, 102502, 151494, 182932, 203107, 240289, 247076, 199665,
+  163820, 145382, 86789, 69368, 51207, 39112, 20509, 12301, 6586, 1909
+)
+dx <- c(
+  156, 58, 47, 49, 48, 68, 120, 162, 160, 294, 417, 522, 546, 628,
+  891, 831, 926, 731, 269
+)
 mx <- dx / px
 cumrate(mx, eage = 70)
+
 }

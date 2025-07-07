@@ -4,12 +4,13 @@ library(crcheck)
 # Extract the ICCC3-2005 main classification from SEER website.
 url <- "https://seer.cancer.gov/iccc/iccc3.html"
 table <- html_table(read_html(url))[[1]]
-iccc3_2005 <- table[-c(1,7,13,23,28,34,39,48,61,69,77,81),]
+iccc3_2005 <- table[-c(1, 7, 13, 23, 28, 34, 39, 48, 61, 69, 77, 81), ]
 colnames(iccc3_2005) <- c("desc", "morp", "topo", "recode")
 iccc3_2005 <- list(
   morp = lapply(strsplit(iccc3_2005$morp, ","), recode_morp),
   topo = lapply(strsplit(iccc3_2005$topo, ","), recode_topo),
-  recode = as.list(iccc3_2005$recode))
+  recode = as.list(iccc3_2005$recode)
+)
 
 v2005 <- list(
   main = iccc3_2005
@@ -18,8 +19,6 @@ v2005 <- list(
 # Extract the ICCC3-2005 extended classification from SEER website.
 url <- "https://seer.cancer.gov/iccc/iccc3_ext.html"
 table <- html_table(read_html(url))[[1]]
-
-
 
 
 # Extract the ICCC3-2017 version from SEER website.
@@ -38,18 +37,21 @@ cols <- c("group", "morp", "topo", "beha", "recode1", "recode2")
 colnames(table) <- cols
 colnames(mm) <- cols
 
-table2 <- table |> 
-  filter(recode1 %in% sprintf("%03d", c(0:115, 999)),
-         !group == "9820") |>
-  bind_rows(mm) |> 
-  arrange(recode1, group) |> 
+table2 <- table |>
+  filter(
+    recode1 %in% sprintf("%03d", c(0:115, 999)),
+    !group == "9820"
+  ) |>
+  bind_rows(mm) |>
+  arrange(recode1, group) |>
   filter(!morp == "")
 
-  iccc3_2017 <- list(
-    morp = lapply(strsplit(table2$morp, ","), recode_morp),
-    topo = lapply(strsplit(table2$topo, ","), recode_topo),
-    extend = as.list(table2$recode1),
-    recode = as.list(table2$recode2))
+iccc3_2017 <- list(
+  morp = lapply(strsplit(table2$morp, ","), recode_morp),
+  topo = lapply(strsplit(table2$topo, ","), recode_topo),
+  extend = as.list(table2$recode1),
+  recode = as.list(table2$recode2)
+)
 
 
 ICCC3Rule <- list(
@@ -58,4 +60,3 @@ ICCC3Rule <- list(
 )
 
 rm(url, table, iccc3_2005, iccc3_2017, v2005, mm, table2, cols, url2017)
-
