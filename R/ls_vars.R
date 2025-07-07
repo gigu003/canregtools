@@ -49,13 +49,14 @@ ls_vars <- function(type = "std") {
 ls_dict <- function(dict = "registry") {
   file_path <- dict_addr(dict)
   if (!file.exists(file_path)) {
-    stop("Dictionary file not found: ", file_path)
+    message("Dictionary file not found: ", file_path)
+  } else {
+    dict <- readRDS(file_path)
+    dplyr::tibble(
+      areacode = names(dict),
+      value = unname(dict)
+    )  
   }
-  dict <- readRDS(file_path)
-  dplyr::tibble(
-    areacode = names(dict),
-    value = unname(dict)
-  )
 }
 
 #' List dictionary files used by canregtools
