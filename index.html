@@ -6,18 +6,13 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Analyzing Population-Based Cancer Registry Data • canregtools</title>
-<!-- favicons --><link rel="icon" type="image/png" sizes="48x48" href="favicon-48x48.png">
-<link rel="icon" type="”image/svg+xml”" href="favicon.svg">
-<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
-<link rel="icon" sizes="any" href="favicon.ico">
-<link rel="manifest" href="site.webmanifest">
 <!-- jquery --><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js" integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script><!-- Bootstrap --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha256-bZLfwXAP04zRMK2BjiO8iu9pf4FbLqX6zitd+tIvLhE=" crossorigin="anonymous">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script><!-- bootstrap-toc --><link rel="stylesheet" href="bootstrap-toc.css">
 <script src="bootstrap-toc.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
 <!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- pkgdown --><link href="pkgdown.css" rel="stylesheet">
 <script src="pkgdown.js"></script><meta property="og:title" content="Analyzing Population-Based Cancer Registry Data">
-<meta property="og:description" content="Tools designed to streamline data analysis, visualization, and reporting in Population-Based Cancer Registration (PBCR).">
+<meta property="og:description" content="Tools for cleaning, analyzing, visualizing, and reporting data from Population-Based Cancer Registries (PBCRs), with standardized workflows for filtering, selecting, and restructuring data, designed for routine registry operations.">
 <meta property="og:image" content="/logo.png">
 <!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script><!--[if lt IE 9]>
 <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
@@ -46,6 +41,9 @@
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
 <li>
+  <a href="articles/canregtools.html">Get started</a>
+</li>
+<li>
   <a href="reference/index.html">Reference</a>
 </li>
 <li>
@@ -72,7 +70,7 @@
       </header><div class="row">
   <div class="contents col-md-9">
 <div class="section level1">
-<div class="page-header"><h1 id="canregtools-">canregtools <img src="reference/figures/logo.png" align="right" height="120"><a class="anchor" aria-label="anchor" href="#canregtools-"></a>
+<div class="page-header"><h1 id="canregtools-">canregtools <img src="reference/figures/logo.png" align="right" height="139" alt=""><a class="anchor" aria-label="anchor" href="#canregtools-"></a>
 </h1></div>
 <!-- badges: start -->
 
@@ -86,7 +84,7 @@
 <li>
 <code><a href="reference/count_canreg.html">count_canreg()</a></code> convert object with class of <code>canreg</code> or <code>canregs</code> to object with class of <code>fbswicd</code> or <code>fbswicds</code>.</li>
 <li>
-<code><a href="reference/create_asr.html">create_asr()</a></code> calculate age-standardized rates (ASR), truncated rates and cumulative rates, <code><a href="reference/create_quality.html">create_quality()</a></code> calculate quality indicators such as crude incidence or mortality, mortality to incidence ratio (M:I), percent of pathological verified cases (MV%), and etc. , <code><a href="reference/create_age_rate.html">create_age_rate()</a></code> calculate age specific rate, <code>create_sheet()</code> create a summary sheet containing some of these statistics.</li>
+<code><a href="reference/create_asr.html">create_asr()</a></code> calculate age-standardized rates (ASR), truncated rates and cumulative rates, <code><a href="reference/create_quality.html">create_quality()</a></code> calculate quality indicators such as crude incidence or mortality, mortality to incidence ratio (M:I), percent of pathological verified cases (MV%), and etc. , <code><a href="reference/create_age_rate.html">create_age_rate()</a></code> calculate age specific rate.</li>
 <li>
 <code><a href="reference/draw_pyramid.html">draw_pyramid()</a></code> draw population pyramid, <code><a href="reference/draw_linechart.html">draw_linechart()</a></code> draw line chart, <code><a href="reference/draw_barchart.html">draw_barchart()</a></code> draw grouped bar chart.</li>
 <li>
@@ -108,57 +106,54 @@
 <h2 id="usage">Usage<a class="anchor" aria-label="anchor" href="#usage"></a>
 </h2>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://gigu003.github.io/canregtools/" class="external-link">canregtools</a></span><span class="op">)</span></span>
-<span><span class="fu"><a href="reference/data.html">data</a></span><span class="op">(</span><span class="st">"canregs"</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="co"># Load sample data</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/gigu003/canregtools" class="external-link">canregtools</a></span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"canregs"</span><span class="op">)</span></span>
 <span><span class="va">data</span> <span class="op">&lt;-</span> <span class="va">canregs</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span></span>
 <span></span>
-<span><span class="co"># count `canreg` data to `fbswicd`</span></span>
-<span><span class="va">fbsw</span> <span class="op">&lt;-</span> <span class="va">data</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="reference/count_canreg.html">count_canreg</a></span><span class="op">(</span>cancer_type <span class="op">=</span> <span class="st">"big"</span><span class="op">)</span></span>
+<span><span class="co"># Convert `canreg` to `fbswicd`</span></span>
+<span><span class="va">fbsw</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/count_canreg.html">count_canreg</a></span><span class="op">(</span><span class="va">data</span>, cancer_type <span class="op">=</span> <span class="st">"big"</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># calculate age standard rate (ASR) based on `fbswicd`</span></span>
-<span><span class="va">fbsw</span> <span class="op">|&gt;</span> </span>
-<span>  <span class="fu"><a href="reference/create_asr.html">create_asr</a></span><span class="op">(</span><span class="va">year</span>, <span class="va">sex</span>, <span class="va">cancer</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
+<span><span class="co"># 1. Age-standardized rate (ASR)</span></span>
+<span><span class="fu"><a href="reference/create_asr.html">create_asr</a></span><span class="op">(</span><span class="va">fbsw</span>, <span class="va">year</span>, <span class="va">sex</span>, <span class="va">cancer</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="reference/add_labels.html">add_labels</a></span><span class="op">(</span>lang <span class="op">=</span> <span class="st">"en"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; # A tibble: 84 × 14</span></span>
 <span><span class="co">#&gt;    year sex   cancer site              icd10 no_cases    cr asr_cn2000 asr_wld85</span></span>
 <span><span class="co">#&gt;   &lt;int&gt; &lt;fct&gt; &lt;chr&gt;  &lt;fct&gt;             &lt;chr&gt;    &lt;dbl&gt; &lt;dbl&gt;      &lt;dbl&gt;     &lt;dbl&gt;</span></span>
-<span><span class="co">#&gt; 1  2021 Total 101    Oral Cavity &amp; Ph… C00-…       27  3.95       3.23      3.32</span></span>
-<span><span class="co">#&gt; 2  2021 Total 102    Nasopharynx       C11          7  1.02       0.78      0.83</span></span>
-<span><span class="co">#&gt; 3  2021 Total 103    Esophagus         C15         65  9.52       6.88      6.65</span></span>
-<span><span class="co">#&gt; 4  2021 Total 104    Stomach           C16        101 14.8       11.2      11.2 </span></span>
-<span><span class="co">#&gt; 5  2021 Total 105    Conlon, Rectum &amp;… C18-…      180 26.4       19.8      19.9 </span></span>
+<span><span class="co">#&gt; 1  2021 Total 101    Oral Cavity &amp; Ph… C00-…       38  5.53       3.74      3.79</span></span>
+<span><span class="co">#&gt; 2  2021 Total 102    Nasopharynx       C11          5  0.73       0.71      0.71</span></span>
+<span><span class="co">#&gt; 3  2021 Total 103    Esophagus         C15         59  8.58       4.53      4.85</span></span>
+<span><span class="co">#&gt; 4  2021 Total 104    Stomach           C16        123 17.9       11.1      11.2 </span></span>
+<span><span class="co">#&gt; 5  2021 Total 105    Conlon, Rectum &amp;… C18-…      236 34.3       20.6      20.2 </span></span>
 <span><span class="co">#&gt; # ℹ 79 more rows</span></span>
 <span><span class="co">#&gt; # ℹ 5 more variables: truncr_cn2000 &lt;dbl&gt;, truncr_wld85 &lt;dbl&gt;, cumur &lt;dbl&gt;,</span></span>
 <span><span class="co">#&gt; #   prop &lt;dbl&gt;, rank &lt;int&gt;</span></span>
 <span></span>
-<span><span class="co"># calculate quality indicators based on `fbswicd`</span></span>
-<span><span class="va">fbsw</span> <span class="op">|&gt;</span> </span>
-<span>  <span class="fu"><a href="reference/create_quality.html">create_quality</a></span><span class="op">(</span><span class="va">cancer</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
-<span>  <span class="fu"><a href="reference/add_labels.html">add_labels</a></span><span class="op">(</span>label_type <span class="op">=</span> <span class="st">"abbr"</span>, lang<span class="op">=</span><span class="st">"en"</span><span class="op">)</span></span>
+<span><span class="co"># 2. Quality indicators</span></span>
+<span><span class="fu"><a href="reference/create_quality.html">create_quality</a></span><span class="op">(</span><span class="va">fbsw</span>, <span class="va">cancer</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="reference/add_labels.html">add_labels</a></span><span class="op">(</span>label_type <span class="op">=</span> <span class="st">"abbr"</span>, lang <span class="op">=</span> <span class="st">"en"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; # A tibble: 28 × 16</span></span>
 <span><span class="co">#&gt;    year sex   cancer site       icd10    rks   fbs  inci   sws  mort    mi    mv</span></span>
-<span><span class="co">#&gt;   &lt;int&gt; &lt;fct&gt; &lt;chr&gt;  &lt;fct&gt;      &lt;chr&gt;  &lt;int&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;</span></span>
-<span><span class="co">#&gt; 1  9000 Total 101    Oral Cavi… C00-… 683110    27  3.95    13  1.9   0.48  55.6</span></span>
-<span><span class="co">#&gt; 2  9000 Total 102    Nasophary… C11   683110     7  1.02     5  0.73  0.71  57.1</span></span>
-<span><span class="co">#&gt; 3  9000 Total 103    Esophagus  C15   683110    65  9.52    46  6.73  0.71  86.2</span></span>
-<span><span class="co">#&gt; 4  9000 Total 104    Stomach    C16   683110   101 14.8     79 11.6   0.78  71.3</span></span>
-<span><span class="co">#&gt; 5  9000 Total 105    Colorectum C18-… 683110   180 26.4    103 15.1   0.57  81.7</span></span>
+<span><span class="co">#&gt;   &lt;int&gt; &lt;fct&gt; &lt;chr&gt;  &lt;fct&gt;      &lt;chr&gt;  &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;</span></span>
+<span><span class="co">#&gt; 1  9000 Total 101    Oral Cavi… C00-… 687356    38  5.53    13  1.89  0.34  73.7</span></span>
+<span><span class="co">#&gt; 2  9000 Total 102    Nasophary… C11   687356     5  0.73     0  0     0     40  </span></span>
+<span><span class="co">#&gt; 3  9000 Total 103    Esophagus  C15   687356    59  8.58    50  7.27  0.85  74.6</span></span>
+<span><span class="co">#&gt; 4  9000 Total 104    Stomach    C16   687356   123 17.9     82 11.9   0.67  71.5</span></span>
+<span><span class="co">#&gt; 5  9000 Total 105    Colorectum C18-… 687356   236 34.3    103 15.0   0.44  77.5</span></span>
 <span><span class="co">#&gt; # ℹ 23 more rows</span></span>
 <span><span class="co">#&gt; # ℹ 4 more variables: dco &lt;dbl&gt;, ub &lt;dbl&gt;, sub &lt;dbl&gt;, m8000 &lt;dbl&gt;</span></span>
 <span></span>
-<span><span class="co"># calculate age specific rate based on `fbswicd`</span></span>
-<span><span class="va">fbsw</span> <span class="op">|&gt;</span> </span>
-<span>  <span class="fu"><a href="reference/create_age_rate.html">create_age_rate</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
+<span><span class="co"># 3. Age-specific rates</span></span>
+<span><span class="fu"><a href="reference/create_age_rate.html">create_age_rate</a></span><span class="op">(</span><span class="va">fbsw</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="reference/add_labels.html">add_labels</a></span><span class="op">(</span>lang <span class="op">=</span> <span class="st">"en"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; # A tibble: 19 × 8</span></span>
 <span><span class="co">#&gt;    year sex   cancer site        icd10 agegrp   cases  rate</span></span>
-<span><span class="co">#&gt;   &lt;int&gt; &lt;fct&gt; &lt;chr&gt;  &lt;fct&gt;       &lt;chr&gt; &lt;fct&gt;    &lt;int&gt; &lt;dbl&gt;</span></span>
-<span><span class="co">#&gt; 1  9000 Total 60     All Cancers ALL   0 岁         6  79.1</span></span>
-<span><span class="co">#&gt; 2  9000 Total 60     All Cancers ALL   1-4 岁      12  42.0</span></span>
-<span><span class="co">#&gt; 3  9000 Total 60     All Cancers ALL   5-9 岁      14  46.5</span></span>
-<span><span class="co">#&gt; 4  9000 Total 60     All Cancers ALL   10-14 岁     6  18.5</span></span>
-<span><span class="co">#&gt; 5  9000 Total 60     All Cancers ALL   15-19 岁     6  16.1</span></span>
+<span><span class="co">#&gt;   &lt;int&gt; &lt;fct&gt; &lt;chr&gt;  &lt;fct&gt;       &lt;chr&gt; &lt;fct&gt;    &lt;dbl&gt; &lt;dbl&gt;</span></span>
+<span><span class="co">#&gt; 1  9000 Total 60     All Cancers ALL   0 岁         3  44.3</span></span>
+<span><span class="co">#&gt; 2  9000 Total 60     All Cancers ALL   1-4 岁      12  31.4</span></span>
+<span><span class="co">#&gt; 3  9000 Total 60     All Cancers ALL   5-9 岁       9  16.4</span></span>
+<span><span class="co">#&gt; 4  9000 Total 60     All Cancers ALL   10-14 岁    13  32.5</span></span>
+<span><span class="co">#&gt; 5  9000 Total 60     All Cancers ALL   15-19 岁     8  26.2</span></span>
 <span><span class="co">#&gt; # ℹ 14 more rows</span></span></code></pre></div>
 </div>
 </div>
@@ -193,13 +188,16 @@
 <h2 data-toc-skip>Developers</h2>
 <ul class="list-unstyled">
 <li>Qiong Chen <br><small class="roles"> Author, maintainer, copyright holder </small> <a href="https://orcid.org/0000-0003-2401-0046" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a>  </li>
+<li><a href="authors.html">More about authors...</a></li>
 </ul>
 </div>
 
 <div class="dev-status">
 <h2 data-toc-skip>Dev status</h2>
 <ul class="list-unstyled">
+<li><a href="https://CRAN.R-project.org/package=canregtools" class="external-link"><img src="https://www.r-pkg.org/badges/version/canregtools" alt="CRAN status"></a></li>
 <li><a href="https://github.com/gigu003/canregtools/actions/workflows/R-CMD-check.yaml" class="external-link"><img src="https://github.com/gigu003/canregtools/actions/workflows/R-CMD-check.yaml/badge.svg" alt="R-CMD-check"></a></li>
+<li><a href="https://codecov.io/gh/gigu003/canregtools" class="external-link"><img src="https://codecov.io/gh/gigu003/canregtools/branch/main/graph/badge.svg" alt="codecov"></a></li>
 </ul>
 </div>
 
@@ -214,7 +212,7 @@
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.2.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
 </div>
 
       </footer>
