@@ -96,25 +96,25 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 687356</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $fbs</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 2655</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 2800</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $inci</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 386.26</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 407.36</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $sws</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 1080</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 1087</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $mort</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 157.12</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 158.14</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $mi</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.41</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.39</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $mv</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 75.89</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 74.79</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $dco</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.9</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.86</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $death</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0</span>
@@ -123,13 +123,14 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 2021</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $inci_vars</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "year"   "sex"    "agegrp" "basi"   "icd10"  "cancer" "morp"  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "regi_num" "year"     "sex"      "agegrp"   "basi"     "icd10"    "cancer"  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [8] "morp"    </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $miss_r_vars_inci</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "birthda" "inciden" "deathda"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $mort_vars</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "year"   "sex"    "cancer" "agegrp" "icd10" </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "regi_num" "year"     "sex"      "cancer"   "agegrp"   "icd10"   </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $miss_r_vars_mort</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "birthda" "inciden" "deathda" "basi"   </span>
@@ -140,17 +141,21 @@
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">canregs</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   areacode    rks  fbs   inci  sws   mort   mi    mv  dco death rks_year</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1   410103 687356 2655 386.26 1080 157.12 0.41 75.89 0.90     0     2021</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2   410307 491325 1466 298.38  717 145.93 0.49 72.37 0.89     0     2021</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3   411721 882017 2190 248.29 1470 166.66 0.67 70.55 2.28     0     2016</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                                      inci_vars          miss_r_vars_inci</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1 year, sex, agegrp, basi, icd10, cancer, morp birthda, inciden, deathda</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2 year, sex, agegrp, basi, icd10, cancer, morp birthda, inciden, deathda</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3 year, sex, agegrp, basi, icd10, cancer, morp birthda, inciden, deathda</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                          mort_vars                miss_r_vars_mort</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1 year, sex, cancer, agegrp, icd10 birthda, inciden, deathda, basi</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2 year, sex, cancer, agegrp, icd10 birthda, inciden, deathda, basi</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3 year, sex, cancer, agegrp, icd10 birthda, inciden, deathda, basi</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1   410103 687356 2800 407.36 1087 158.14 0.39 74.79 0.86     0     2021</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2   410307 491325 1480 301.23  718 146.14 0.49 72.43 0.88     0     2021</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3   411721 882017 2200 249.43 1470 166.66 0.67 70.55 2.27     0     2016</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                                                inci_vars</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1 regi_num, year, sex, agegrp, basi, icd10, cancer, morp</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2 regi_num, year, sex, agegrp, basi, icd10, cancer, morp</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3 regi_num, year, sex, agegrp, basi, icd10, cancer, morp</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>            miss_r_vars_inci                                  mort_vars</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1 birthda, inciden, deathda regi_num, year, sex, cancer, agegrp, icd10</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2 birthda, inciden, deathda regi_num, year, sex, cancer, agegrp, icd10</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3 birthda, inciden, deathda regi_num, year, sex, cancer, agegrp, icd10</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                  miss_r_vars_mort</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1 birthda, inciden, deathda, basi</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2 birthda, inciden, deathda, basi</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3 birthda, inciden, deathda, basi</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
