@@ -61,18 +61,28 @@ count_canreg.canreg <- function(x,
                                 age_breaks = c(0, 1, seq(5, 85, 5)),
                                 label_tail = NULL,
                                 cancer_type = "big") {
+  regi_num <- rlang::sym("regi_num")
   format <- cr_clean(x,
     age_breaks = age_breaks, label_tail = label_tail,
     cancer_type = cancer_type
   )
-  fb <- format$FBcases
-  sw <- format$SWcases
-
+  fb <- drop_sex_cancer(format$FBcases,
+                        drop_na = c("year", "sex", "agegrp", "cancer"))
+  sw <- drop_sex_cancer(format$SWcases,
+                        drop_na = c("year", "sex", "agegrp", "cancer"))
+  exclude <- bind_rows(
+    format$FBcases |>
+      filter(!!regi_num %nin% fb[["regi_num"]]) |>
+      mutate(source = "FBcases", .before = everything()),
+    format$SWcases |>
+      filter(!!regi_num %nin% sw[["regi_num"]]) |>
+      mutate(source = "SWcases", .before = everything())
+  )
 
   year <- rlang::sym("year")
   sex <- rlang::sym("sex")
   cancer <- rlang::sym("cancer")
-  sumvars <- c("fbs", "sws", "mv", "dco", "m8000", "ub", "sub")
+  sumvars <- c("fbs", "sws", "mv", "dco", "mvs", "ub", "sub")
 
   ubs <- c("C26", "C39", "C48", "C76", "C77", "C78", "C79", "C80", "C97")
   basi <- rlang::sym("basi")
@@ -86,13 +96,10 @@ count_canreg.canreg <- function(x,
   mv <- rlang::sym("mv")
   ub <- rlang::sym("ub")
   sub <- rlang::sym("sub")
-  m8000 <- rlang::sym("m8000")
+  mvs <- rlang::sym("mvs")
   dco <- rlang::sym("dco")
 
-  fb <- fb |>
-    filter(!is.na(!!year), !is.na(!!sex), !is.na(!!cancer))
   res_sw <- sw |>
-    filter(!is.na(!!year), !is.na(!!sex), !is.na(!!cancer)) |>
     mutate(!!c44 := as.integer(substr(!!icd10, 1, 3) == "C44")) |>
     count(!!!rlang::syms(byvars), !!c44, name = "sws")
   res <- fb |>
@@ -101,13 +108,14 @@ count_canreg.canreg <- function(x,
       !!c44 := as.integer(substr(!!icd10, 1, 3) == "C44"),
       !!mv := as.integer(!!basi %in% 5:7),
       !!dco := as.integer(!!basi == 0),
-      !!m8000 := as.integer(!!morp %in% c("8000", "80001") & !!basi %in% 5:7),
+      !!mvs := as.integer(!!morp %in% c("8000", "8001", "8010", "8020", "8021") & !!basi %in% 5:7),
       !!ub := as.integer(substr(!!icd10, 1, 3) %in% ubs),
       !!sub := as.integer(substr(!!icd10, 5, 5) == "9")
     ) |>
     group_by(!!!rlang::syms(byvars), !!c44) |>
     reframe(across(all_of(setdiff(sumvars, "sws")), sum)) |>
-    left_join(res_sw, by = c(byvars, "c44"))
+    full_join(res_sw, by = c(byvars, "c44")) |>
+    mutate(across(all_of(sumvars), function(x) as.integer(replace_na(x))))
 
   # Construct the `fbswicd`
   fbswicd<- bind_rows(
@@ -120,20 +128,19 @@ count_canreg.canreg <- function(x,
       group_by(!!!rlang::syms(setdiff(byvars, "cancer"))) |>
       reframe(across(all_of(sumvars), sum, na.rm = TRUE)) |>
       mutate(!!cancer := "61")
-  )
+    )
 
+  years <- unique(c(pluck(fb, "year"), pluck(sw, "year")))
  # expand full combinations
   fbswicd <- expand_grid(
-    year = unique(fbswicd$year),
-    sex = unique(fbswicd$sex),
-    cancer = unique(fbswicd$cancer),
-    agegrp = factor(levels(res$agegrp),
-      levels = levels(res$agegrp))
+    year = years,
+    sex = c(1L, 2L),
+    cancer = unique(c(get_cancer(cancer_type), fbswicd[["cancer"]])),
+    agegrp = factor(levels(res$agegrp), levels = levels(res$agegrp))
     ) |>
-    left_join(fbswicd, by = byvars) |>
-    mutate(across(all_of(sumvars), function(x) as.integer(replace_na(x))))
-  
-
+    left_join(fbswicd, by = byvars, ) |> 
+    mutate(across(all_of(sumvars), ~ tidyr::replace_na(.x, 0)))
+    
   # Count the sub-sites and morphology codes
   sitemorp <- fb |>
     group_by(!!!rlang::syms(c("year", "sex", "cancer"))) |>
@@ -141,11 +148,13 @@ count_canreg.canreg <- function(x,
       site = list(ctp(!!icd10)),
       !!morp := list(ctp(!!morp))
     )
+  # construct the result list
   res <- list(
     areacode = purrr::pluck(format, "areacode"),
     fbswicd = fbswicd,
     sitemorp = sitemorp,
-    pop = purrr::pluck(format, "POP")
+    pop = purrr::pluck(format, "POP"),
+    exclude = exclude
   )
 
   attr(res, "class") <- c("fbswicd", class(res))

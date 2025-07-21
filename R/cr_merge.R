@@ -57,7 +57,7 @@ cr_merge.fbswicds <- function(data) {
   accept_vars <- names(classify_areacode("10302"))
   areacode <- unique(unlist(map(data, pluck("areacode"))))
   gvars <- c("year", "sex", "agegrp", "cancer")
-  svars <- c("fbs", "sws", "mv", "ub", "sub", "m8000", "dco")
+  svars <- c("fbs", "sws", "mv", "ub", "sub", "mvs", "dco")
   fbswicd <- cmerge(data, nested = "fbswicd")
   fbswicd <- fbswicd |>
     group_by(!!!rlang::syms(gvars)) |>
@@ -75,10 +75,11 @@ cr_merge.fbswicds <- function(data) {
       !!site := list(combine_tp(!!site)),
       !!morp := list(combine_tp(!!morp))
     )
+  exclude = cmerge(data, nested = "exclude")
 
   structure(
     list(areacode = areacode, fbswicd = fbswicd, sitemorp = sitemorp,
-         pop = pop),
+         pop = pop, exclude = exclude),
     class = c("fbswicd", "list")
   )
 }

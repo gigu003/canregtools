@@ -42,3 +42,4 @@ test_that("summary.canregs collapse = TRUE returns merged tibble", {
   expect_s3_class(result, "data.frame")
   expect_true(all(c("rks", "fbs", "sws") %in% names(result)))
 })
+

@@ -86,11 +86,13 @@ cr_clean.FBcases <- function(x,
   icd10 <- rlang::sym("icd10")
   cancer <- rlang::sym("cancer")
   agegrp <- rlang::sym("agegrp")
+  regi_num= rlang::sym("regi_num")
 
   res <- x |>
     select(!!!rlang::syms(c("sex", "birthda", "inciden",
                             "basi", "icd10", "morp"))) |>
     mutate(
+      !!regi_num := row_number(),
       !!year := as.integer(format(!!inciden, "%Y")),
       !!sex := tidy_sex(!!sex),
       !!age := calc_age(!!birthda, !!inciden),
@@ -102,12 +104,8 @@ cr_clean.FBcases <- function(x,
         label_tail = label_tail
       )
     ) |>
-    filter(!is.na(cancer), !(!!sex == 0),
-           !((!!sex == 1 & cancer %in% female_cancer) |
-               (!!sex == 2 & cancer %in% male_cancer) |
-               !!sex == 0)) |>
     select(!!!rlang::syms(c(
-      "year", "sex", "agegrp", "basi", "icd10",
+      "regi_num", "year", "sex", "agegrp", "basi", "icd10",
       "cancer", "morp"
     )))
 
@@ -126,8 +124,6 @@ cr_clean.SWcases <- function(x,
                              age_breaks = c(0, 1, seq(5, 85, 5)),
                              label_tail = NULL,
                              cancer_type = "big") {
-  female_cancer <- c(29:37, 114:117, 206, 320:325)
-  male_cancer <- c(38:41, 118:119, 207, 326:328)
   year <- rlang::sym("year")
   age <- rlang::sym("age")
   sex <- rlang::sym("sex")
@@ -136,9 +132,11 @@ cr_clean.SWcases <- function(x,
   icd10 <- rlang::sym("icd10")
   cancer <- rlang::sym("cancer")
   agegrp <- rlang::sym("agegrp")
+  regi_num= rlang::sym("regi_num")
   res <- x |>
     select(!!sex, !!birthda, !!deathda, !!icd10) |>
     mutate(
+      !!regi_num := row_number(),
       !!year := as.integer(format(!!deathda, "%Y")),
       !!sex := tidy_sex(!!sex),
       !!age := calc_age(!!birthda, !!deathda),
@@ -149,11 +147,7 @@ cr_clean.SWcases <- function(x,
         label_tail = label_tail
       )
     ) |>
-    filter(!is.na(!!cancer), !(!!sex == 0),
-           !((!!sex == 1 & !!cancer %in% female_cancer) |
-               (!!sex == 2 & !!cancer %in% male_cancer) |
-               !!sex == 0)) |>
-    select(year, !!sex, !!cancer, !!agegrp, !!icd10)
+    select(!!regi_num, !!year, !!sex, !!cancer, !!agegrp, !!icd10)
 
   class(res) <- c("SWcases", class(res))
   return(res)
@@ -213,7 +207,7 @@ cr_clean.POP <- function(x,
       year = uniyear,
       sex = c(1L, 2L),
       agegrp = uniagegrp
-    ) |>
+      ) |>
       left_join(res, by = c("year", "sex", "agegrp")) |>
       mutate(across(c(!!!sum_vars), ~ dplyr::coalesce(.x, 0)))
   }

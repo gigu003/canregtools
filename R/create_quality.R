@@ -105,7 +105,7 @@ create_quality.fbswicds <- function(x,
 #'
 create_quality.fbswicd <- function(x, ..., decimal = 2) {
   sex <- rlang::sym("sex")
-  stats <- c("fbs", "sws", "mv", "dco", "ub", "sub", "m8000")
+  stats <- c("fbs", "sws", "mv", "dco", "ub", "sub", "mvs")
   s_vars1 <- rlang::syms(stats)
   s_vars2 <- s_vars1[3:length(s_vars1)]
   fbs <- rlang::sym("fbs")

@@ -159,6 +159,39 @@ get_expr_vars <- function(...) {
       return(NULL)
     }
   }
-  
   unique(unlist(lapply(conds, extract_from_expr)))
+}
+
+get_sex_cancer <- function(sex = "male") {
+  if (sex == "male") {
+    c(29:37, 114:117, 206, 320:325)
+  } else if (sex == "female") {
+    c(38:41, 118:119, 207, 326:328)
+  }
+}
+
+drop_sex_cancer <- function(data, drop_na = NULL) {
+  sex <- rlang::sym("sex")
+  cancer <- rlang::sym("cancer")
+  res <- data |>
+    filter(
+      !(!!sex == 1 & !!cancer %in% get_sex_cancer("female")) |
+        !(!!sex == 2 & !!cancer %in% get_sex_cancer("male"))
+      )
+  if (!is.null(drop_na)) {
+    res |>
+      tidyr::drop_na(any_of(drop_na))
+  } else {
+    return(res)
+  }
+}
+
+get_cancer <- function(cancer_type = "big") {
+  switch(
+    cancer_type,
+    "big" = as.character(c(101:126)),
+    "small" = as.character(c(1:59)),
+    "gco" = as.character(c(301:338)),
+    "system" = as.character(c(201:211))
+  )
 }

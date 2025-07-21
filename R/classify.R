@@ -34,12 +34,10 @@ classify_icd10 <- function(x,
   idx <- match(clean_x, dict_icd10_code[["icd10"]])
   res <- dict_icd10_code[idx, cancer_type]
   res <- unname(unlist(res))
-  if (!lang == "code") {
-    res <- tidy_var(res,
+  res <- tidy_var(res,
       var_name = "cancer", lang = lang,
       label_type = label_type, as_factor = as_factor
     )
-  }
 
   return(res)
 }
