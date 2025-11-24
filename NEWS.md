@@ -1,3 +1,5 @@
+# canregtools 0.3.0
+
 # canregtools 0.2.9
 
 * Fixed an issue where mortality rates were not displayed when incidence rates were missing for certain cancer types.
