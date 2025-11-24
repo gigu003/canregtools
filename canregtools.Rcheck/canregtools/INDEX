@@ -1,0 +1,83 @@
+add_labels              Add variable labels for data set.
+add_var_labels          Add Variable Labels with Units
+ageadjust               Calculate the age standardized rate using the
+                        direct method
+calc_age                Calculate the actual age in completed years
+                        between two dates
+canregs                 Example Population-Based Cancer Registry Data
+                        ('canregs')
+check_canreg            Check the class of 'canreg'
+classify_areacode       Classify codes for the administrative divisions
+                        of China
+classify_areacode2      Classify codes for the administrative divisions
+                        of China
+classify_childhood      Classify childhood cancer according to the
+                        ICCC3 standards
+classify_icd10          Classify ICD10 codes to cancer categories
+classify_morp           Classify ICD-O-3 morphology codes into
+                        categories
+classify_topo           Classify ICD-O-3 topography codes into
+                        categories
+combine_tp              Sum named numeric vectors
+count_canreg            Count and classify 'canreg' data
+cr_clean                Clean canreg data.
+cr_filter               Filter cases from objects of class 'canreg' or
+                        'canregs'
+cr_merge                Merge elements from objects of class 'canregs',
+                        'fbswicds', or 'asrs'
+cr_reframe              Reframe data of class canregs or fbswicds
+cr_render               Render reports from built-in quarto templates
+cr_select               Select elements from objects with class
+                        '"canregs"', or '"fbswicds"'
+cr_write                Clean canreg data.
+create_age_rate         Calculate age specific rate
+create_asr              Calculate age-standardized rate (ASR)
+create_quality          Calculate quality indicators
+create_report           Render standardized cancer registry reports
+                        from built-in templates
+create_site             Count
+cumrate                 Calculate the cumulative incidence or mortality
+                        rate
+cumrisk                 Calculate the cumulative risk
+cutage                  Group ages into categories
+del_dict_files          Delete a dictionary file from canregtools
+                        config
+draw_barchart           Draw Grouped Bar Charts with Facets
+draw_dumbbell           Plot dumbbell chart
+draw_linechart          Draw a Custom Line Chart Using Base R
+draw_pyramid            Plot a population pyramid
+drop_others             Drop “other” cancer codes
+drop_total              Drop the total cancer
+esti_fbswicd            Estimate object of fbswicd
+esti_pop                Estimating population structure using
+                        interpolation method.
+expand_age_pop          Expand population data from 5-year age groups
+                        to single-year ages
+expand_lifetable        Expand an five-year abridged life table to
+                        complete life table
+get_pop                 Subset or summarize population data
+get_stdpop              Get standardized population data
+ls_attrs                list built-in attributes name used in
+                        'cr_reframe()'
+ls_dict                 list dictionary used in package
+ls_dict_files           List dictionary files used by canregtools
+ls_vars                 List variable names and their descriptions by
+                        category
+lt                      Compute a life table from age-specific
+                        mortality rates
+lt2                     Compute a life table from age-specific
+                        mortality rates
+quality                 Quality Indicators from the China Cancer
+                        Registry Annual Report
+read_canreg             Read cancer registration data
+show_registry           Get the areacodes of the registry
+summary.canreg          Summary object of class 'canreg'
+tidy_age                Tidy age description
+tidy_sex                Tidy gender variable
+tidy_var                Reformat variable values for Cancer
+                        Registration in China
+truncrate               Calculate truncated age standardized rate
+write_areacode          Write custom six-digit administrative division
+                        codes to dictionary
+write_registry          Write registry attributes to a user-defined
+                        dictionary

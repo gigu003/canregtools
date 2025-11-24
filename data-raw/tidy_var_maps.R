@@ -6,7 +6,8 @@ var_names <- c(
   "sex", "edu", "trib", "occu", "marri",
   "grad", "beha", "basi", "treat",
   "status", "caus", "deadplace", "lost",
-  "stats", "summary", "reframe", "std"
+  "stats", "summary", "reframe", "std",
+  "morp_group", "icd10"
 )
 tidy_var_maps <- lapply(var_names, function(x) {
   read_excel(here("data-raw/vars_label.xlsx"), sheet = x)

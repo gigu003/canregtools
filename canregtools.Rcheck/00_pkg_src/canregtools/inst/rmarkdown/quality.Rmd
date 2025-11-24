@@ -1,0 +1,402 @@
+---
+title: '`r params$report_title`'
+author: '`r params$report_author`'
+date: '`r Sys.Date()`'
+params:
+  report_data: null
+  report_title: "default title"
+  report_author: "默认登记处"
+  year: 2022
+output:
+  html_document:
+    toc: true
+    toc_float: true
+    number_sections: 3
+    theme: united
+  word_document:
+    toc: FALSE
+    toc_depth: 3
+    number_sections: true
+    fig_width: 6
+    fig_height: 4
+    fig_caption: true
+    highlight: pygments
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, message = FALSE,
+                      fig.height = 8, fig.width = 8, fig.align = "center")
+pkgs <- c("canregtools", "dplyr", "tidyr", "showtext", "epoxy", "ggplot2",
+          "forcats")
+mess <- lapply(pkgs, library, character.only = TRUE)
+showtext_auto()
+source("functions.R")
+data("quality")
+stdd <- quality |>
+  filter(year == 2017)
+```
+
+
+```{r}
+data <- params$report_data
+pop <- data$POP
+fbsw <- count_canreg(data)
+areacode <- data$areacode
+name <- tidy_var(areacode, var_name = "areacode", lang = "cn")
+```
+
+> 本质量控制报告用于对肿瘤登记数据进行年度质量评估。报告中所使用的数据为初步版本，尚未最终确认，因此不得对外公开发布，以免造成误导。
+
+## 人口数据审核
+### 人口总数变化情况
+
+```{r}
+popx <- pop |>
+  group_by(year) |>
+  reframe(rks = sum(rks))
+```
+
+```{epoxy .data = popx}
+{name}肿瘤登记处的最新覆盖人口数为 {.comma rks[length(rks)]}。下图展示了历年人口数相对于最大年份人口数的百分比变化情况，
+用以反映覆盖人群规模的变化趋势。
+```
+
+```{r, fig.height=6, fig.width=5}
+pop2 <- pop |>
+  group_by(year) |>
+  reframe(across(c(rks), sum)) |>
+  mutate(sex = 0)
+myear <- pop2 |> filter(rks == 0) |> pull(year) |> unique()
+
+pop3 <- pop |>
+  group_by(year, sex) |>
+  reframe(across(c(rks), sum)) |>
+  bind_rows(pop2)
+if (!length(myear) == 0) {
+  pop3 <- pop3 |>
+    filter(!year %in% myear)
+}
+pop3 |>
+  group_by(sex) |>
+  mutate(ratio = round(rks / max(rks) * 100, 2)) |>
+  add_labels() |>
+  ggplot(aes(x = factor(year), y = ratio)) +
+  geom_bar(aes(fill = sex), stat = "identity", position = "dodge") +
+  facet_wrap(~sex, scales = "free_y", nrow = 3) +
+  geom_text(aes(label = ratio), vjust = 1.6, color = "black", size = 4) +
+  xlab("年份") +
+  ylab("百分比（%）") +
+  ggtitle("人口总数变化情况（分性别）") +
+  theme_classic() +
+  theme(legend.position = "none",
+        strip.text = element_text(size = 10, face = "bold.italic"),
+        strip.background = element_blank(),
+        axis.text = element_text(size = 10),
+        axis.title = element_text(size = 12, face = "bold"),
+        plot.title = element_text(face = "bold", size = 14, hjust = 0.5))
+```
+
+
+### 人口金字塔变化情况
+
+```{r, fig.height = 20}
+draw_pyramid(fbsw$pop,
+             x = agegrp,
+             y = rks,
+             group = sex,
+             facet = year,grid = c(5, 1), cgap = 0.2, labs = c("男性", "年龄组", "女性"))
+```
+
+## 总体癌症发病死亡情况
+
+```{r, fig.height = 6}
+qua1 <- create_quality(fbsw, year, sex)
+qua1 |>
+  select(year, sex, fbs, sws) |>
+  pivot_longer(c(fbs, sws), names_to = "type", values_to = "value") |>
+  mutate(type = factor(type, levels = c("fbs", "sws"),
+                       labels = c("发病数", "死亡数"))) |>
+  add_labels() |>
+  group_by(type, sex) |>
+  mutate(ratio = round(value / max(value) * 100, 1)) |>
+  bbarplot(x = year, y = value, fill = sex, facet = sex ~ type, ratio,
+           title = "历年发病数(死亡数)变化情况",
+           caption = "白色标签值为数的绝对值(单位：例)\n
+           黑色标签值为相对与最高值的百分比（单位：%）",
+           ylab = "发病数/死亡数")
+```
+
+
+## 癌症发病情况
+### 总体癌症发病率
+
+```{r}
+asr <- create_asr(fbsw, year, sex) |>
+  select(year, sex, cr, asr_cn2000) |>
+  add_labels()
+asr |>
+  pivot_longer(c(cr, asr_cn2000), names_to = "type", values_to = "value") |>
+  mutate(type = factor(type, levels = c("cr", "asr_cn2000"),
+                       labels = c("发病率", "中标发病率")),
+         value = round(value, 1)) |>
+  group_by(type, sex) |>
+  mutate(ratio = round(value / max(value) * 100, 1)) |>
+  bbarplot(x = year, y = value, fill = sex, facet = sex ~ type, ratio,
+           title = "历年总体癌症发病率变化情况",
+           caption = "白色标签值为率的绝对值(单位：1/10万)\n
+           黑色标签值为相对与最高值的百分比（单位：%）",
+           ylab = "发病率(1/10万)")
+```
+
+
+### 主要部位癌症发病率变化情况
+
+```{r}
+asr1 <- create_asr(fbsw, year, sex, cancer)
+asr1 |>
+  filter(sex == 0) |>
+  select(year, cancer, no_cases) |>
+  pivot_wider(names_from = "year", values_from = "no_cases") |>
+  drop_others() |>
+  add_labels(label_type = "abbr") |>
+  rename("部位" = site) |>
+  select(-cancer) |>
+  kableExtra::kable("html") |>
+  kableExtra::kable_styling(bootstrap_options = c("striped", "hover"))
+```
+
+
+
+### 主要部位癌症标化发病率变化（图示）
+
+```{r}
+asr1 |>
+  filter(!sex == 0) |>
+  drop_others() |>
+  drop_total() |>
+  add_labels(label_type = "abbr") |>
+  select(year, site, sex, asr_cn2000) |>
+  bscatter(x = factor(year), y = fct_reorder(site, asr_cn2000),
+           fill = asr_cn2000, label = asr_cn2000,
+           facet = ~ sex,
+           title = "主要部位恶性肿瘤历年标化发病率变化",
+           caption = "黑色标签值:粗发病率（1/10万）")
+```
+
+### 年龄别癌症发病率(图示)
+
+> 年龄别癌症发病率是评估肿瘤登记数据质量的重要指标之一。不同癌种具有各自特有的年龄变化模式。对于大多数癌种，如肺癌、食管癌和胃癌，0–39 岁人群的发病率较低，而在 40 岁以后，发病率会随着年龄增加而迅速上升。相较之下，乳腺癌和甲状腺癌的发病高峰多集中在 50–55 岁年龄组左右。若某登记处的年龄别癌症发病率明显偏离这些预期的年龄变化趋势，可能提示其数据存在质量问题。
+
+1. 若发现某年龄组的发病率出现异常波动（与预期的年龄变化模式不符），可能提示存在数据质量问题。例如，在应呈上升趋势的老年年龄段中，发病率却意外下降，可能表明该年龄组存在发病病例的漏报。
+1. 若发病率异常波动但发病病例数与往年相差不大，则可能提示该年度该年龄组的人口数据存在偏差或录入错误。
+
+```{r, fig.height = 10, fig.width = 8}
+agerate <- create_age_rate(fbsw, year, sex, cancer) |>
+  filter(!sex == 0, year == params$year) |>
+  drop_others() |>
+  add_labels(label_type = "abbr", as_factor = FALSE) |>
+  mutate(agegrp = as.numeric(agegrp)) |>
+  mutate(agegrp = as.numeric(as.character(factor(agegrp,
+                                                 levels = 1:19,
+                                                 labels = c(0, 1,
+                                                            seq(5, 85, 5))))))
+
+cancers <- asr1 |> filter(sex == 0, rank <= 10) |> pull(cancer)
+
+agerate |>
+  filter(cancer %in% cancers) |>
+  draw_linechart(x = agegrp, y = rate, group = sex, grid = c(5, 2),
+                 x_axis = c(0,1,seq(5,85,5)),
+                 facet = site, axis_title = c("年龄", "发病率(1/10万)"),main=site)
+```
+
+
+## 癌症死亡情况
+### 总体癌症死亡率
+
+```{r}
+asr <- create_asr(fbsw, year, sex, event = "sws") |>
+  select(year, sex, cr, asr_cn2000) |>
+  add_labels()
+asr |>
+  pivot_longer(c(cr, asr_cn2000), names_to = "type", values_to = "value") |>
+  mutate(type = factor(type, levels = c("cr", "asr_cn2000"),
+                       labels = c("死亡率", "中标死亡率")),
+         value = round(value, 1)) |>
+  group_by(type, sex) |>
+  mutate(ratio = round(value / max(value) * 100, 1)) |>
+  bbarplot(x = year, y = value, fill = sex, facet = sex ~ type, ratio,
+           title = "历年总体癌症死亡率变化情况",
+           caption = "白色标签值为率的绝对值(单位：1/10万)\n黑色标签值为相对与最高值的百分比（单位：%）",
+           ylab = "死亡率(1/10万)")
+
+```
+
+
+### 主要部位癌症死亡率变化
+
+```{r}
+asr2 <- create_asr(fbsw, year, sex, cancer, event = "sws")
+asr2 |>
+  filter(sex == 0) |>
+  select(year, cancer, no_cases) |>
+  pivot_wider(names_from = "year", values_from = "no_cases") |>
+  drop_others() |>
+  add_labels(label_type = "abbr") |>
+  rename("部位" = site) |>
+  select(-cancer) |>
+  kableExtra::kable("html") |>
+  kableExtra::kable_styling(bootstrap_options = c("striped", "hover"))
+```
+
+
+
+### 主要部位癌症标化死亡率变化（图示）
+
+> 主要部位恶性肿瘤死亡率的数值大小通过对应色块的颜色深浅来表示，较深的颜色代表较高的值，如果不同年份之间色块出现跳跃则表示率变化波动较大。
+
+```{r}
+asr2 |>
+  filter(!sex == 0) |>
+  drop_others() |>
+  drop_total() |>
+  add_labels(label_type = "abbr") |>
+  select(year, site, sex, asr_cn2000) |>
+  bscatter(x = factor(year), y = site, fill = asr_cn2000, label = asr_cn2000,
+           facet = ~sex, xlab = "年份",
+           title = "主要部位恶性肿瘤历年标化死亡率变化",
+           caption = "黑色标签值为粗死亡率（1/10万）")
+```
+
+### 年龄别癌症死亡率（图示）
+
+1. 检查常见部位癌症分性别的年龄别癌症死亡率曲线是质量评价流程的一个部分；
+1. 发现年龄组发病率非正常波动（与预期望模式比较），
+  如：率在上升年龄段（老年组）中的意外下降， 提示该年龄组发病存在漏报;
+1. 同时也可检测年龄组人口分布存在的问题；
+
+```{r, fig.height = 10, fig.width = 8}
+agerate <- create_age_rate(fbsw, year, sex, cancer, event = "sws") |>
+  filter(!sex == 0, year == params$year) |>
+  drop_others() |>
+  add_labels(label_type = "abbr", as_factor = FALSE) |>
+  mutate(agegrp = as.numeric(agegrp)) |>
+  mutate(agegrp = as.numeric(as.character(factor(agegrp,
+                                                 levels = 1:19,
+                                                 labels = c(0, 1,
+                                                            seq(5, 85, 5))))))
+
+agerate |>
+  filter(cancer %in% cancers) |>
+  draw_linechart(x = agegrp, y = rate, group = sex,
+                 facet = site, grid = c(5, 2),
+                 axis_title = c("年龄", "死亡率(1/10万)"))
+
+```
+
+## 主要质量控制指标
+### 病理诊断比例(MV%)变化
+
+> 病理诊断比例（MV%）是评价数据有效性指标之一，MV%越高提示病例数据来源的准确性越高，但同时，MV%可以间接用来评价肿瘤登记数据的完整性。MV%通常与一个地区的医疗水平、癌症诊断能力等相关，社会经济、医疗水平相似的地区，MV%也很相近，如果登记处MV%与区域的标准存在较大差异，提示数据质量可能存在问题。
+
+$$ MV=\frac{时期内病理学确诊癌症病例数}{时期内所有癌症新发病例数}*100 $$
+
+1. 过高的MV%提示登记处的病例来源过度依赖组织学、细胞学及血液学诊断，其他途径病例发现来源缺乏或不完善（完整性存在问题，漏报！）。
+1. 过低的MV%提示登记处的病例有效性不足。
+
+```{r}
+qua2 <- create_quality(fbsw, year, sex, cancer) |>
+  add_labels(label_type = "abbr") |>
+  drop_others()
+qua2 |>
+  filter(!sex == "合计") |>
+  bscatter(x = factor(year), y = site, fill = mv, label = mv, facet = ~ sex,
+           title = "历年病理诊断比例（MV%）变化情况",
+           xlab = "年份",
+           caption = "黑色标签值为病理诊断比例（%）")
+```
+
+```{r}
+qua2 |>
+  filter(sex == "合计", year == params$year) |>
+  mutate(area_type = classify_areacode(areacode)$area_type) |>
+  select(area_type, site, cancer, mv) |>
+  left_join(stdd, by = c("area_type", "cancer")) |>
+  arrange(desc(mv.y)) |>
+  ggplot(aes(y = site)) +
+  geom_point(aes(x = mv.x), colour = "red", size = 2) +
+  geom_point(aes(x = mv.y), colour = "blue", size = 2) +
+  scale_x_continuous(position = "top", breaks = seq(5, 100, 5)) +
+  labs(title = "病理诊断比例（MV%）与区域标准比较",
+       subtitle = paste(params$year, "年"),
+       caption = "红色点为登记处指标值\n蓝色点为国家区域标准值，如果本登记地区为农村地区，则标准为国家农村地区，反之亦然") +
+  cr_grid()
+
+```
+
+### 死亡发病比（M:I）
+
+> 死亡发病比（M:I）是癌症发病率与癌症死亡率的比值，其值大小通常与癌症5年生存率相关。M:I越小，则癌症预后越好，生存率越高；M:I越大，则癌症预后越差，生存率越低。
+
+$$ M:I=\frac{时期内癌症死亡数}{时期内新发病例数} $$
+
+1. M:I相对过大，提示*发病登记可能存在漏报*，同时还要考虑生命统计的数据完整性和有效性问题；
+1. M:I相对过小，提示发病数据中有*重复记录*可能或*死亡漏报*；
+1. M:I值大小与生存率以及 死亡证书质量（根本死因的准确性）相关；
+1. M:I值应该与相似地区M:I值相近，不同年份之间M:I值不会有大的波动。
+
+
+```{r,fig.fullwidth = TRUE}
+qua2 |>
+  filter(!sex == "合计") |>
+  select(year, site, sex, mi) |>
+  ggplot(aes(x = factor(year), y = site)) +
+  geom_tile(aes(fill = mi)) +
+  scale_x_discrete(position = "top") +
+  geom_text(aes(label = mi), vjust = 0.5, color = "black",  size = 2.5) +
+  scale_fill_gradient(low = "white", high = "darkred") +
+  facet_wrap(~sex,  strip.position = "bottom") +
+  ggtitle("历年死亡发病比（M:I）变化情况") +
+  cr_color_block()
+
+```
+
+```{r}
+qua2 |>
+  filter(sex == "合计", year == params$year) |>
+  mutate(area_type = classify_areacode(areacode)$area_type) |>
+  select(area_type, site, cancer, mi) |>
+  left_join(stdd, by = c("area_type", "cancer")) |>
+  arrange(desc(mi.y)) |>
+  ggplot(aes(y = site)) +
+  geom_point(aes(x = mi.x), colour = "red", size = 2) +
+  geom_point(aes(x = mi.y), colour = "blue", size = 2) +
+  scale_x_continuous(position = "top", breaks = seq(0.1, 1, 0.1)) +
+  labs(title = "死亡发病比（M:I）与区域标准比较",
+       subtitle = paste(params$year, "年"),
+       caption = "红色点为登记处指标值\n蓝色点为国家区域标准值，如果本登记地区为农村地区，则标准为国家农村地区，反之亦然") +
+  cr_grid()
+```
+
+
+### 只有死亡医学证明书比例(DCO%)
+
+> “只有死亡医学证明书比例（DCO%）”是反映死亡补发病流程的关键指标之一。当某一病例仅来自全死因死亡数据，且无法通过常规病例发现途径获取其发病日期等相关信息时，便以其死亡日期作为发病日期进行记录，此类病例被称为 DCO 病例。DCO 病例在全部病例中所占的比例即为 DCO%。该指标用于评价数据的有效性，其数值越高，说明依赖死亡信息补发病的比例越大，数据有效性越低；反之，DCO% 越低，数据的有效性越高。
+
+- 如果所有部位的DCO%均为0，则提示可能未开展死亡补发病流程，数据完整性可能存在问题。
+- 如果部分部位的DCO%比例超过10%，则提示未能有效追踪相关发病信息。
+
+```{r}
+qua2 |>
+  filter(!sex == "合计") |>
+  select(year, site, sex, dco) |>
+  ggplot(aes(x = factor(year), y = site)) +
+  geom_tile(aes(fill = dco)) +
+  scale_x_discrete(position = "top") +
+  geom_text(aes(label = dco), vjust = 0.5, color = "black", size = 2.5) +
+  scale_fill_gradient(low = "white", high = "darkred") +
+  facet_wrap(~sex,  strip.position = "bottom") +
+  labs(title = "只有死亡医学证明书比例（DCO%）变化情况",
+       subtitle = "稳定性评价") +
+  cr_color_block()
+```

@@ -25,14 +25,7 @@ options(tibble.print_min = 5, tibble.print_max = 5)
 
 
 ## Overview
-
-canregtools is an R package designed to streamline data analysis, visualization, and reporting in Population-Based Cancer Registration (PBCR). It includes five sets of R functions that cover data reading, processing, statistical calculations, visualization, and reporting.
-
-- `read_canreg()` read data formats required by the National Cancer Center in China to object with class of `canreg` or `canregs`. The raw data is stored in an Excel file containing three sheets named FB, SW, and POP, where FB represents incidence data, SW represents mortality data, and POP represents population data.
-- `count_canreg()` convert object with class of `canreg` or `canregs` to object with class of `fbswicd` or `fbswicds`.
-- `create_asr()` calculate age-standardized rates (ASR), truncated rates and cumulative rates, `create_quality()` calculate quality indicators such as crude incidence or mortality, mortality to incidence ratio (M:I), percent of pathological verified cases (MV%), and etc. , `create_age_rate()` calculate age specific rate.
-- `draw_pyramid()` draw population pyramid, `draw_linechart()` draw line chart, `draw_barchart()` draw grouped bar chart.
-- `create_report()` generate cancer registry report based on data of class "canreg" or "canregs", the output file type can be Word, HTML, or PDF.
+Canregtools is an R package designed to streamline the analysis workflow of Population-Based Cancer Registration (PBCR) data. It supports the complete process from data cleaning and processing to statistical analysis, visualization, and automated report generation. The package offers a comprehensive set of functions grouped into five core modules: data import, data processing, statistical computation, visualization, and report generation. These tools aim to enhance the efficiency, accuracy, and reproducibility of cancer registry data analysis, facilitating standardized and scalable PBCR workflows.
 
 ## Installation
 Currently, the package is not available on CRAN, but you can install the development version of canregtools from GitHub. The installation method is as follows:

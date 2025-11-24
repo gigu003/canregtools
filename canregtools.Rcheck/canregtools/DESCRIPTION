@@ -1,0 +1,36 @@
+Package: canregtools
+Title: Analyzing Population-Based Cancer Registry Data
+Version: 0.2.9
+Authors@R: 
+    person("Qiong", "Chen", , "chenq08@126.com", role = c("aut", "cre", "cph"),
+           comment = c(ORCID = "0000-0003-2401-0046",
+           affiliation = "Department of Cancer Epidemiology, The Affiliated
+           Cancer Hospital of Zhengzhou University & Henan Cancer Hospital,
+           Henan Cancer Registry in China"))
+Description: Tools for cleaning, analyzing, visualizing, and reporting data
+    from Population-Based Cancer Registries (PBCRs), with standardized workflows
+    for filtering, selecting, and restructuring data, designed for routine
+    registry operations.
+License: MIT + file LICENSE
+URL: https://github.com/gigu003/canregtools,
+        https://gigu003.github.io/canregtools/,
+        https://canregtools.chenq.site
+BugReports: https://github.com/gigu003/canregtools/issues
+Depends: R (>= 4.1.0)
+Imports: dplyr, fs, graphics, grDevices, here, readxl, rlang, tidyr,
+        purrr, quarto, stats
+Suggests: covr, knitr, rmarkdown, testthat (>= 3.0.0)
+Config/testthat/edition: 3
+Encoding: UTF-8
+LazyData: true
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.2
+VignetteBuilder: knitr
+NeedsCompilation: no
+Packaged: 2025-11-24 01:13:38 UTC; qc0824
+Author: Qiong Chen [aut, cre, cph] (ORCID:
+    <https://orcid.org/0000-0003-2401-0046>, affiliation: Department of
+    Cancer Epidemiology, The Affiliated Cancer Hospital of Zhengzhou
+    University & Henan Cancer Hospital, Henan Cancer Registry in China)
+Maintainer: Qiong Chen <chenq08@126.com>
+Built: R 4.5.0; ; 2025-11-24 01:14:53 UTC; unix

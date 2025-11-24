@@ -1,0 +1,76 @@
+
+## `r city`
+
+```{r}
+color_palette <- c("white", "red")
+my_modified_gt_theme <- function(gt_tbl) {
+  
+  # Grab number of rows of data from gt object
+  n_rows <- nrow(gt_tbl$`_data`)
+  
+  gt_tbl |> 
+    tab_options(
+      data_row.padding = px(6),
+      heading.align = 'left',
+      column_labels.background.color = 'dodgerblue4',
+      heading.title.font.size = px(26),
+      heading.subtitle.font.size = px(14),
+      table_body.hlines.width = px(0)
+    ) |> 
+    tab_style(
+      style = cell_text(
+        color = 'dodgerblue4', 
+        weight = 'bold', 
+        font = google_font('Merriweather')
+      ),
+      locations = cells_title(groups = 'title')
+    ) |> 
+    tab_style(
+      style = cell_fill(color = 'grey95'),
+      # Use number of rows from data set
+      locations = cells_body(rows = seq(1, n_rows, 2))
+    )
+}
+
+```
+
+
+
+```{r}
+library(gt)
+gt_tbl <- dat |> 
+  arrange(areacode) |>
+  select(-area, -areacode, -area_cn) |> 
+  gt(rowname_col = "areacode_cn") |> 
+  tab_stubhead(label = "区县名") |> 
+  tab_header(
+    title = paste0(city, params$year, "年数据质控指标"),
+    subtitle = md("各区县质量控制数据")
+  ) |> 
+  tab_source_note(
+    source_note = "数据来源: 河南省肿瘤登记网络直报信息管理系统。"
+    ) |>
+  tab_source_note(
+    source_note = paste0("数据提取日期: ", Sys.Date())
+  ) |> 
+  cols_label(
+    rks = "人口数",
+    fbs = "发病数",
+    inci = md("发病率<br>1/10万"),
+    sws = "死亡数",
+    mort = md("死亡率<br>1/10万"),
+    mi = "M:I",
+    mv = "MV%",
+    dco = "DCO%",
+    ub = "UB%",
+    sub = "SUB%",
+    mvs = "MVS%",
+    death = md("全因<br>死亡率<br>‰")
+  ) |> 
+  tab_footnote(
+    footnote = md("**M:I**: 死亡发病比例；**MV%**: 病理诊断比例%；**DCO%**: 只有死亡医学证明书病例比例%；**UB%**: 部位不明比例%；**SUB%**: 亚部位不明比例%；**MVs%**: 病理类型不明比例%。"),
+  ) |> 
+  my_modified_gt_theme()
+gt_tbl
+```
+
