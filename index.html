@@ -34,15 +34,12 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">canregtools</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.2.9</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.2.10</span>
       </span>
     </div>
 
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
-<li>
-  <a href="articles/canregtools.html">Get started</a>
-</li>
 <li>
   <a href="reference/index.html">Reference</a>
 </li>
@@ -77,19 +74,7 @@
 <div class="section level2">
 <h2 id="overview">Overview<a class="anchor" aria-label="anchor" href="#overview"></a>
 </h2>
-<p>canregtools is an R package designed to streamline data analysis, visualization, and reporting in Population-Based Cancer Registration (PBCR). It includes five sets of R functions that cover data reading, processing, statistical calculations, visualization, and reporting.</p>
-<ul>
-<li>
-<code><a href="reference/read_canreg.html">read_canreg()</a></code> read data formats required by the National Cancer Center in China to object with class of <code>canreg</code> or <code>canregs</code>. The raw data is stored in an Excel file containing three sheets named FB, SW, and POP, where FB represents incidence data, SW represents mortality data, and POP represents population data.</li>
-<li>
-<code><a href="reference/count_canreg.html">count_canreg()</a></code> convert object with class of <code>canreg</code> or <code>canregs</code> to object with class of <code>fbswicd</code> or <code>fbswicds</code>.</li>
-<li>
-<code><a href="reference/create_asr.html">create_asr()</a></code> calculate age-standardized rates (ASR), truncated rates and cumulative rates, <code><a href="reference/create_quality.html">create_quality()</a></code> calculate quality indicators such as crude incidence or mortality, mortality to incidence ratio (M:I), percent of pathological verified cases (MV%), and etc. , <code><a href="reference/create_age_rate.html">create_age_rate()</a></code> calculate age specific rate.</li>
-<li>
-<code><a href="reference/draw_pyramid.html">draw_pyramid()</a></code> draw population pyramid, <code><a href="reference/draw_linechart.html">draw_linechart()</a></code> draw line chart, <code><a href="reference/draw_barchart.html">draw_barchart()</a></code> draw grouped bar chart.</li>
-<li>
-<code><a href="reference/create_report.html">create_report()</a></code> generate cancer registry report based on data of class “canreg” or “canregs”, the output file type can be Word, HTML, or PDF.</li>
-</ul>
+<p>Canregtools is an R package designed to streamline the analysis workflow of Population-Based Cancer Registration (PBCR) data. It supports the complete process from data cleaning and processing to statistical analysis, visualization, and automated report generation. The package offers a comprehensive set of functions grouped into five core modules: data import, data processing, statistical computation, visualization, and report generation. These tools aim to enhance the efficiency, accuracy, and reproducibility of cancer registry data analysis, facilitating standardized and scalable PBCR workflows.</p>
 </div>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
@@ -119,7 +104,7 @@
 <span>  <span class="fu"><a href="reference/add_labels.html">add_labels</a></span><span class="op">(</span>lang <span class="op">=</span> <span class="st">"en"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; # A tibble: 84 × 14</span></span>
 <span><span class="co">#&gt;    year sex   cancer site              icd10 no_cases    cr asr_cn2000 asr_wld85</span></span>
-<span><span class="co">#&gt;   &lt;int&gt; &lt;fct&gt; &lt;chr&gt;  &lt;fct&gt;             &lt;chr&gt;    &lt;dbl&gt; &lt;dbl&gt;      &lt;dbl&gt;     &lt;dbl&gt;</span></span>
+<span><span class="co">#&gt;   &lt;int&gt; &lt;fct&gt; &lt;chr&gt;  &lt;fct&gt;             &lt;fct&gt;    &lt;dbl&gt; &lt;dbl&gt;      &lt;dbl&gt;     &lt;dbl&gt;</span></span>
 <span><span class="co">#&gt; 1  2021 Total 101    Oral Cavity &amp; Ph… C00-…       38  5.53       3.74      3.79</span></span>
 <span><span class="co">#&gt; 2  2021 Total 102    Nasopharynx       C11          5  0.73       0.71      0.71</span></span>
 <span><span class="co">#&gt; 3  2021 Total 103    Esophagus         C15         59  8.58       4.53      4.85</span></span>
@@ -134,21 +119,21 @@
 <span>  <span class="fu"><a href="reference/add_labels.html">add_labels</a></span><span class="op">(</span>label_type <span class="op">=</span> <span class="st">"abbr"</span>, lang <span class="op">=</span> <span class="st">"en"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; # A tibble: 28 × 16</span></span>
 <span><span class="co">#&gt;    year sex   cancer site       icd10    rks   fbs  inci   sws  mort    mi    mv</span></span>
-<span><span class="co">#&gt;   &lt;int&gt; &lt;fct&gt; &lt;chr&gt;  &lt;fct&gt;      &lt;chr&gt;  &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;</span></span>
-<span><span class="co">#&gt; 1  9000 Total 101    Oral Cavi… C00-… 687356    38  5.53    13  1.89  0.34  73.7</span></span>
-<span><span class="co">#&gt; 2  9000 Total 102    Nasophary… C11   687356     5  0.73     0  0     0     40  </span></span>
-<span><span class="co">#&gt; 3  9000 Total 103    Esophagus  C15   687356    59  8.58    50  7.27  0.85  74.6</span></span>
+<span><span class="co">#&gt;   &lt;int&gt; &lt;fct&gt; &lt;chr&gt;  &lt;fct&gt;      &lt;fct&gt;  &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;</span></span>
+<span><span class="co">#&gt; 1  9000 Total 101    Oral Cavi… C00-… 687356    38  5.53    20  2.91  0.53  73.7</span></span>
+<span><span class="co">#&gt; 2  9000 Total 102    Nasophary… C11   687356     5  0.73     2  0.29  0.4   40  </span></span>
+<span><span class="co">#&gt; 3  9000 Total 103    Esophagus  C15   687356    59  8.58    58  8.44  0.98  74.6</span></span>
 <span><span class="co">#&gt; 4  9000 Total 104    Stomach    C16   687356   123 17.9     82 11.9   0.67  71.5</span></span>
 <span><span class="co">#&gt; 5  9000 Total 105    Colorectum C18-… 687356   236 34.3    103 15.0   0.44  77.5</span></span>
 <span><span class="co">#&gt; # ℹ 23 more rows</span></span>
-<span><span class="co">#&gt; # ℹ 4 more variables: dco &lt;dbl&gt;, ub &lt;dbl&gt;, sub &lt;dbl&gt;, m8000 &lt;dbl&gt;</span></span>
+<span><span class="co">#&gt; # ℹ 4 more variables: dco &lt;dbl&gt;, ub &lt;dbl&gt;, sub &lt;dbl&gt;, mvs &lt;dbl&gt;</span></span>
 <span></span>
 <span><span class="co"># 3. Age-specific rates</span></span>
 <span><span class="fu"><a href="reference/create_age_rate.html">create_age_rate</a></span><span class="op">(</span><span class="va">fbsw</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="reference/add_labels.html">add_labels</a></span><span class="op">(</span>lang <span class="op">=</span> <span class="st">"en"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; # A tibble: 19 × 8</span></span>
 <span><span class="co">#&gt;    year sex   cancer site        icd10 agegrp   cases  rate</span></span>
-<span><span class="co">#&gt;   &lt;int&gt; &lt;fct&gt; &lt;chr&gt;  &lt;fct&gt;       &lt;chr&gt; &lt;fct&gt;    &lt;dbl&gt; &lt;dbl&gt;</span></span>
+<span><span class="co">#&gt;   &lt;int&gt; &lt;fct&gt; &lt;chr&gt;  &lt;fct&gt;       &lt;fct&gt; &lt;fct&gt;    &lt;dbl&gt; &lt;dbl&gt;</span></span>
 <span><span class="co">#&gt; 1  9000 Total 60     All Cancers ALL   0 岁         3  44.3</span></span>
 <span><span class="co">#&gt; 2  9000 Total 60     All Cancers ALL   1-4 岁      12  31.4</span></span>
 <span><span class="co">#&gt; 3  9000 Total 60     All Cancers ALL   5-9 岁       9  16.4</span></span>
@@ -212,7 +197,7 @@
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
       </footer>

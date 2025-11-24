@@ -18,15 +18,12 @@ and areacode in the dataset based on the specified language and label type."><me
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">canregtools</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.2.9</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.2.10</span>
       </span>
     </div>
 
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav"><li>
-  <a href="../articles/canregtools.html">Get started</a>
-</li>
-<li>
   <a href="../reference/index.html">Reference</a>
 </li>
 <li>
@@ -61,8 +58,10 @@ and <code>areacode</code> in the dataset based on the specified language and lab
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">add_labels</span><span class="op">(</span></span>
 <span>  <span class="va">x</span>,</span>
 <span>  vars <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"sex"</span>, <span class="st">"cancer"</span>, <span class="st">"areacode"</span><span class="op">)</span>,</span>
+<span>  names <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  label_type <span class="op">=</span> <span class="st">"full"</span>,</span>
 <span>  lang <span class="op">=</span> <span class="st">"zh"</span>,</span>
+<span>  sep <span class="op">=</span> <span class="st">" "</span>,</span>
 <span>  as_factor <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -80,6 +79,10 @@ and <code>areacode</code> in the dataset based on the specified language and lab
 <code>"sex"</code>, <code>"cancer"</code>, and <code>"areacode"</code>.</p></dd>
 
 
+<dt id="arg-names">names<a class="anchor" aria-label="anchor" href="#arg-names"></a></dt>
+<dd><p>A character vector contains the labels added.</p></dd>
+
+
 <dt id="arg-label-type">label_type<a class="anchor" aria-label="anchor" href="#arg-label-type"></a></dt>
 <dd><p>Type of the label used ("full" or "abbr").</p></dd>
 
@@ -87,6 +90,11 @@ and <code>areacode</code> in the dataset based on the specified language and lab
 <dt id="arg-lang">lang<a class="anchor" aria-label="anchor" href="#arg-lang"></a></dt>
 <dd><p>Character, specify the output language, options are 'cn',
 or 'en', default is 'cn'.</p></dd>
+
+
+<dt id="arg-sep">sep<a class="anchor" aria-label="anchor" href="#arg-sep"></a></dt>
+<dd><p>String used to separate labels when multiple languages are
+specified.</p></dd>
 
 
 <dt id="arg-as-factor">as_factor<a class="anchor" aria-label="anchor" href="#arg-as-factor"></a></dt>
@@ -118,7 +126,7 @@ or 'en', default is 'cn'.</p></dd>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
       </footer></div>

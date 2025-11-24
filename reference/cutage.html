@@ -20,15 +20,12 @@ language-specific suffixes.'><meta property="og:image" content="/logo.png"><!-- 
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">canregtools</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.2.9</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.2.10</span>
       </span>
     </div>
 
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav"><li>
-  <a href="../articles/canregtools.html">Get started</a>
-</li>
-<li>
   <a href="../reference/index.html">Reference</a>
 </li>
 <li>
@@ -138,103 +135,97 @@ Default is FALSE.</p></dd>
     <h2>Examples</h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">ages</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sample.html" class="external-link">sample</a></span><span class="op">(</span><span class="fl">0</span><span class="op">:</span><span class="fl">101</span>, <span class="fl">200</span>, replace <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu">cutage</span><span class="op">(</span><span class="va">ages</span>, method <span class="op">=</span> <span class="st">"distance"</span>, length <span class="op">=</span> <span class="fl">5</span>, maxage <span class="op">=</span> <span class="fl">60</span>, sep_zero <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   [1] 5-9 岁   55-59 岁 25-29 岁 40-44 岁 60+ 岁   5-9 岁   60+ 岁   30-34 岁</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   [9] 60+ 岁   15-19 岁 60+ 岁   35-39 岁 55-59 岁 15-19 岁 30-34 岁 60+ 岁  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [17] 30-34 岁 60+ 岁   1-4 岁   60+ 岁   60+ 岁   1-4 岁   20-24 岁 5-9 岁  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [25] 50-54 岁 60+ 岁   60+ 岁   40-44 岁 15-19 岁 40-44 岁 30-34 岁 5-9 岁  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [33] 60+ 岁   60+ 岁   45-49 岁 15-19 岁 40-44 岁 60+ 岁   60+ 岁   50-54 岁</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [41] 50-54 岁 60+ 岁   60+ 岁   60+ 岁   60+ 岁   60+ 岁   15-19 岁 60+ 岁  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [49] 1-4 岁   45-49 岁 1-4 岁   10-14 岁 20-24 岁 45-49 岁 60+ 岁   60+ 岁  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [57] 1-4 岁   35-39 岁 60+ 岁   60+ 岁   10-14 岁 40-44 岁 60+ 岁   60+ 岁  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [65] 35-39 岁 60+ 岁   60+ 岁   60+ 岁   35-39 岁 60+ 岁   60+ 岁   30-34 岁</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [73] 60+ 岁   60+ 岁   60+ 岁   45-49 岁 60+ 岁   20-24 岁 60+ 岁   5-9 岁  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [81] 60+ 岁   35-39 岁 60+ 岁   30-34 岁 60+ 岁   60+ 岁   35-39 岁 60+ 岁  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [89] 20-24 岁 40-44 岁 40-44 岁 60+ 岁   60+ 岁   40-44 岁 35-39 岁 35-39 岁</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [97] 30-34 岁 60+ 岁   10-14 岁 60+ 岁   20-24 岁 60+ 岁   60+ 岁   60+ 岁  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [105] 30-34 岁 25-29 岁 60+ 岁   45-49 岁 45-49 岁 60+ 岁   60+ 岁   60+ 岁  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [113] 60+ 岁   60+ 岁   40-44 岁 35-39 岁 40-44 岁 60+ 岁   25-29 岁 10-14 岁</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [121] 15-19 岁 60+ 岁   15-19 岁 60+ 岁   60+ 岁   60+ 岁   40-44 岁 5-9 岁  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [129] 35-39 岁 60+ 岁   60+ 岁   60+ 岁   60+ 岁   10-14 岁 1-4 岁   15-19 岁</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [137] 60+ 岁   10-14 岁 30-34 岁 25-29 岁 20-24 岁 60+ 岁   60+ 岁   15-19 岁</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [145] 60+ 岁   35-39 岁 45-49 岁 30-34 岁 60+ 岁   25-29 岁 45-49 岁 10-14 岁</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [153] 50-54 岁 25-29 岁 60+ 岁   45-49 岁 60+ 岁   45-49 岁 50-54 岁 5-9 岁  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [161] 60+ 岁   10-14 岁 15-19 岁 55-59 岁 1-4 岁   60+ 岁   30-34 岁 45-49 岁</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [169] 60+ 岁   60+ 岁   40-44 岁 5-9 岁   40-44 岁 20-24 岁 60+ 岁   15-19 岁</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [177] 60+ 岁   60+ 岁   55-59 岁 5-9 岁   50-54 岁 10-14 岁 5-9 岁   1-4 岁  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [185] 25-29 岁 45-49 岁 60+ 岁   60+ 岁   25-29 岁 60+ 岁   10-14 岁 5-9 岁  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [193] 60+ 岁   60+ 岁   60+ 岁   60+ 岁   55-59 岁 60+ 岁   25-29 岁 60+ 岁  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   [1] 25-29 岁 40-44 岁 60+ 岁   5-9 岁   60+ 岁   30-34 岁 60+ 岁   15-19 岁</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   [9] 60+ 岁   35-39 岁 55-59 岁 15-19 岁 30-34 岁 60+ 岁   30-34 岁 60+ 岁  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [17] 1-4 岁   60+ 岁   60+ 岁   1-4 岁   20-24 岁 5-9 岁   50-54 岁 60+ 岁  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [25] 60+ 岁   40-44 岁 15-19 岁 40-44 岁 30-34 岁 5-9 岁   60+ 岁   60+ 岁  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [33] 45-49 岁 15-19 岁 40-44 岁 60+ 岁   60+ 岁   50-54 岁 50-54 岁 60+ 岁  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [41] 60+ 岁   60+ 岁   60+ 岁   60+ 岁   15-19 岁 60+ 岁   1-4 岁   45-49 岁</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [49] 1-4 岁   10-14 岁 20-24 岁 45-49 岁 60+ 岁   60+ 岁   1-4 岁   35-39 岁</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [57] 60+ 岁   60+ 岁   10-14 岁 40-44 岁 60+ 岁   60+ 岁   35-39 岁 60+ 岁  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [65] 60+ 岁   60+ 岁   35-39 岁 60+ 岁   60+ 岁   30-34 岁 60+ 岁   60+ 岁  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [73] 60+ 岁   45-49 岁 60+ 岁   20-24 岁 60+ 岁   5-9 岁   60+ 岁   35-39 岁</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [81] 60+ 岁   30-34 岁 60+ 岁   60+ 岁   35-39 岁 60+ 岁   20-24 岁 40-44 岁</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [89] 40-44 岁 60+ 岁   60+ 岁   40-44 岁 35-39 岁 35-39 岁 30-34 岁 60+ 岁  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [97] 10-14 岁 60+ 岁   20-24 岁 60+ 岁   60+ 岁   60+ 岁   30-34 岁 25-29 岁</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [105] 60+ 岁   45-49 岁 45-49 岁 60+ 岁   60+ 岁   60+ 岁   60+ 岁   60+ 岁  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [113] 40-44 岁 35-39 岁 40-44 岁 60+ 岁   25-29 岁 10-14 岁 15-19 岁 60+ 岁  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [121] 15-19 岁 60+ 岁   60+ 岁   60+ 岁   40-44 岁 5-9 岁   35-39 岁 60+ 岁  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [129] 60+ 岁   60+ 岁   60+ 岁   10-14 岁 1-4 岁   15-19 岁 60+ 岁   10-14 岁</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [137] 30-34 岁 25-29 岁 20-24 岁 60+ 岁   60+ 岁   15-19 岁 60+ 岁   35-39 岁</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [145] 45-49 岁 30-34 岁 60+ 岁   25-29 岁 45-49 岁 10-14 岁 50-54 岁 25-29 岁</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [153] 60+ 岁   45-49 岁 60+ 岁   45-49 岁 50-54 岁 5-9 岁   60+ 岁   10-14 岁</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [161] 15-19 岁 55-59 岁 1-4 岁   60+ 岁   30-34 岁 45-49 岁 60+ 岁   60+ 岁  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [169] 40-44 岁 5-9 岁   40-44 岁 20-24 岁 60+ 岁   15-19 岁 60+ 岁   60+ 岁  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [177] 55-59 岁 5-9 岁   50-54 岁 10-14 岁 5-9 岁   1-4 岁   25-29 岁 45-49 岁</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [185] 60+ 岁   60+ 岁   25-29 岁 60+ 岁   10-14 岁 5-9 岁   60+ 岁   60+ 岁  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [193] 60+ 岁   60+ 岁   55-59 岁 60+ 岁   25-29 岁 60+ 岁   60+ 岁   60+ 岁  </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 14 Levels: 0 岁 1-4 岁 5-9 岁 10-14 岁 15-19 岁 20-24 岁 25-29 岁 ... 60+ 岁</span>
 <span class="r-in"><span><span class="co"># Custom breaks</span></span></span>
 <span class="r-in"><span><span class="fu">cutage</span><span class="op">(</span><span class="va">ages</span>, method <span class="op">=</span> <span class="st">"interval"</span>, breaks <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">15</span>, <span class="fl">30</span>, <span class="fl">45</span>, <span class="fl">60</span>, <span class="fl">75</span>, <span class="cn">Inf</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   [1] 0-14 岁  45-59 岁 15-29 岁 30-44 岁 75+ 岁   0-14 岁  75+ 岁   30-44 岁</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   [9] 75+ 岁   15-29 岁 60-74 岁 30-44 岁 45-59 岁 15-29 岁 30-44 岁 75+ 岁  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [17] 30-44 岁 60-74 岁 0-14 岁  60-74 岁 75+ 岁   0-14 岁  15-29 岁 0-14 岁 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [25] 45-59 岁 75+ 岁   75+ 岁   30-44 岁 15-29 岁 30-44 岁 30-44 岁 0-14 岁 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [33] 60-74 岁 60-74 岁 45-59 岁 15-29 岁 30-44 岁 75+ 岁   60-74 岁 45-59 岁</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [41] 45-59 岁 60-74 岁 60-74 岁 75+ 岁   75+ 岁   75+ 岁   15-29 岁 75+ 岁  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [49] 0-14 岁  45-59 岁 0-14 岁  0-14 岁  15-29 岁 45-59 岁 60-74 岁 75+ 岁  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [57] 0-14 岁  30-44 岁 60-74 岁 75+ 岁   0-14 岁  30-44 岁 60-74 岁 60-74 岁</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [65] 30-44 岁 60-74 岁 75+ 岁   75+ 岁   30-44 岁 75+ 岁   75+ 岁   30-44 岁</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [73] 75+ 岁   60-74 岁 75+ 岁   45-59 岁 60-74 岁 15-29 岁 60-74 岁 0-14 岁 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [81] 60-74 岁 30-44 岁 75+ 岁   30-44 岁 75+ 岁   60-74 岁 30-44 岁 75+ 岁  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [89] 15-29 岁 30-44 岁 30-44 岁 75+ 岁   75+ 岁   30-44 岁 30-44 岁 30-44 岁</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [97] 30-44 岁 75+ 岁   0-14 岁  75+ 岁   15-29 岁 75+ 岁   75+ 岁   75+ 岁  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [105] 30-44 岁 15-29 岁 75+ 岁   45-59 岁 45-59 岁 60-74 岁 75+ 岁   75+ 岁  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [113] 75+ 岁   75+ 岁   30-44 岁 30-44 岁 30-44 岁 75+ 岁   15-29 岁 0-14 岁 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [121] 15-29 岁 75+ 岁   15-29 岁 75+ 岁   75+ 岁   75+ 岁   30-44 岁 0-14 岁 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [129] 30-44 岁 60-74 岁 75+ 岁   60-74 岁 75+ 岁   0-14 岁  0-14 岁  15-29 岁</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [137] 75+ 岁   0-14 岁  30-44 岁 15-29 岁 15-29 岁 75+ 岁   60-74 岁 15-29 岁</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [145] 60-74 岁 30-44 岁 45-59 岁 30-44 岁 75+ 岁   15-29 岁 45-59 岁 0-14 岁 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [153] 45-59 岁 15-29 岁 60-74 岁 45-59 岁 75+ 岁   45-59 岁 45-59 岁 0-14 岁 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [161] 75+ 岁   0-14 岁  15-29 岁 45-59 岁 0-14 岁  75+ 岁   30-44 岁 45-59 岁</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [169] 60-74 岁 75+ 岁   30-44 岁 0-14 岁  30-44 岁 15-29 岁 75+ 岁   15-29 岁</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [177] 75+ 岁   75+ 岁   45-59 岁 0-14 岁  45-59 岁 0-14 岁  0-14 岁  0-14 岁 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [185] 15-29 岁 45-59 岁 60-74 岁 60-74 岁 15-29 岁 60-74 岁 0-14 岁  0-14 岁 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [193] 75+ 岁   75+ 岁   75+ 岁   75+ 岁   45-59 岁 75+ 岁   15-29 岁 75+ 岁  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   [1] 15-29 岁 30-44 岁 75+ 岁   0-14 岁  75+ 岁   30-44 岁 75+ 岁   15-29 岁</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   [9] 60-74 岁 30-44 岁 45-59 岁 15-29 岁 30-44 岁 75+ 岁   30-44 岁 60-74 岁</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [17] 0-14 岁  60-74 岁 75+ 岁   0-14 岁  15-29 岁 0-14 岁  45-59 岁 75+ 岁  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [25] 75+ 岁   30-44 岁 15-29 岁 30-44 岁 30-44 岁 0-14 岁  60-74 岁 60-74 岁</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [33] 45-59 岁 15-29 岁 30-44 岁 75+ 岁   60-74 岁 45-59 岁 45-59 岁 60-74 岁</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [41] 60-74 岁 75+ 岁   75+ 岁   75+ 岁   15-29 岁 75+ 岁   0-14 岁  45-59 岁</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [49] 0-14 岁  0-14 岁  15-29 岁 45-59 岁 60-74 岁 75+ 岁   0-14 岁  30-44 岁</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [57] 60-74 岁 75+ 岁   0-14 岁  30-44 岁 60-74 岁 60-74 岁 30-44 岁 60-74 岁</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [65] 75+ 岁   75+ 岁   30-44 岁 75+ 岁   75+ 岁   30-44 岁 75+ 岁   60-74 岁</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [73] 75+ 岁   45-59 岁 60-74 岁 15-29 岁 60-74 岁 0-14 岁  60-74 岁 30-44 岁</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [81] 75+ 岁   30-44 岁 75+ 岁   60-74 岁 30-44 岁 75+ 岁   15-29 岁 30-44 岁</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [89] 30-44 岁 75+ 岁   75+ 岁   30-44 岁 30-44 岁 30-44 岁 30-44 岁 75+ 岁  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [97] 0-14 岁  75+ 岁   15-29 岁 75+ 岁   75+ 岁   75+ 岁   30-44 岁 15-29 岁</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [105] 75+ 岁   45-59 岁 45-59 岁 60-74 岁 75+ 岁   75+ 岁   75+ 岁   75+ 岁  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [113] 30-44 岁 30-44 岁 30-44 岁 75+ 岁   15-29 岁 0-14 岁  15-29 岁 75+ 岁  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [121] 15-29 岁 75+ 岁   75+ 岁   75+ 岁   30-44 岁 0-14 岁  30-44 岁 60-74 岁</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [129] 75+ 岁   60-74 岁 75+ 岁   0-14 岁  0-14 岁  15-29 岁 75+ 岁   0-14 岁 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [137] 30-44 岁 15-29 岁 15-29 岁 75+ 岁   60-74 岁 15-29 岁 60-74 岁 30-44 岁</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [145] 45-59 岁 30-44 岁 75+ 岁   15-29 岁 45-59 岁 0-14 岁  45-59 岁 15-29 岁</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [153] 60-74 岁 45-59 岁 75+ 岁   45-59 岁 45-59 岁 0-14 岁  75+ 岁   0-14 岁 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [161] 15-29 岁 45-59 岁 0-14 岁  75+ 岁   30-44 岁 45-59 岁 60-74 岁 75+ 岁  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [169] 30-44 岁 0-14 岁  30-44 岁 15-29 岁 75+ 岁   15-29 岁 75+ 岁   75+ 岁  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [177] 45-59 岁 0-14 岁  45-59 岁 0-14 岁  0-14 岁  0-14 岁  15-29 岁 45-59 岁</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [185] 60-74 岁 60-74 岁 15-29 岁 60-74 岁 0-14 岁  0-14 岁  75+ 岁   75+ 岁  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [193] 75+ 岁   75+ 岁   45-59 岁 75+ 岁   15-29 岁 75+ 岁   60-74 岁 75+ 岁  </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Levels: 0-14 岁 15-29 岁 30-44 岁 45-59 岁 60-74 岁 75+ 岁</span>
 <span class="r-in"><span><span class="co"># Quantile-based grouping</span></span></span>
 <span class="r-in"><span><span class="fu">cutage</span><span class="op">(</span><span class="va">ages</span>, method <span class="op">=</span> <span class="st">"quantile"</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   [1] 1-24.75 岁   49-78.25 岁  1-24.75 岁   25.75-48 岁  79.25-100 岁</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   [6] 1-24.75 岁   79.25-100 岁 25.75-48 岁  79.25-100 岁 1-24.75 岁  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [11] 49-78.25 岁  25.75-48 岁  49-78.25 岁  1-24.75 岁   25.75-48 岁 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [16] 79.25-100 岁 25.75-48 岁  49-78.25 岁  1-24.75 岁   49-78.25 岁 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [21] 79.25-100 岁 1-24.75 岁   1-24.75 岁   1-24.75 岁   49-78.25 岁 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [26] 79.25-100 岁 79.25-100 岁 25.75-48 岁  1-24.75 岁   25.75-48 岁 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [31] 25.75-48 岁  1-24.75 岁   49-78.25 岁  49-78.25 岁  25.75-48 岁 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [36] 1-24.75 岁   25.75-48 岁  79.25-100 岁 49-78.25 岁  49-78.25 岁 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [41] 49-78.25 岁  49-78.25 岁  49-78.25 岁  79.25-100 岁 79.25-100 岁</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [46] 79.25-100 岁 1-24.75 岁   79.25-100 岁 1-24.75 岁   25.75-48 岁 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [51] 1-24.75 岁   1-24.75 岁   1-24.75 岁   25.75-48 岁  49-78.25 岁 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [56] 79.25-100 岁 1-24.75 岁   25.75-48 岁  49-78.25 岁  49-78.25 岁 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [61] 1-24.75 岁   25.75-48 岁  49-78.25 岁  49-78.25 岁  25.75-48 岁 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [66] 49-78.25 岁  49-78.25 岁  79.25-100 岁 25.75-48 岁  79.25-100 岁</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [71] 79.25-100 岁 25.75-48 岁  79.25-100 岁 49-78.25 岁  79.25-100 岁</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [76] 25.75-48 岁  49-78.25 岁  1-24.75 岁   49-78.25 岁  1-24.75 岁  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [81] 49-78.25 岁  25.75-48 岁  79.25-100 岁 25.75-48 岁  79.25-100 岁</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [86] 49-78.25 岁  25.75-48 岁  79.25-100 岁 1-24.75 岁   25.75-48 岁 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [91] 25.75-48 岁  79.25-100 岁 79.25-100 岁 25.75-48 岁  25.75-48 岁 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [96] 25.75-48 岁  25.75-48 岁  79.25-100 岁 1-24.75 岁   79.25-100 岁</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [101] 1-24.75 岁   79.25-100 岁 49-78.25 岁  79.25-100 岁 25.75-48 岁 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [106] 25.75-48 岁  79.25-100 岁 49-78.25 岁  25.75-48 岁  49-78.25 岁 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [111] 79.25-100 岁 79.25-100 岁 79.25-100 岁 &lt;NA&gt;         25.75-48 岁 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [116] 25.75-48 岁  25.75-48 岁  79.25-100 岁 1-24.75 岁   1-24.75 岁  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [121] 1-24.75 岁   &lt;NA&gt;         1-24.75 岁   79.25-100 岁 79.25-100 岁</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [126] 79.25-100 岁 25.75-48 岁  1-24.75 岁   25.75-48 岁  49-78.25 岁 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [131] 79.25-100 岁 49-78.25 岁  79.25-100 岁 1-24.75 岁   1-24.75 岁  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [136] 1-24.75 岁   49-78.25 岁  1-24.75 岁   25.75-48 岁  25.75-48 岁 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [141] 1-24.75 岁   79.25-100 岁 49-78.25 岁  1-24.75 岁   49-78.25 岁 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [146] 25.75-48 岁  49-78.25 岁  25.75-48 岁  49-78.25 岁  25.75-48 岁 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [151] 25.75-48 岁  1-24.75 岁   49-78.25 岁  25.75-48 岁  49-78.25 岁 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [156] 49-78.25 岁  49-78.25 岁  25.75-48 岁  49-78.25 岁  1-24.75 岁  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [161] 49-78.25 岁  1-24.75 岁   1-24.75 岁   49-78.25 岁  1-24.75 岁  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [166] 79.25-100 岁 25.75-48 岁  25.75-48 岁  49-78.25 岁  79.25-100 岁</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [171] 25.75-48 岁  1-24.75 岁   25.75-48 岁  1-24.75 岁   79.25-100 岁</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [176] 1-24.75 岁   79.25-100 岁 79.25-100 岁 49-78.25 岁  1-24.75 岁  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [181] 49-78.25 岁  1-24.75 岁   1-24.75 岁   1-24.75 岁   25.75-48 岁 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [186] 49-78.25 岁  49-78.25 岁  49-78.25 岁  1-24.75 岁   49-78.25 岁 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [191] 1-24.75 岁   1-24.75 岁   79.25-100 岁 49-78.25 岁  79.25-100 岁</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [196] 79.25-100 岁 49-78.25 岁  79.25-100 岁 25.75-48 岁  79.25-100 岁</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Levels: 1-24.75 岁 25.75-48 岁 49-78.25 岁 79.25-100 岁</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   [1] 1-25.75 岁  26.75-48 岁 80-100 岁   1-25.75 岁  80-100 岁   26.75-48 岁</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   [7] 80-100 岁   1-25.75 岁  49-79 岁    26.75-48 岁 49-79 岁    1-25.75 岁 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [13] 26.75-48 岁 80-100 岁   26.75-48 岁 49-79 岁    1-25.75 岁  49-79 岁   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [19] 80-100 岁   1-25.75 岁  1-25.75 岁  1-25.75 岁  49-79 岁    80-100 岁  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [25] 80-100 岁   26.75-48 岁 1-25.75 岁  26.75-48 岁 26.75-48 岁 1-25.75 岁 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [31] 49-79 岁    49-79 岁    26.75-48 岁 1-25.75 岁  26.75-48 岁 80-100 岁  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [37] 49-79 岁    49-79 岁    49-79 岁    49-79 岁    49-79 岁    80-100 岁  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [43] 80-100 岁   80-100 岁   1-25.75 岁  80-100 岁   1-25.75 岁  26.75-48 岁</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [49] 1-25.75 岁  1-25.75 岁  1-25.75 岁  26.75-48 岁 49-79 岁    80-100 岁  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [55] 1-25.75 岁  26.75-48 岁 49-79 岁    49-79 岁    1-25.75 岁  26.75-48 岁</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [61] 49-79 岁    49-79 岁    26.75-48 岁 49-79 岁    49-79 岁    80-100 岁  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [67] 26.75-48 岁 80-100 岁   80-100 岁   26.75-48 岁 80-100 岁   49-79 岁   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [73] 80-100 岁   26.75-48 岁 49-79 岁    1-25.75 岁  49-79 岁    1-25.75 岁 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [79] 49-79 岁    26.75-48 岁 80-100 岁   26.75-48 岁 80-100 岁   49-79 岁   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [85] 26.75-48 岁 80-100 岁   1-25.75 岁  26.75-48 岁 26.75-48 岁 80-100 岁  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [91] 80-100 岁   26.75-48 岁 26.75-48 岁 26.75-48 岁 26.75-48 岁 80-100 岁  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [97] 1-25.75 岁  80-100 岁   1-25.75 岁  80-100 岁   49-79 岁    80-100 岁  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [103] 26.75-48 岁 26.75-48 岁 80-100 岁   49-79 岁    26.75-48 岁 49-79 岁   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [109] 80-100 岁   80-100 岁   80-100 岁   &lt;NA&gt;        26.75-48 岁 26.75-48 岁</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [115] 26.75-48 岁 80-100 岁   1-25.75 岁  1-25.75 岁  1-25.75 岁  &lt;NA&gt;       </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [121] 1-25.75 岁  80-100 岁   80-100 岁   80-100 岁   26.75-48 岁 1-25.75 岁 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [127] 26.75-48 岁 49-79 岁    80-100 岁   49-79 岁    80-100 岁   1-25.75 岁 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [133] 1-25.75 岁  1-25.75 岁  49-79 岁    1-25.75 岁  26.75-48 岁 26.75-48 岁</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [139] 1-25.75 岁  80-100 岁   49-79 岁    1-25.75 岁  49-79 岁    26.75-48 岁</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [145] 49-79 岁    26.75-48 岁 49-79 岁    26.75-48 岁 26.75-48 岁 1-25.75 岁 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [151] 49-79 岁    26.75-48 岁 49-79 岁    49-79 岁    49-79 岁    26.75-48 岁</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [157] 49-79 岁    1-25.75 岁  49-79 岁    1-25.75 岁  1-25.75 岁  49-79 岁   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [163] 1-25.75 岁  80-100 岁   26.75-48 岁 26.75-48 岁 49-79 岁    80-100 岁  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [169] 26.75-48 岁 1-25.75 岁  26.75-48 岁 1-25.75 岁  80-100 岁   1-25.75 岁 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [175] 80-100 岁   80-100 岁   49-79 岁    1-25.75 岁  49-79 岁    1-25.75 岁 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [181] 1-25.75 岁  1-25.75 岁  26.75-48 岁 49-79 岁    49-79 岁    49-79 岁   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [187] 1-25.75 岁  49-79 岁    1-25.75 岁  1-25.75 岁  80-100 岁   49-79 岁   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [193] 80-100 岁   80-100 岁   49-79 岁    80-100 岁   1-25.75 岁  80-100 岁  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [199] 49-79 岁    80-100 岁  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Levels: 1-25.75 岁 26.75-48 岁 49-79 岁 80-100 岁</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
@@ -250,7 +241,7 @@ Default is FALSE.</p></dd>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
       </footer></div>
