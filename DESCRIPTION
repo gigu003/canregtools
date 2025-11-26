@@ -20,15 +20,12 @@ Depends:
     R (>= 4.1.0)
 Imports:
     dplyr,
-    fs,
     graphics,
     grDevices,
-    here,
     readxl,
     rlang,
     tidyr,
     purrr,
-    quarto,
     stats
 Suggests: 
     covr,

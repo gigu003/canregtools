@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html>
+<head><title>R: Analyzing Population-Based Cancer Registry Data</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+<link rel="stylesheet" type="text/css" href="R.css">
+</head><body><div class="container">
+<h1> Analyzing Population-Based Cancer Registry Data
+<img class="toplogo" src="../../../doc/html/Rlogo.svg" alt="[R logo]">
+</h1>
+<hr>
+<div style="text-align: center;">
+<a href="../../../doc/html/packages.html"><img class="arrow" src="../../../doc/html/left.jpg" alt="[Up]"></a>
+<a href="../../../doc/html/index.html"><img class="arrow" src="../../../doc/html/up.jpg" alt="[Top]"></a>
+</div><h2>Documentation for package &lsquo;canregtools&rsquo; version 0.2.10</h2>
+
+<ul><li><a href="../DESCRIPTION" type="text/plain; charset=utf-8">DESCRIPTION file</a>.</li>
+<li><a href="../NEWS.md">Package NEWS</a>.</li>
+</ul>
+
+<h2>Help Pages</h2>
+
+
+<p style="text-align: center;">
+<a href="#A">A</a>
+<a href="#C">C</a>
+<a href="#D">D</a>
+<a href="#E">E</a>
+<a href="#G">G</a>
+<a href="#L">L</a>
+<a href="#Q">Q</a>
+<a href="#R">R</a>
+<a href="#S">S</a>
+<a href="#T">T</a>
+<a href="#W">W</a>
+</p>
+
+
+<h2><a id="A">-- A --</a></h2>
+
+<table style="width: 100%;">
+<tr><td style="width: 25%;"><a href="add_labels.html">add_labels</a></td>
+<td>Add variable labels for data set.</td></tr>
+<tr><td style="width: 25%;"><a href="add_var_labels.html">add_var_labels</a></td>
+<td>Add Variable Labels with Units</td></tr>
+<tr><td style="width: 25%;"><a href="ageadjust.html">ageadjust</a></td>
+<td>Calculate the age standardized rate using the direct method</td></tr>
+</table>
+
+<h2><a id="C">-- C --</a></h2>
+
+<table style="width: 100%;">
+<tr><td style="width: 25%;"><a href="calc_age.html">calc_age</a></td>
+<td>Calculate the actual age in completed years between two dates</td></tr>
+<tr><td style="width: 25%;"><a href="canregs.html">canregs</a></td>
+<td>Example Population-Based Cancer Registry Data ('canregs')</td></tr>
+<tr><td style="width: 25%;"><a href="classify_areacode.html">classify_areacode</a></td>
+<td>Classify codes for the administrative divisions of China</td></tr>
+<tr><td style="width: 25%;"><a href="classify_areacode2.html">classify_areacode2</a></td>
+<td>Classify codes for the administrative divisions of China</td></tr>
+<tr><td style="width: 25%;"><a href="classify_childhood.html">classify_childhood</a></td>
+<td>Classify childhood cancer according to the ICCC3 standards</td></tr>
+<tr><td style="width: 25%;"><a href="classify_icd10.html">classify_icd10</a></td>
+<td>Classify ICD10 codes to cancer categories</td></tr>
+<tr><td style="width: 25%;"><a href="classify_morp.html">classify_morp</a></td>
+<td>Classify ICD-O-3 morphology codes into categories</td></tr>
+<tr><td style="width: 25%;"><a href="classify_topo.html">classify_topo</a></td>
+<td>Classify ICD-O-3 topography codes into categories</td></tr>
+<tr><td style="width: 25%;"><a href="combine_tp.html">combine_tp</a></td>
+<td>Sum named numeric vectors</td></tr>
+<tr><td style="width: 25%;"><a href="count_canreg.html">count_canreg</a></td>
+<td>Count and classify 'canreg' data</td></tr>
+<tr><td style="width: 25%;"><a href="count_canreg.html">count_canreg.canreg</a></td>
+<td>Count and classify 'canreg' data</td></tr>
+<tr><td style="width: 25%;"><a href="count_canreg.html">count_canreg.canregs</a></td>
+<td>Count and classify 'canreg' data</td></tr>
+<tr><td style="width: 25%;"><a href="create_age_rate.html">create_age_rate</a></td>
+<td>Calculate age specific rate</td></tr>
+<tr><td style="width: 25%;"><a href="create_age_rate.html">create_age_rate.canreg</a></td>
+<td>Calculate age specific rate</td></tr>
+<tr><td style="width: 25%;"><a href="create_age_rate.html">create_age_rate.canregs</a></td>
+<td>Calculate age specific rate</td></tr>
+<tr><td style="width: 25%;"><a href="create_age_rate.html">create_age_rate.fbswicd</a></td>
+<td>Calculate age specific rate</td></tr>
+<tr><td style="width: 25%;"><a href="create_age_rate.html">create_age_rate.fbswicds</a></td>
+<td>Calculate age specific rate</td></tr>
+<tr><td style="width: 25%;"><a href="create_asr.html">create_asr</a></td>
+<td>Calculate age-standardized rate (ASR)</td></tr>
+<tr><td style="width: 25%;"><a href="create_asr.html">create_asr.canreg</a></td>
+<td>Calculate age-standardized rate (ASR)</td></tr>
+<tr><td style="width: 25%;"><a href="create_asr.html">create_asr.canregs</a></td>
+<td>Calculate age-standardized rate (ASR)</td></tr>
+<tr><td style="width: 25%;"><a href="create_asr.html">create_asr.fbswicd</a></td>
+<td>Calculate age-standardized rate (ASR)</td></tr>
+<tr><td style="width: 25%;"><a href="create_asr.html">create_asr.fbswicds</a></td>
+<td>Calculate age-standardized rate (ASR)</td></tr>
+<tr><td style="width: 25%;"><a href="create_quality.html">create_quality</a></td>
+<td>Calculate quality indicators</td></tr>
+<tr><td style="width: 25%;"><a href="create_quality.html">create_quality.canreg</a></td>
+<td>Calculate quality indicators</td></tr>
+<tr><td style="width: 25%;"><a href="create_quality.html">create_quality.canregs</a></td>
+<td>Calculate quality indicators</td></tr>
+<tr><td style="width: 25%;"><a href="create_quality.html">create_quality.fbswicd</a></td>
+<td>Calculate quality indicators</td></tr>
+<tr><td style="width: 25%;"><a href="create_quality.html">create_quality.fbswicds</a></td>
+<td>Calculate quality indicators</td></tr>
+<tr><td style="width: 25%;"><a href="create_report.html">create_report</a></td>
+<td>Render standardized cancer registry reports from built-in templates</td></tr>
+<tr><td style="width: 25%;"><a href="create_report.html">create_report.canreg</a></td>
+<td>Render standardized cancer registry reports from built-in templates</td></tr>
+<tr><td style="width: 25%;"><a href="create_report.html">create_report.canregs</a></td>
+<td>Render standardized cancer registry reports from built-in templates</td></tr>
+<tr><td style="width: 25%;"><a href="create_site.html">create_site</a></td>
+<td>Count</td></tr>
+<tr><td style="width: 25%;"><a href="cr_clean.html">cr_clean</a></td>
+<td>Clean canreg data.</td></tr>
+<tr><td style="width: 25%;"><a href="cr_clean.html">cr_clean.canreg</a></td>
+<td>Clean canreg data.</td></tr>
+<tr><td style="width: 25%;"><a href="cr_clean.html">cr_clean.canregs</a></td>
+<td>Clean canreg data.</td></tr>
+<tr><td style="width: 25%;"><a href="cr_clean.html">cr_clean.FBcases</a></td>
+<td>Clean canreg data.</td></tr>
+<tr><td style="width: 25%;"><a href="cr_clean.html">cr_clean.POP</a></td>
+<td>Clean canreg data.</td></tr>
+<tr><td style="width: 25%;"><a href="cr_clean.html">cr_clean.SWcases</a></td>
+<td>Clean canreg data.</td></tr>
+<tr><td style="width: 25%;"><a href="cr_filter.html">cr_filter</a></td>
+<td>Filter cases from objects of class 'canreg' or 'canregs'</td></tr>
+<tr><td style="width: 25%;"><a href="cr_filter.html">cr_filter.age_rates</a></td>
+<td>Filter cases from objects of class 'canreg' or 'canregs'</td></tr>
+<tr><td style="width: 25%;"><a href="cr_filter.html">cr_filter.asrs</a></td>
+<td>Filter cases from objects of class 'canreg' or 'canregs'</td></tr>
+<tr><td style="width: 25%;"><a href="cr_filter.html">cr_filter.canreg</a></td>
+<td>Filter cases from objects of class 'canreg' or 'canregs'</td></tr>
+<tr><td style="width: 25%;"><a href="cr_filter.html">cr_filter.canregs</a></td>
+<td>Filter cases from objects of class 'canreg' or 'canregs'</td></tr>
+<tr><td style="width: 25%;"><a href="cr_filter.html">cr_filter.default</a></td>
+<td>Filter cases from objects of class 'canreg' or 'canregs'</td></tr>
+<tr><td style="width: 25%;"><a href="cr_filter.html">cr_filter.qualities</a></td>
+<td>Filter cases from objects of class 'canreg' or 'canregs'</td></tr>
+<tr><td style="width: 25%;"><a href="cr_merge.html">cr_merge</a></td>
+<td>Merge elements from objects of class 'canregs', 'fbswicds', or 'asrs'</td></tr>
+<tr><td style="width: 25%;"><a href="cr_merge.html">cr_merge.age_rates</a></td>
+<td>Merge elements from objects of class 'canregs', 'fbswicds', or 'asrs'</td></tr>
+<tr><td style="width: 25%;"><a href="cr_merge.html">cr_merge.asrs</a></td>
+<td>Merge elements from objects of class 'canregs', 'fbswicds', or 'asrs'</td></tr>
+<tr><td style="width: 25%;"><a href="cr_merge.html">cr_merge.canregs</a></td>
+<td>Merge elements from objects of class 'canregs', 'fbswicds', or 'asrs'</td></tr>
+<tr><td style="width: 25%;"><a href="cr_merge.html">cr_merge.fbswicds</a></td>
+<td>Merge elements from objects of class 'canregs', 'fbswicds', or 'asrs'</td></tr>
+<tr><td style="width: 25%;"><a href="cr_merge.html">cr_merge.qualities</a></td>
+<td>Merge elements from objects of class 'canregs', 'fbswicds', or 'asrs'</td></tr>
+<tr><td style="width: 25%;"><a href="cr_merge.html">cr_merge.summaries</a></td>
+<td>Merge elements from objects of class 'canregs', 'fbswicds', or 'asrs'</td></tr>
+<tr><td style="width: 25%;"><a href="cr_reframe.html">cr_reframe</a></td>
+<td>Reframe data of class canregs or fbswicds</td></tr>
+<tr><td style="width: 25%;"><a href="cr_reframe.html">cr_reframe.canregs</a></td>
+<td>Reframe data of class canregs or fbswicds</td></tr>
+<tr><td style="width: 25%;"><a href="cr_reframe.html">cr_reframe.fbswicds</a></td>
+<td>Reframe data of class canregs or fbswicds</td></tr>
+<tr><td style="width: 25%;"><a href="cr_select.html">cr_select</a></td>
+<td>Select elements from objects with class '"canregs"', or '"fbswicds"'</td></tr>
+<tr><td style="width: 25%;"><a href="cr_select.html">cr_select.age_rates</a></td>
+<td>Select elements from objects with class '"canregs"', or '"fbswicds"'</td></tr>
+<tr><td style="width: 25%;"><a href="cr_select.html">cr_select.asrs</a></td>
+<td>Select elements from objects with class '"canregs"', or '"fbswicds"'</td></tr>
+<tr><td style="width: 25%;"><a href="cr_select.html">cr_select.canregs</a></td>
+<td>Select elements from objects with class '"canregs"', or '"fbswicds"'</td></tr>
+<tr><td style="width: 25%;"><a href="cr_select.html">cr_select.fbswicds</a></td>
+<td>Select elements from objects with class '"canregs"', or '"fbswicds"'</td></tr>
+<tr><td style="width: 25%;"><a href="cr_select.html">cr_select.summaries</a></td>
+<td>Select elements from objects with class '"canregs"', or '"fbswicds"'</td></tr>
+<tr><td style="width: 25%;"><a href="cr_write.html">cr_write</a></td>
+<td>Clean canreg data.</td></tr>
+<tr><td style="width: 25%;"><a href="cr_write.html">cr_write.canreg</a></td>
+<td>Clean canreg data.</td></tr>
+<tr><td style="width: 25%;"><a href="cr_write.html">cr_write.canregs</a></td>
+<td>Clean canreg data.</td></tr>
+<tr><td style="width: 25%;"><a href="cumrate.html">cumrate</a></td>
+<td>Calculate the cumulative incidence or mortality rate</td></tr>
+<tr><td style="width: 25%;"><a href="cumrisk.html">cumrisk</a></td>
+<td>Calculate the cumulative risk</td></tr>
+<tr><td style="width: 25%;"><a href="cutage.html">cutage</a></td>
+<td>Group ages into categories</td></tr>
+</table>
+
+<h2><a id="D">-- D --</a></h2>
+
+<table style="width: 100%;">
+<tr><td style="width: 25%;"><a href="del_dict_files.html">del_dict_files</a></td>
+<td>Delete a dictionary file from canregtools config</td></tr>
+<tr><td style="width: 25%;"><a href="draw_barchart.html">draw_barchart</a></td>
+<td>Draw Grouped Bar Charts with Facets</td></tr>
+<tr><td style="width: 25%;"><a href="draw_dumbbell.html">draw_dumbbell</a></td>
+<td>Plot dumbbell chart</td></tr>
+<tr><td style="width: 25%;"><a href="draw_linechart.html">draw_linechart</a></td>
+<td>Draw a Custom Line Chart Using Base R</td></tr>
+<tr><td style="width: 25%;"><a href="draw_pyramid.html">draw_pyramid</a></td>
+<td>Plot a population pyramid</td></tr>
+<tr><td style="width: 25%;"><a href="drop_others.html">drop_others</a></td>
+<td>Drop “other” cancer codes</td></tr>
+<tr><td style="width: 25%;"><a href="drop_total.html">drop_total</a></td>
+<td>Drop the total cancer</td></tr>
+</table>
+
+<h2><a id="E">-- E --</a></h2>
+
+<table style="width: 100%;">
+<tr><td style="width: 25%;"><a href="esti_fbswicd.html">esti_fbswicd</a></td>
+<td>Estimate object of fbswicd</td></tr>
+<tr><td style="width: 25%;"><a href="esti_pop.html">esti_pop</a></td>
+<td>Estimating population structure using interpolation method.</td></tr>
+<tr><td style="width: 25%;"><a href="expand_age_pop.html">expand_age_pop</a></td>
+<td>Expand population data from 5-year age groups to single-year ages</td></tr>
+<tr><td style="width: 25%;"><a href="expand_lifetable.html">expand_lifetable</a></td>
+<td>Expand an five-year abridged life table to complete life table</td></tr>
+</table>
+
+<h2><a id="G">-- G --</a></h2>
+
+<table style="width: 100%;">
+<tr><td style="width: 25%;"><a href="get_pop.html">get_pop</a></td>
+<td>Subset or summarize population data</td></tr>
+<tr><td style="width: 25%;"><a href="get_pop.html">get_pop.canreg</a></td>
+<td>Subset or summarize population data</td></tr>
+<tr><td style="width: 25%;"><a href="get_pop.html">get_pop.canregs</a></td>
+<td>Subset or summarize population data</td></tr>
+<tr><td style="width: 25%;"><a href="get_pop.html">get_pop.fbswicd</a></td>
+<td>Subset or summarize population data</td></tr>
+<tr><td style="width: 25%;"><a href="get_pop.html">get_pop.fbswicds</a></td>
+<td>Subset or summarize population data</td></tr>
+<tr><td style="width: 25%;"><a href="get_stdpop.html">get_stdpop</a></td>
+<td>Get standardized population data</td></tr>
+</table>
+
+<h2><a id="L">-- L --</a></h2>
+
+<table style="width: 100%;">
+<tr><td style="width: 25%;"><a href="ls_attrs.html">ls_attrs</a></td>
+<td>list built-in attributes name used in 'cr_reframe()'</td></tr>
+<tr><td style="width: 25%;"><a href="ls_dict.html">ls_dict</a></td>
+<td>list dictionary used in package</td></tr>
+<tr><td style="width: 25%;"><a href="ls_dict_files.html">ls_dict_files</a></td>
+<td>List dictionary files used by canregtools</td></tr>
+<tr><td style="width: 25%;"><a href="ls_vars.html">ls_vars</a></td>
+<td>List variable names and their descriptions by category</td></tr>
+<tr><td style="width: 25%;"><a href="lt.html">lt</a></td>
+<td>Compute a life table from age-specific mortality rates</td></tr>
+<tr><td style="width: 25%;"><a href="lt2.html">lt2</a></td>
+<td>Compute a life table from age-specific mortality rates</td></tr>
+</table>
+
+<h2><a id="Q">-- Q --</a></h2>
+
+<table style="width: 100%;">
+<tr><td style="width: 25%;"><a href="quality.html">quality</a></td>
+<td>Quality Indicators from the China Cancer Registry Annual Report</td></tr>
+</table>
+
+<h2><a id="R">-- R --</a></h2>
+
+<table style="width: 100%;">
+<tr><td style="width: 25%;"><a href="read_canreg.html">read_canreg</a></td>
+<td>Read cancer registration data</td></tr>
+</table>
+
+<h2><a id="S">-- S --</a></h2>
+
+<table style="width: 100%;">
+<tr><td style="width: 25%;"><a href="show_registry.html">show_registry</a></td>
+<td>Get the areacodes of the registry</td></tr>
+<tr><td style="width: 25%;"><a href="summary.html">summary.canreg</a></td>
+<td>Summary object of class 'canreg'</td></tr>
+<tr><td style="width: 25%;"><a href="summary.html">summary.canregs</a></td>
+<td>Summary object of class 'canreg'</td></tr>
+</table>
+
+<h2><a id="T">-- T --</a></h2>
+
+<table style="width: 100%;">
+<tr><td style="width: 25%;"><a href="tidy_age.html">tidy_age</a></td>
+<td>Tidy age description</td></tr>
+<tr><td style="width: 25%;"><a href="tidy_sex.html">tidy_sex</a></td>
+<td>Tidy gender variable</td></tr>
+<tr><td style="width: 25%;"><a href="tidy_var.html">tidy_var</a></td>
+<td>Reformat variable values for Cancer Registration in China</td></tr>
+<tr><td style="width: 25%;"><a href="truncrate.html">truncrate</a></td>
+<td>Calculate truncated age standardized rate</td></tr>
+</table>
+
+<h2><a id="W">-- W --</a></h2>
+
+<table style="width: 100%;">
+<tr><td style="width: 25%;"><a href="write_areacode.html">write_areacode</a></td>
+<td>Write custom six-digit administrative division codes to dictionary</td></tr>
+<tr><td style="width: 25%;"><a href="write_registry.html">write_registry</a></td>
+<td>Write registry attributes to a user-defined dictionary</td></tr>
+<tr><td style="width: 25%;"><a href="write_registry.html">write_registry.character</a></td>
+<td>Write registry attributes to a user-defined dictionary</td></tr>
+<tr><td style="width: 25%;"><a href="write_registry.html">write_registry.data.frame</a></td>
+<td>Write registry attributes to a user-defined dictionary</td></tr>
+<tr><td style="width: 25%;"><a href="write_registry.html">write_registry.list</a></td>
+<td>Write registry attributes to a user-defined dictionary</td></tr>
+<tr><td style="width: 25%;"><a href="write_registry.html">write_registry.NULL</a></td>
+<td>Write registry attributes to a user-defined dictionary</td></tr>
+</table>
+</div></body></html>
