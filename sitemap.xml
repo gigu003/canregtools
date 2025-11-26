@@ -11,7 +11,6 @@
 <url><loc>/reference/calc_age.html</loc></url>
 <url><loc>/reference/canregs.html</loc></url>
 <url><loc>/reference/canregtools-package.html</loc></url>
-<url><loc>/reference/check_canreg.html</loc></url>
 <url><loc>/reference/classify_areacode.html</loc></url>
 <url><loc>/reference/classify_areacode2.html</loc></url>
 <url><loc>/reference/classify_childhood.html</loc></url>
@@ -24,7 +23,6 @@
 <url><loc>/reference/cr_filter.html</loc></url>
 <url><loc>/reference/cr_merge.html</loc></url>
 <url><loc>/reference/cr_reframe.html</loc></url>
-<url><loc>/reference/cr_render.html</loc></url>
 <url><loc>/reference/cr_select.html</loc></url>
 <url><loc>/reference/cr_write.html</loc></url>
 <url><loc>/reference/create_age_rate.html</loc></url>
