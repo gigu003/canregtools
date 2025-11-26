@@ -25,17 +25,13 @@ options(tibble.print_min = 5, tibble.print_max = 5)
 
 
 ## Overview
-Canregtools is an R package designed to streamline the analysis workflow of Population-Based Cancer Registration (PBCR) data. It supports the complete process from data cleaning and processing to statistical analysis, visualization, and automated report generation. The package offers a comprehensive set of functions grouped into five core modules: data import, data processing, statistical computation, visualization, and report generation. These tools aim to enhance the efficiency, accuracy, and reproducibility of cancer registry data analysis, facilitating standardized and scalable PBCR workflows.
+Canregtools is an R package designed to streamline the analysis workflow for Population-Based Cancer Registry (PBCR) data. It aims to improve the efficiency, accuracy, and reproducibility of cancer registry data processing, thereby supporting standardized, and routine PBCR analytical workflows.
 
-## Installation
-Currently, the package is not available on CRAN, but you can install the development version of canregtools from GitHub. The installation method is as follows:
+## Install
+Currently, the package is not available on CRAN, but you can install the development version of canregtools from [https://gigu003.r-universe.dev/](https://gigu003.r-universe.dev/).
 
-```{r, eval = FALSE}
-## Install the remotes package
-install.packages("remotes")
-
-library(remotes)
-install_github("gigu003/canregtools")
+``` r
+install.packages('canregtools', repos = c('https://gigu003.r-universe.dev', 'https://cloud.r-project.org'))
 ```
 
 ## Usage

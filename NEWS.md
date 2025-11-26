@@ -1,6 +1,5 @@
 # canregtools 0.2.10
 
-* Add cr_render() function which render cancer registry report with a internal template.
 * Fix missing deaths variable from population data in cr_reframe() merging.
 
 # canregtools 0.2.9

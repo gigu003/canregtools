@@ -14,27 +14,19 @@ status](https://www.r-pkg.org/badges/version/canregtools)](https://CRAN.R-projec
 ## Overview
 
 Canregtools is an R package designed to streamline the analysis workflow
-of Population-Based Cancer Registration (PBCR) data. It supports the
-complete process from data cleaning and processing to statistical
-analysis, visualization, and automated report generation. The package
-offers a comprehensive set of functions grouped into five core modules:
-data import, data processing, statistical computation, visualization,
-and report generation. These tools aim to enhance the efficiency,
-accuracy, and reproducibility of cancer registry data analysis,
-facilitating standardized and scalable PBCR workflows.
+for Population-Based Cancer Registry (PBCR) data. It aims to improve the
+efficiency, accuracy, and reproducibility of cancer registry data
+processing, thereby supporting standardized, and routine PBCR analytical
+workflows.
 
-## Installation
+## Install
 
 Currently, the package is not available on CRAN, but you can install the
-development version of canregtools from GitHub. The installation method
-is as follows:
+development version of canregtools from
+<https://gigu003.r-universe.dev/>.
 
 ``` r
-## Install the remotes package
-install.packages("remotes")
-
-library(remotes)
-install_github("gigu003/canregtools")
+install.packages('canregtools', repos = c('https://gigu003.r-universe.dev', 'https://cloud.r-project.org'))
 ```
 
 ## Usage
@@ -52,13 +44,13 @@ fbsw <- count_canreg(data, cancer_type = "big")
 create_asr(fbsw, year, sex, cancer) |>
   add_labels(lang = "en")
 #> # A tibble: 84 × 14
-#>    year sex   cancer site              icd10 no_cases    cr asr_cn2000 asr_wld85
-#>   <int> <fct> <chr>  <fct>             <fct>    <dbl> <dbl>      <dbl>     <dbl>
-#> 1  2021 Total 101    Oral Cavity & Ph… C00-…       38  5.53       3.74      3.79
-#> 2  2021 Total 102    Nasopharynx       C11          5  0.73       0.71      0.71
-#> 3  2021 Total 103    Esophagus         C15         59  8.58       4.53      4.85
-#> 4  2021 Total 104    Stomach           C16        123 17.9       11.1      11.2 
-#> 5  2021 Total 105    Conlon, Rectum &… C18-…      236 34.3       20.6      20.2 
+#>    year   sex sex_en cancer cancer_en        no_cases    cr asr_cn2000 asr_wld85
+#>   <int> <dbl> <fct>  <chr>  <fct>               <dbl> <dbl>      <dbl>     <dbl>
+#> 1  2021     0 Total  101    Oral Cavity & P…       38  5.53       3.74      3.79
+#> 2  2021     0 Total  102    Nasopharynx             5  0.73       0.71      0.71
+#> 3  2021     0 Total  103    Esophagus              59  8.58       4.53      4.85
+#> 4  2021     0 Total  104    Stomach               123 17.9       11.1      11.2 
+#> 5  2021     0 Total  105    Conlon, Rectum …      236 34.3       20.6      20.2 
 #> # ℹ 79 more rows
 #> # ℹ 5 more variables: truncr_cn2000 <dbl>, truncr_wld85 <dbl>, cumur <dbl>,
 #> #   prop <dbl>, rank <int>
@@ -67,13 +59,13 @@ create_asr(fbsw, year, sex, cancer) |>
 create_quality(fbsw, cancer) |>
   add_labels(label_type = "abbr", lang = "en")
 #> # A tibble: 28 × 16
-#>    year sex   cancer site       icd10    rks   fbs  inci   sws  mort    mi    mv
-#>   <int> <fct> <chr>  <fct>      <fct>  <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl>
-#> 1  9000 Total 101    Oral Cavi… C00-… 687356    38  5.53    20  2.91  0.53  73.7
-#> 2  9000 Total 102    Nasophary… C11   687356     5  0.73     2  0.29  0.4   40  
-#> 3  9000 Total 103    Esophagus  C15   687356    59  8.58    58  8.44  0.98  74.6
-#> 4  9000 Total 104    Stomach    C16   687356   123 17.9     82 11.9   0.67  71.5
-#> 5  9000 Total 105    Colorectum C18-… 687356   236 34.3    103 15.0   0.44  77.5
+#>    year   sex sex_en cancer cancer_en    rks   fbs  inci   sws  mort    mi    mv
+#>   <int> <dbl> <fct>  <chr>  <fct>      <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl>
+#> 1  9000     0 T      101    Oral Cav… 687356    38  5.53    20  2.91  0.53  73.7
+#> 2  9000     0 T      102    Nasophar… 687356     5  0.73     2  0.29  0.4   40  
+#> 3  9000     0 T      103    Esophagus 687356    59  8.58    58  8.44  0.98  74.6
+#> 4  9000     0 T      104    Stomach   687356   123 17.9     82 11.9   0.67  71.5
+#> 5  9000     0 T      105    Colorect… 687356   236 34.3    103 15.0   0.44  77.5
 #> # ℹ 23 more rows
 #> # ℹ 4 more variables: dco <dbl>, ub <dbl>, sub <dbl>, mvs <dbl>
 
@@ -81,12 +73,12 @@ create_quality(fbsw, cancer) |>
 create_age_rate(fbsw) |>
   add_labels(lang = "en")
 #> # A tibble: 19 × 8
-#>    year sex   cancer site        icd10 agegrp   cases  rate
-#>   <int> <fct> <chr>  <fct>       <fct> <fct>    <dbl> <dbl>
-#> 1  9000 Total 60     All Cancers ALL   0 岁         3  44.3
-#> 2  9000 Total 60     All Cancers ALL   1-4 岁      12  31.4
-#> 3  9000 Total 60     All Cancers ALL   5-9 岁       9  16.4
-#> 4  9000 Total 60     All Cancers ALL   10-14 岁    13  32.5
-#> 5  9000 Total 60     All Cancers ALL   15-19 岁     8  26.2
+#>    year   sex sex_en cancer cancer_en   agegrp   cases  rate
+#>   <int> <dbl> <fct>  <chr>  <fct>       <fct>    <dbl> <dbl>
+#> 1  9000     0 Total  60     All Cancers 0 岁         3  44.3
+#> 2  9000     0 Total  60     All Cancers 1-4 岁      12  31.4
+#> 3  9000     0 Total  60     All Cancers 5-9 岁       9  16.4
+#> 4  9000     0 Total  60     All Cancers 10-14 岁    13  32.5
+#> 5  9000     0 Total  60     All Cancers 15-19 岁     8  26.2
 #> # ℹ 14 more rows
 ```
