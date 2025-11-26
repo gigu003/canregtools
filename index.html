@@ -74,18 +74,14 @@
 <div class="section level2">
 <h2 id="overview">Overview<a class="anchor" aria-label="anchor" href="#overview"></a>
 </h2>
-<p>Canregtools is an R package designed to streamline the analysis workflow of Population-Based Cancer Registration (PBCR) data. It supports the complete process from data cleaning and processing to statistical analysis, visualization, and automated report generation. The package offers a comprehensive set of functions grouped into five core modules: data import, data processing, statistical computation, visualization, and report generation. These tools aim to enhance the efficiency, accuracy, and reproducibility of cancer registry data analysis, facilitating standardized and scalable PBCR workflows.</p>
+<p>Canregtools is an R package designed to streamline the analysis workflow for Population-Based Cancer Registry (PBCR) data. It aims to improve the efficiency, accuracy, and reproducibility of cancer registry data processing, thereby supporting standardized, and routine PBCR analytical workflows.</p>
 </div>
 <div class="section level2">
-<h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
+<h2 id="install">Install<a class="anchor" aria-label="anchor" href="#install"></a>
 </h2>
-<p>Currently, the package is not available on CRAN, but you can install the development version of canregtools from GitHub. The installation method is as follows:</p>
+<p>Currently, the package is not available on CRAN, but you can install the development version of canregtools from <a href="https://gigu003.r-universe.dev/" class="external-link uri">https://gigu003.r-universe.dev/</a>.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co">## Install the remotes package</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"remotes"</span><span class="op">)</span></span>
-<span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://remotes.r-lib.org" class="external-link">remotes</a></span><span class="op">)</span></span>
-<span><span class="fu">install_github</span><span class="op">(</span><span class="st">"gigu003/canregtools"</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">'canregtools'</span>, repos <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">'https://gigu003.r-universe.dev'</span>, <span class="st">'https://cloud.r-project.org'</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="usage">Usage<a class="anchor" aria-label="anchor" href="#usage"></a>
@@ -103,13 +99,13 @@
 <span><span class="fu"><a href="reference/create_asr.html">create_asr</a></span><span class="op">(</span><span class="va">fbsw</span>, <span class="va">year</span>, <span class="va">sex</span>, <span class="va">cancer</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="reference/add_labels.html">add_labels</a></span><span class="op">(</span>lang <span class="op">=</span> <span class="st">"en"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; # A tibble: 84 × 14</span></span>
-<span><span class="co">#&gt;    year sex   cancer site              icd10 no_cases    cr asr_cn2000 asr_wld85</span></span>
-<span><span class="co">#&gt;   &lt;int&gt; &lt;fct&gt; &lt;chr&gt;  &lt;fct&gt;             &lt;fct&gt;    &lt;dbl&gt; &lt;dbl&gt;      &lt;dbl&gt;     &lt;dbl&gt;</span></span>
-<span><span class="co">#&gt; 1  2021 Total 101    Oral Cavity &amp; Ph… C00-…       38  5.53       3.74      3.79</span></span>
-<span><span class="co">#&gt; 2  2021 Total 102    Nasopharynx       C11          5  0.73       0.71      0.71</span></span>
-<span><span class="co">#&gt; 3  2021 Total 103    Esophagus         C15         59  8.58       4.53      4.85</span></span>
-<span><span class="co">#&gt; 4  2021 Total 104    Stomach           C16        123 17.9       11.1      11.2 </span></span>
-<span><span class="co">#&gt; 5  2021 Total 105    Conlon, Rectum &amp;… C18-…      236 34.3       20.6      20.2 </span></span>
+<span><span class="co">#&gt;    year   sex sex_en cancer cancer_en        no_cases    cr asr_cn2000 asr_wld85</span></span>
+<span><span class="co">#&gt;   &lt;int&gt; &lt;dbl&gt; &lt;fct&gt;  &lt;chr&gt;  &lt;fct&gt;               &lt;dbl&gt; &lt;dbl&gt;      &lt;dbl&gt;     &lt;dbl&gt;</span></span>
+<span><span class="co">#&gt; 1  2021     0 Total  101    Oral Cavity &amp; P…       38  5.53       3.74      3.79</span></span>
+<span><span class="co">#&gt; 2  2021     0 Total  102    Nasopharynx             5  0.73       0.71      0.71</span></span>
+<span><span class="co">#&gt; 3  2021     0 Total  103    Esophagus              59  8.58       4.53      4.85</span></span>
+<span><span class="co">#&gt; 4  2021     0 Total  104    Stomach               123 17.9       11.1      11.2 </span></span>
+<span><span class="co">#&gt; 5  2021     0 Total  105    Conlon, Rectum …      236 34.3       20.6      20.2 </span></span>
 <span><span class="co">#&gt; # ℹ 79 more rows</span></span>
 <span><span class="co">#&gt; # ℹ 5 more variables: truncr_cn2000 &lt;dbl&gt;, truncr_wld85 &lt;dbl&gt;, cumur &lt;dbl&gt;,</span></span>
 <span><span class="co">#&gt; #   prop &lt;dbl&gt;, rank &lt;int&gt;</span></span>
@@ -118,13 +114,13 @@
 <span><span class="fu"><a href="reference/create_quality.html">create_quality</a></span><span class="op">(</span><span class="va">fbsw</span>, <span class="va">cancer</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="reference/add_labels.html">add_labels</a></span><span class="op">(</span>label_type <span class="op">=</span> <span class="st">"abbr"</span>, lang <span class="op">=</span> <span class="st">"en"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; # A tibble: 28 × 16</span></span>
-<span><span class="co">#&gt;    year sex   cancer site       icd10    rks   fbs  inci   sws  mort    mi    mv</span></span>
-<span><span class="co">#&gt;   &lt;int&gt; &lt;fct&gt; &lt;chr&gt;  &lt;fct&gt;      &lt;fct&gt;  &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;</span></span>
-<span><span class="co">#&gt; 1  9000 Total 101    Oral Cavi… C00-… 687356    38  5.53    20  2.91  0.53  73.7</span></span>
-<span><span class="co">#&gt; 2  9000 Total 102    Nasophary… C11   687356     5  0.73     2  0.29  0.4   40  </span></span>
-<span><span class="co">#&gt; 3  9000 Total 103    Esophagus  C15   687356    59  8.58    58  8.44  0.98  74.6</span></span>
-<span><span class="co">#&gt; 4  9000 Total 104    Stomach    C16   687356   123 17.9     82 11.9   0.67  71.5</span></span>
-<span><span class="co">#&gt; 5  9000 Total 105    Colorectum C18-… 687356   236 34.3    103 15.0   0.44  77.5</span></span>
+<span><span class="co">#&gt;    year   sex sex_en cancer cancer_en    rks   fbs  inci   sws  mort    mi    mv</span></span>
+<span><span class="co">#&gt;   &lt;int&gt; &lt;dbl&gt; &lt;fct&gt;  &lt;chr&gt;  &lt;fct&gt;      &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;</span></span>
+<span><span class="co">#&gt; 1  9000     0 T      101    Oral Cav… 687356    38  5.53    20  2.91  0.53  73.7</span></span>
+<span><span class="co">#&gt; 2  9000     0 T      102    Nasophar… 687356     5  0.73     2  0.29  0.4   40  </span></span>
+<span><span class="co">#&gt; 3  9000     0 T      103    Esophagus 687356    59  8.58    58  8.44  0.98  74.6</span></span>
+<span><span class="co">#&gt; 4  9000     0 T      104    Stomach   687356   123 17.9     82 11.9   0.67  71.5</span></span>
+<span><span class="co">#&gt; 5  9000     0 T      105    Colorect… 687356   236 34.3    103 15.0   0.44  77.5</span></span>
 <span><span class="co">#&gt; # ℹ 23 more rows</span></span>
 <span><span class="co">#&gt; # ℹ 4 more variables: dco &lt;dbl&gt;, ub &lt;dbl&gt;, sub &lt;dbl&gt;, mvs &lt;dbl&gt;</span></span>
 <span></span>
@@ -132,13 +128,13 @@
 <span><span class="fu"><a href="reference/create_age_rate.html">create_age_rate</a></span><span class="op">(</span><span class="va">fbsw</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="reference/add_labels.html">add_labels</a></span><span class="op">(</span>lang <span class="op">=</span> <span class="st">"en"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; # A tibble: 19 × 8</span></span>
-<span><span class="co">#&gt;    year sex   cancer site        icd10 agegrp   cases  rate</span></span>
-<span><span class="co">#&gt;   &lt;int&gt; &lt;fct&gt; &lt;chr&gt;  &lt;fct&gt;       &lt;fct&gt; &lt;fct&gt;    &lt;dbl&gt; &lt;dbl&gt;</span></span>
-<span><span class="co">#&gt; 1  9000 Total 60     All Cancers ALL   0 岁         3  44.3</span></span>
-<span><span class="co">#&gt; 2  9000 Total 60     All Cancers ALL   1-4 岁      12  31.4</span></span>
-<span><span class="co">#&gt; 3  9000 Total 60     All Cancers ALL   5-9 岁       9  16.4</span></span>
-<span><span class="co">#&gt; 4  9000 Total 60     All Cancers ALL   10-14 岁    13  32.5</span></span>
-<span><span class="co">#&gt; 5  9000 Total 60     All Cancers ALL   15-19 岁     8  26.2</span></span>
+<span><span class="co">#&gt;    year   sex sex_en cancer cancer_en   agegrp   cases  rate</span></span>
+<span><span class="co">#&gt;   &lt;int&gt; &lt;dbl&gt; &lt;fct&gt;  &lt;chr&gt;  &lt;fct&gt;       &lt;fct&gt;    &lt;dbl&gt; &lt;dbl&gt;</span></span>
+<span><span class="co">#&gt; 1  9000     0 Total  60     All Cancers 0 岁         3  44.3</span></span>
+<span><span class="co">#&gt; 2  9000     0 Total  60     All Cancers 1-4 岁      12  31.4</span></span>
+<span><span class="co">#&gt; 3  9000     0 Total  60     All Cancers 5-9 岁       9  16.4</span></span>
+<span><span class="co">#&gt; 4  9000     0 Total  60     All Cancers 10-14 岁    13  32.5</span></span>
+<span><span class="co">#&gt; 5  9000     0 Total  60     All Cancers 15-19 岁     8  26.2</span></span>
 <span><span class="co">#&gt; # ℹ 14 more rows</span></span></code></pre></div>
 </div>
 </div>
