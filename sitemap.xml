@@ -9,6 +9,7 @@
 <url><loc>/reference/add_var_labels.html</loc></url>
 <url><loc>/reference/ageadjust.html</loc></url>
 <url><loc>/reference/calc_age.html</loc></url>
+<url><loc>/reference/calc_ax.html</loc></url>
 <url><loc>/reference/canregs.html</loc></url>
 <url><loc>/reference/canregtools-package.html</loc></url>
 <url><loc>/reference/classify_areacode.html</loc></url>
@@ -43,7 +44,7 @@
 <url><loc>/reference/esti_fbswicd.html</loc></url>
 <url><loc>/reference/esti_pop.html</loc></url>
 <url><loc>/reference/expand_age_pop.html</loc></url>
-<url><loc>/reference/expand_lifetable.html</loc></url>
+<url><loc>/reference/expand_lx.html</loc></url>
 <url><loc>/reference/get_pop.html</loc></url>
 <url><loc>/reference/get_stdpop.html</loc></url>
 <url><loc>/reference/index.html</loc></url>
@@ -52,7 +53,6 @@
 <url><loc>/reference/ls_dict_files.html</loc></url>
 <url><loc>/reference/ls_vars.html</loc></url>
 <url><loc>/reference/lt.html</loc></url>
-<url><loc>/reference/lt2.html</loc></url>
 <url><loc>/reference/quality.html</loc></url>
 <url><loc>/reference/read_canreg.html</loc></url>
 <url><loc>/reference/show_registry.html</loc></url>
