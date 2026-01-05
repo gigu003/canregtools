@@ -2,23 +2,38 @@
 % Please edit documentation in R/lifetable.R
 \name{lt}
 \alias{lt}
-\title{Compute a life table from age-specific mortality rates}
+\title{Construct a life table from age-specific mortality rates}
 \usage{
-lt(mx, sage = 0, sep_zero = TRUE, age_width = 5, sex = "male")
+lt(
+  death = NULL,
+  cancer_death = NULL,
+  pop = NULL,
+  mx = NULL,
+  sage = c(0, 1, seq(5, 85, 5)),
+  sex = "total",
+  cohort = 1e+05,
+  qx_method = "constant"
+)
 }
 \arguments{
+\item{death}{Number of deaths from vital statistics.}
+
+\item{cancer_death}{Cancer related death.}
+
+\item{pop}{Average population size.}
+
 \item{mx}{Numeric vector of age-specific mortality rates.}
 
-\item{sage}{Integer. Starting age of the first age group (default is 0).}
-
-\item{sep_zero}{Logical. Indicates whether the age 0 group is separated from
-the 1–4 age group (default is TRUE).}
-
-\item{age_width}{Integer. Width of each age group in years; typically 1 or 5
-(default is 5).}
+\item{sage}{Numeric vector of starting ages for the age groups,
+default is \code{c(0, 1, seq(5, 85, 5))}.}
 
 \item{sex}{Character string specifying the sex: "male", "female", or "total"
-(default is "male").}
+(default is "total").}
+
+\item{cohort}{The size of the initial cohort (default is 100000).}
+
+\item{qx_method}{Character string specifying the method used to estiamte the
+probability of dying between age x and x + n (qx).}
 }
 \value{
 A data frame with the following columns:
@@ -26,46 +41,37 @@ A data frame with the following columns:
 \item{age}{Starting age of each age group.}
 \item{mx}{Age-specific mortality rate.}
 \item{qx}{Probability of dying between age x and x+n.}
-\item{lx}{Number of survivors at exact age x, starting from a radix of 1.}
+\item{lx}{Number of survivors at exact age x, starting from a radix of cohort.}
 \item{dx}{Number of deaths between ages x and x+n.}
 \item{Lx}{Person-years lived between ages x and x+n.}
 \item{Tx}{Total person-years remaining after age x.}
 \item{ex}{Life expectancy at exact age x.}
 }
+Optionally includes pop, death, and cancer_death if provided.
 }
 \description{
 \code{lt()} constructs a life table based on a vector of age-specific mortality
-rates (mx), starting age, age group width, and specified sex. It calculates
+rates (mx), starting ages of age groups, and specified sex. It calculates
 standard life table columns including the probability of dying (qx),
 number of survivors (lx), number of deaths (dx), person-years lived (Lx),
 total person-years remaining (Tx), and life expectancy (ex).
+It can also compute a cause-deleted life table if cancer_death is provided.
 }
 \details{
 The function uses standard demographic formulas to compute life table values.
 The average number of person-years lived in the interval by those dying in
-the interval (ax) is estimated using the \code{calc_ax()} function, which
-applies formulas based on the specified sex and age group width. The
-calculations assume a radix (starting population) of 1.
+the interval (ax) is estimated based on standard formulas for infant ages,
+and n/2 for other ages. The calculations assume a starting population (radix) of cohort.
+
+If cancer_death is provided, a cause-deleted life table is computed by adjusting mx to exclude cancer deaths.
 }
 \examples{
-# Example 1: Using mortality rates derived from death and population counts
-px <- c(
-  20005, 86920, 102502, 151494, 182932, 203107, 240289, 247076, 199665,
-  163820, 145382, 86789, 69368, 51207, 39112, 20509, 12301, 6586, 1909
-)
-dx <- c(
-  156, 58, 47, 49, 48, 68, 120, 162, 160, 294, 417, 522, 546, 628,
-  891, 831, 926, 731, 269
-)
-mx <- dx / px
-lt(mx, sage = 0, age_width = 5, sex = "male")
-
-# Example 2: Using predefined mortality rates
-mx <- c(
-  0.01685, 0.00085, 0.00044, 0.00045, 0.00064, 0.00086, 0.00103,
-  0.00136, 0.00195, 0.00291, 0.00429, 0.00672, 0.00985, 0.01596,
-  0.02605, 0.04536, 0.07247, 0.12078, 0.17957, 0.25938, 0.25989
-)
-lt(mx, sage = 0, age_width = 5, sex = "total")
+pop <- c(3605201, 14795034, 41758253, 44202275, 44834666, 42184137, 40868806,
+43408408, 33111965, 16344101, 6336435)
+death <- c(19538, 2027, 9730, 37218, 71511, 104616, 193514, 450972, 686178,
+816715, 963781)
+cancer_death <- c(80, 328, 924, 1893, 2841, 10917, 33965, 87945, 152843,
+169826, 144958)
+lt(death = death, pop = pop, sage = c(0,1, seq(5, 85, 10)))
 
 }

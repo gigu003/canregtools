@@ -65,7 +65,7 @@ draw_pyramid(fbsw$pop, agegrp, rks, sex, year,
 qua <- create_quality(data, decimal = 2, year, cancer) |>
   filter(!cancer == 0) |>
   add_labels(label_type = "abbr") |>
-  select(cancer, site, icd10, mi, mv, ub, dco)
+  select(cancer, cancer_cn, mi, mv, ub, dco)
 mi <- qua |> filter(cancer == 60) |> pull(mi)
 mv <- qua |> filter(cancer == 60) |> pull(mv)
 dco <- qua |> filter(cancer == 60) |> pull(dco)
@@ -74,13 +74,13 @@ mi_max <- qua1 |> arrange(desc(mi))
 mv_max <- qua1 |> arrange(desc(mv))
 ```
 
-表数据显示了肿瘤登记处质量控制指标情况，数据显示死亡发病比(M:I)为`r mi`，具有病理学诊断的病例所占比例(MV%)为`r mv`%，只有死亡医学证明书的病例所占比例(DCO%)为`r dco`%。从不同癌症发病部位来看，M:I 最高的癌症部位为`r glue_collapse(as.character(mi_max$site[1:3]), sep=",", last="和")`，其值分别为`r glue_collapse(as.character(mi_max$mi[1:3]), sep="，", last="和")`；M:I 最低的癌症部位为`r glue_collapse(as.character(tail(mi_max$site,3)), sep="，", last="和")`，其值分别为`r glue_collapse(as.character(tail(mi_max$mi,3)), sep="，", last="和")`。MV% 最高的癌症部位为`r glue_collapse(as.character(mv_max$site[1:3]), sep=",", last="和")`，其值分别为`r glue_collapse(as.character(mv_max$mv[1:3]), sep="，", last="和")`；MV% 最低的癌症部位为`r glue_collapse(as.character(tail(mv_max$site,3)), sep="，", last="和")`，其值分别为`r glue_collapse(as.character(tail(mv_max$mv,3)), sep="，", last="和")`。
+表数据显示了肿瘤登记处质量控制指标情况，数据显示死亡发病比(M:I)为`r mi`，具有病理学诊断的病例所占比例(MV%)为`r mv`%，只有死亡医学证明书的病例所占比例(DCO%)为`r dco`%。从不同癌症发病部位来看，M:I 最高的癌症部位为`r glue_collapse(as.character(mi_max$cancer_cn[1:3]), sep=",", last="和")`，其值分别为`r glue_collapse(as.character(mi_max$mi[1:3]), sep="，", last="和")`；M:I 最低的癌症部位为`r glue_collapse(as.character(tail(mi_max$cancer_cn,3)), sep="，", last="和")`，其值分别为`r glue_collapse(as.character(tail(mi_max$mi,3)), sep="，", last="和")`。MV% 最高的癌症部位为`r glue_collapse(as.character(mv_max$cancer_cn[1:3]), sep=",", last="和")`，其值分别为`r glue_collapse(as.character(mv_max$mv[1:3]), sep="，", last="和")`；MV% 最低的癌症部位为`r glue_collapse(as.character(tail(mv_max$cancer_cn,3)), sep="，", last="和")`，其值分别为`r glue_collapse(as.character(tail(mv_max$mv,3)), sep="，", last="和")`。
 
 ```{r quality, tab.cap = "肿瘤登记处质量控制指标情况"}
 qua |>
   select(-cancer) |>
   flextable() |>
-  set_header_labels(site = "部位",
+  set_header_labels(cancer_cn = "部位",
                     icd10 = "ICD0", mi = "M:I",
                     mv = "MV%", dco = "DCO%", ub = "UB%") |>
   theme_zebra() |>
@@ -119,7 +119,7 @@ agerate <- create_age_rate(data, year, sex, cancer) |>
 ```
 
 ```{r agerate,  fig.width=10, fig.height=8}
-draw_linechart(agerate, x = agegrp, y = rate, group = sex, facet = site,
+draw_linechart(agerate, x = agegrp, y = rate, group = sex, facet = cancer_cn,
                grid = c(3, 4), x_label = c(0, 1, seq(5, 85, 5)),
                axis_label = c("年龄", "年龄别率"))
 ```
@@ -137,7 +137,7 @@ asr <- create_asr(data, year, sex, cancer) |>
 ```
 
 ```{r top10_inci, fig.height=6, fig.cap="肿瘤登记地区前10位恶性肿瘤发病率"}
-draw_barchart(asr, y = asr_cn2000, x = site, group = year,
+draw_barchart(asr, y = asr_cn2000, x = cancer_cn, group = year,
               facet = sex, y_label = c("男性(1/10万)", "女性(1/10万)"))
 ```
 
@@ -176,7 +176,7 @@ agerate <- create_age_rate(data, event = "sws", year, sex, cancer) |>
 ```
 
 ```{r, fig.width = 10, fig.height = 8}
-draw_linechart(agerate, x = agegrp, y = rate, group = sex, facet = site,
+draw_linechart(agerate, x = agegrp, y = rate, group = sex, facet = cancer_cn,
                grid = c(3, 4),x_label = c(0, 1, seq(5, 85, 5)),
                axis_label = c("年龄", "年龄别率"))
 ```
@@ -195,7 +195,7 @@ asr <- create_asr(data, event = "sws", year, sex, cancer) |>
 ```{r,fig.height=6}
 draw_barchart(asr,
               y = asr_cn2000,
-              x = site,
+              x = cancer_cn,
               group = year,
               facet = sex,
               y_label = c("男性(1/10万)", "女性(1/10万)"),

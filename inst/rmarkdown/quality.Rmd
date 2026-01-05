@@ -159,7 +159,7 @@ asr1 |>
   pivot_wider(names_from = "year", values_from = "no_cases") |>
   drop_others() |>
   add_labels(label_type = "abbr") |>
-  rename("部位" = site) |>
+  rename("部位" = cancer_cn) |>
   select(-cancer) |>
   kableExtra::kable("html") |>
   kableExtra::kable_styling(bootstrap_options = c("striped", "hover"))
@@ -175,8 +175,8 @@ asr1 |>
   drop_others() |>
   drop_total() |>
   add_labels(label_type = "abbr") |>
-  select(year, site, sex, asr_cn2000) |>
-  bscatter(x = factor(year), y = fct_reorder(site, asr_cn2000),
+  select(year, cancer_cn, sex, asr_cn2000) |>
+  bscatter(x = factor(year), y = fct_reorder(cancer_cn, asr_cn2000),
            fill = asr_cn2000, label = asr_cn2000,
            facet = ~ sex,
            title = "主要部位恶性肿瘤历年标化发病率变化",
@@ -207,7 +207,7 @@ agerate |>
   filter(cancer %in% cancers) |>
   draw_linechart(x = agegrp, y = rate, group = sex, grid = c(5, 2),
                  x_axis = c(0,1,seq(5,85,5)),
-                 facet = site, axis_title = c("年龄", "发病率(1/10万)"),main=site)
+                 facet = cancer_cn, axis_title = c("年龄", "发病率(1/10万)"),main=cancer_cn)
 ```
 
 
@@ -243,7 +243,7 @@ asr2 |>
   pivot_wider(names_from = "year", values_from = "no_cases") |>
   drop_others() |>
   add_labels(label_type = "abbr") |>
-  rename("部位" = site) |>
+  rename("部位" = cancer_cn) |>
   select(-cancer) |>
   kableExtra::kable("html") |>
   kableExtra::kable_styling(bootstrap_options = c("striped", "hover"))
@@ -261,8 +261,8 @@ asr2 |>
   drop_others() |>
   drop_total() |>
   add_labels(label_type = "abbr") |>
-  select(year, site, sex, asr_cn2000) |>
-  bscatter(x = factor(year), y = site, fill = asr_cn2000, label = asr_cn2000,
+  select(year, cancer_cn, sex, asr_cn2000) |>
+  bscatter(x = factor(year), y = cancer_cn, fill = asr_cn2000, label = asr_cn2000,
            facet = ~sex, xlab = "年份",
            title = "主要部位恶性肿瘤历年标化死亡率变化",
            caption = "黑色标签值为粗死亡率（1/10万）")
@@ -289,7 +289,7 @@ agerate <- create_age_rate(fbsw, year, sex, cancer, event = "sws") |>
 agerate |>
   filter(cancer %in% cancers) |>
   draw_linechart(x = agegrp, y = rate, group = sex,
-                 facet = site, grid = c(5, 2),
+                 facet = cancer_cn, grid = c(5, 2),
                  axis_title = c("年龄", "死亡率(1/10万)"))
 
 ```
@@ -310,7 +310,7 @@ qua2 <- create_quality(fbsw, year, sex, cancer) |>
   drop_others()
 qua2 |>
   filter(!sex == "合计") |>
-  bscatter(x = factor(year), y = site, fill = mv, label = mv, facet = ~ sex,
+  bscatter(x = factor(year), y = cancer_cn, fill = mv, label = mv, facet = ~ sex,
            title = "历年病理诊断比例（MV%）变化情况",
            xlab = "年份",
            caption = "黑色标签值为病理诊断比例（%）")
@@ -320,10 +320,10 @@ qua2 |>
 qua2 |>
   filter(sex == "合计", year == params$year) |>
   mutate(area_type = classify_areacode(areacode)$area_type) |>
-  select(area_type, site, cancer, mv) |>
+  select(area_type, cancer_cn, cancer, mv) |>
   left_join(stdd, by = c("area_type", "cancer")) |>
   arrange(desc(mv.y)) |>
-  ggplot(aes(y = site)) +
+  ggplot(aes(y = cancer_cn)) +
   geom_point(aes(x = mv.x), colour = "red", size = 2) +
   geom_point(aes(x = mv.y), colour = "blue", size = 2) +
   scale_x_continuous(position = "top", breaks = seq(5, 100, 5)) +
@@ -349,8 +349,8 @@ $$ M:I=\frac{时期内癌症死亡数}{时期内新发病例数} $$
 ```{r,fig.fullwidth = TRUE}
 qua2 |>
   filter(!sex == "合计") |>
-  select(year, site, sex, mi) |>
-  ggplot(aes(x = factor(year), y = site)) +
+  select(year, cancer_cn, sex, mi) |>
+  ggplot(aes(x = factor(year), y = cancer_cn)) +
   geom_tile(aes(fill = mi)) +
   scale_x_discrete(position = "top") +
   geom_text(aes(label = mi), vjust = 0.5, color = "black",  size = 2.5) +
@@ -365,10 +365,10 @@ qua2 |>
 qua2 |>
   filter(sex == "合计", year == params$year) |>
   mutate(area_type = classify_areacode(areacode)$area_type) |>
-  select(area_type, site, cancer, mi) |>
+  select(area_type, cancer_cn, cancer, mi) |>
   left_join(stdd, by = c("area_type", "cancer")) |>
   arrange(desc(mi.y)) |>
-  ggplot(aes(y = site)) +
+  ggplot(aes(y = cancer_cn)) +
   geom_point(aes(x = mi.x), colour = "red", size = 2) +
   geom_point(aes(x = mi.y), colour = "blue", size = 2) +
   scale_x_continuous(position = "top", breaks = seq(0.1, 1, 0.1)) +
@@ -389,8 +389,8 @@ qua2 |>
 ```{r}
 qua2 |>
   filter(!sex == "合计") |>
-  select(year, site, sex, dco) |>
-  ggplot(aes(x = factor(year), y = site)) +
+  select(year, cancer_cn, sex, dco) |>
+  ggplot(aes(x = factor(year), y = cancer_cn)) +
   geom_tile(aes(fill = dco)) +
   scale_x_discrete(position = "top") +
   geom_text(aes(label = dco), vjust = 0.5, color = "black", size = 2.5) +

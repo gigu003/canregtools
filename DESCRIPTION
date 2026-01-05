@@ -16,6 +16,7 @@ URL: https://github.com/gigu003/canregtools,
     https://gigu003.github.io/canregtools/,
     https://canregtools.chenq.site
 BugReports: https://github.com/gigu003/canregtools/issues
+Date: 2023-12-01
 Depends: 
     R (>= 4.1.0)
 Imports:

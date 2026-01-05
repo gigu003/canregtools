@@ -1,212 +1,179 @@
-#' Compute a life table from age-specific mortality rates
+#' Construct a life table from age-specific mortality rates
 #'
 #' `lt()` constructs a life table based on a vector of age-specific mortality
-#' rates (mx), starting age, age group width, and specified sex. It calculates
+#' rates (mx), starting ages of age groups, and specified sex. It calculates
 #' standard life table columns including the probability of dying (qx),
 #' number of survivors (lx), number of deaths (dx), person-years lived (Lx),
 #' total person-years remaining (Tx), and life expectancy (ex).
+#' It can also compute a cause-deleted life table if cancer_death is provided.
 #'
+#' @param death Number of deaths from vital statistics.
+#' @param cancer_death Cancer related death.
+#' @param pop Average population size.
 #' @param mx Numeric vector of age-specific mortality rates.
-#' @param sage Integer. Starting age of the first age group (default is 0).
-#' @param age_width Integer. Width of each age group in years; typically 1 or 5
-#'    (default is 5).
+#' @param sage Numeric vector of starting ages for the age groups,
+#'        default is `c(0, 1, seq(5, 85, 5))`.
 #' @param sex Character string specifying the sex: "male", "female", or "total"
-#'    (default is "male").
-#' @param sep_zero Logical. Indicates whether the age 0 group is separated from
-#'    the 1–4 age group (default is TRUE).
+#' (default is "total").
+#' @param cohort The size of the initial cohort (default is 100000).
+#' @param qx_method Character string specifying the method used to estiamte the
+#'      probability of dying between age x and x + n (qx).
 #'
 #' @return A data frame with the following columns:
 #' \describe{
-#'   \item{age}{Starting age of each age group.}
-#'   \item{mx}{Age-specific mortality rate.}
-#'   \item{qx}{Probability of dying between age x and x+n.}
-#'   \item{lx}{Number of survivors at exact age x, starting from a radix of 1.}
-#'   \item{dx}{Number of deaths between ages x and x+n.}
-#'   \item{Lx}{Person-years lived between ages x and x+n.}
-#'   \item{Tx}{Total person-years remaining after age x.}
-#'   \item{ex}{Life expectancy at exact age x.}
+#' \item{age}{Starting age of each age group.}
+#' \item{mx}{Age-specific mortality rate.}
+#' \item{qx}{Probability of dying between age x and x+n.}
+#' \item{lx}{Number of survivors at exact age x, starting from a radix of cohort.}
+#' \item{dx}{Number of deaths between ages x and x+n.}
+#' \item{Lx}{Person-years lived between ages x and x+n.}
+#' \item{Tx}{Total person-years remaining after age x.}
+#' \item{ex}{Life expectancy at exact age x.}
 #' }
+#' Optionally includes pop, death, and cancer_death if provided.
 #'
 #' @details
 #' The function uses standard demographic formulas to compute life table values.
 #' The average number of person-years lived in the interval by those dying in
-#' the interval (ax) is estimated using the `calc_ax()` function, which
-#' applies formulas based on the specified sex and age group width. The
-#' calculations assume a radix (starting population) of 1.
+#' the interval (ax) is estimated based on standard formulas for infant ages,
+#' and n/2 for other ages. The calculations assume a starting population (radix) of cohort.
+#'
+#' If cancer_death is provided, a cause-deleted life table is computed by adjusting mx to exclude cancer deaths.
 #'
 #' @export
 #'
 #' @examples
-#' # Example 1: Using mortality rates derived from death and population counts
-#' px <- c(
-#'   20005, 86920, 102502, 151494, 182932, 203107, 240289, 247076, 199665,
-#'   163820, 145382, 86789, 69368, 51207, 39112, 20509, 12301, 6586, 1909
-#' )
-#' dx <- c(
-#'   156, 58, 47, 49, 48, 68, 120, 162, 160, 294, 417, 522, 546, 628,
-#'   891, 831, 926, 731, 269
-#' )
-#' mx <- dx / px
-#' lt(mx, sage = 0, age_width = 5, sex = "male")
-#' 
-#' # Example 2: Using predefined mortality rates
-#' mx <- c(
-#'   0.01685, 0.00085, 0.00044, 0.00045, 0.00064, 0.00086, 0.00103,
-#'   0.00136, 0.00195, 0.00291, 0.00429, 0.00672, 0.00985, 0.01596,
-#'   0.02605, 0.04536, 0.07247, 0.12078, 0.17957, 0.25938, 0.25989
-#' )
-#' lt(mx, sage = 0, age_width = 5, sex = "total")
+#' pop <- c(3605201, 14795034, 41758253, 44202275, 44834666, 42184137, 40868806,
+#' 43408408, 33111965, 16344101, 6336435)
+#' death <- c(19538, 2027, 9730, 37218, 71511, 104616, 193514, 450972, 686178,
+#' 816715, 963781)
+#' cancer_death <- c(80, 328, 924, 1893, 2841, 10917, 33965, 87945, 152843,
+#' 169826, 144958)
+#' lt(death = death, pop = pop, sage = c(0,1, seq(5, 85, 10)))
 #'
-lt <- function(mx, sage = 0, sep_zero = TRUE, age_width = 5, sex = "male") {
-  nn <- length(mx)
-  ax <- calc_ax(mx, sage, age_width, sex)
-  # calculate width of each age group
-  switch(as.character(age_width),
-    "1" = {
-      nx <- c(rep(1, nn - 1), Inf)
-      age <- c(sage, seq(1, nn - 1, 1))
-    },
-    "5" = {
-      if (sage == 0) {
-        nx <- c(1, 4, rep(5, nn - 3), Inf)
-        age <- c(sage, 1, seq(5, (nn - 2) * 5, 5))
-      } else {
-        nx <- c(ceiling(sage / 5) * 5 - sage, rep(5, nn - 2), Inf)
-        age <- c(sage, seq(ceiling(sage / 5) * 5, (nn - 1) * 5, 5))
-      }
+lt <- function(
+    death = NULL,
+    cancer_death = NULL,
+    pop = NULL,
+    mx = NULL,
+    sage = c(0, 1, seq(5, 85, 5)),
+    sex = "total",
+    cohort = 100000,
+    qx_method = "constant"
+) {
+  
+  # Handle input for mx
+  if (!is.null(cancer_death)) {
+    if (is.null(death) || is.null(pop)) {
+      stop("death and pop are required when cancer_death is provided")
     }
-  )
+    if (length(death) != length(cancer_death) || length(death) != length(pop)) {
+      stop("death, cancer_death, and pop must have the same length")
+    }
+    mx <- (death - cancer_death) / pop
+    if (any(mx < 0, na.rm = TRUE)) {
+      stop("Adjusted mx cannot be negative")
+    }
+  } else if (!is.null(death) && !is.null(pop)) {
+    if (length(death) != length(pop)) {
+      stop("death and pop must have the same length")
+    }
+    mx <- death / pop
+  } else if (is.null(mx)) {
+    stop("Provide either mx, or death and pop (and optionally cancer_death)")
+  }
+  
+  # Calculate the number of age groups 'nn'
+  nn <- length(mx)
+  
+  if (length(sage) != nn) {
+    stop("`sage` must have the same length as `mx`.")
+  }
+  
+  sage <- as.numeric(sage)
+  
+  if (any(diff(sage) <= 0)) {
+    stop("`sage` must be strictly increasing.")
+  }
+  
+  nx <- c(diff(sage), Inf)
+  # Calculate ax
+  ax <- calc_ax(mx, sage, sex)
+  
+  # Calculate age specific probability of death 'qx'
+  if (qx_method == "constant") {
+    qx <- 1 - exp(-nx * mx)
+  } else if (qx_method == "empirical") {
 
-  qx <- nx * mx / (1 + (nx - ax) * mx)
-
+    qx <- nx * mx / (1 + (nx - ax) * mx)
+  } else if (qx_method == "uniform") {
+    qx <- nx * mx / (1 + nx / 2 * mx)
+  }
+  
   qx[nn] <- 1
+  qx[is.na(qx)] <- 0
+  
+  # Calculate lx and dx
   if (nn > 1) {
-    lx <- c(1, cumprod(1 - qx[1:(nn - 1)]))
+    lx <- cohort * c(1, cumprod(1 - qx[1:(nn - 1)]))
     dx <- -diff(c(lx, 0))
   } else {
-    lx <- dx <- 1
+    lx <- dx <- cohort
   }
-  Lx <- nx * lx - dx * (nx - ax)
+  
+  # Calculate Lx
+  Lx <- rep(NA, nn)
+  for (i in 1:(nn - 1)) {
+    Lx[i] <- nx[i] * lx[i + 1] + ax[i] * dx[i]
+  }
   Lx[nn] <- lx[nn] / mx[nn]
+  
+  # Calculate Tx and ex
   Tx <- rev(cumsum(rev(Lx)))
   ex <- Tx / lx
-  if (nn > 2) {
-    rx <- c(Lx[1] / lx[1], Lx[2:(nn - 1)] / Lx[1:(nn - 2)], Tx[nn] / Tx[nn - 1])
-  } else if (nn == 2) {
-    rx <- c(Lx[1] / lx[1], Tx[nn] / Tx[nn - 1])
-  } else {
-    rx <- c(Lx[1] / lx[1])
-  }
-  if (age_width == 5) {
-    rx <- c(
-      0, (Lx[1] + Lx[2]) / 5 * lx[1], Lx[3] / (Lx[1] + Lx[2]),
-      Lx[4:(nn - 1)] / Lx[3:(nn - 2)], Tx[nn] / Tx[nn - 1]
-    )
-  }
+  
+  num_trunc <- ifelse(cohort == 1, 5, 2)
+  
+  # Create result data frame
   result <- data.frame(
-    age = age, mx = mx, qx = qx, lx = lx,
-    dx = dx, Lx = Lx, Tx = Tx, ex = ex
+    age = sage,
+    mx = round(mx, 5),
+    qx = round(qx, 5),
+    lx = round(lx, num_trunc),
+    dx = round(dx, num_trunc),
+    Lx = round(Lx, num_trunc),
+    Tx = round(Tx, num_trunc),
+    ex = round(ex, 2)
   )
+  
+  # Add optional columns
+  if (!is.null(pop)) result$pop <- pop
+  if (!is.null(death)) result$death <- death
+  if (!is.null(cancer_death)) result$cancer_death <- cancer_death
+  
   return(result)
 }
 
-
-#' @param mx Numeric vector of age-specific mortality rates (`mₓ`),
-#'    representing the central death rate for each age interval.
-#' @param sage Numeric scalar indicating the starting age of the first age
-#'    interval. Must be non-negative.
-#' @param age_width Numeric scalar specifying the width of each age interval.
-#'    Common values are 1 for single-year intervals or 5 for five-year
-#'    intervals.
-#' @param sex Character string indicating the sex category. Acceptable values
-#'    are `"male"`, `"female"`, or `"total"`.
+#' Expand a five-year abridged life table to a complete life table
 #'
-#' @returns A numeric vector of `ax` values corresponding to each age interval.
-#'    The final open-ended age interval is assigned an `Inf` value.
-#' @noRd
-#'
-calc_ax <- function(mx, sage, age_width, sex) {
-  nn <- length(mx)
-  # calculate a0
-  if (sage == 0) {
-    switch(sex,
-      female = {
-        a0 <- ifelse(mx[1] < 0.107, 0.053 + 2.8 * mx[1], 0.35)
-      },
-      male = {
-        a0 <- ifelse(mx[1] < 0.107, 0.045 + 2.684 * mx[1], 0.33)
-      },
-      total = {
-        a0 <- ifelse(mx[1] < 0.107, 0.049 + 2.742 * mx[1], 0.34)
-      },
-      default = {
-        stop(paste("unsupported sex value:", sex))
-      }
-    )
-  } else if (sage > 0) {
-    a0 <- 0.5
-  } else {
-    stop("sage must be non-negative")
-  }
-
-  # calculate a1
-  if (age_width == 5 && sage == 0) {
-    switch(sex,
-      female = {
-        a1 <- ifelse(mx[1] < 0.107, 1.522 - 1.518 * mx[1], 1.361)
-      },
-      male = {
-        a1 <- ifelse(mx[1] < 0.107, 1.651 - 2.816 * mx[1], 1.352)
-      },
-      total = {
-        a1 <- ifelse(mx[1] < 0.107, 1.5865 - 2.167 * mx[1], 1.3565)
-      },
-      default = {
-        stop(paste("unsupported sex value:", sex))
-      }
-    )
-  }
-
-  # calculate ax
-  if (sage == 0) {
-    switch(as.character(age_width),
-      "1" = {
-        ax <- c(a0, rep(0.5, nn - 2), Inf)
-      },
-      "5" = {
-        ax <- c(a0, a1, rep(2.5, nn - 3), Inf)
-      }
-    )
-  } else {
-    switch(as.character(age_width),
-      "1" = {
-        ax <- c(rep(0.5, nn - 1), Inf)
-      },
-      "5" = {
-        ax <- c(rep(2.5, nn - 1), Inf)
-      }
-    )
-  }
-  ax
-}
-
-#' Expand an five-year abridged life table to complete life table
-#'
-#' `expand_lifetable()` transforms a five-year abridged life table into a
+#' `expand_lx()` transforms a five-year abridged life table into a
 #' one-year complete life table using the Elandt–Johnson method.
 #'
 #' @param lx A numeric vector representing the number of survivors (\eqn{l_x})
-#'   at the beginning of each age interval in the abridged life table. The
-#'   vector should correspond to age intervals: 0, 1–4, 5–9, ..., up to the
-#'   oldest age group.
+#' at the beginning of each age interval in the abridged life table. The
+#' vector should correspond to age intervals provided in `sage`.
+#' @param sage Numeric vector of starting ages for the age groups,
+#' default is `c(0, 1, seq(5, 85, 5))`.
+#' @param max_age Numeric value specifying the max age of the output estimated
+#' lx(fitlx) and mx (fitmx).
 #'
 #' @return A list containing:
 #' \describe{
-#'   \item{fitlx}{A numeric vector of length 101 representing the estimated
-#'   number of survivors at each single year of age from 0 to 100.}
-#'   \item{fitmx}{A numeric vector of length 101 representing the estimated
-#'   central death rates (\eqn{m_x}) for each single year of
-#'   age from 0 to 100.}
+#' \item{fitlx}{A numeric vector representing the estimated
+#' number of survivors at each single year of age from 0 to 100.}
+#' \item{fitmx}{A numeric vector representing the estimated
+#' central death rates (\eqn{m_x}) for each single year of
+#' age from 0 to 100.}
 #' }
 #'
 #' @export
@@ -221,25 +188,59 @@ calc_ax <- function(mx, sage, age_width, sex) {
 #' @examples
 #' # Example abridged life table data (normalized to a radix of 1)
 #' lx <- c(
-#'   100000, 99498.39, 99294.62, 99173.88, 99047.59, 98840.46,
-#'   98521.16, 98161.25, 97636.99, 96900.13, 95718.96, 93930.91,
-#'   91463.21, 87131.41, 80525.02, 70907.59, 58090.75, 41630.48,
-#'   24019.33
+#' 100000, 99498.39, 99294.62, 99173.88, 99047.59, 98840.46,
+#' 98521.16, 98161.25, 97636.99, 96900.13, 95718.96, 93930.91,
+#' 91463.21, 87131.41, 80525.02, 70907.59, 58090.75, 41630.48,
+#' 24019.33
 #' )
 #' lx <- lx / 100000
-#' expand_lifetable(lx)
-expand_lifetable <- function(lx) {
+#' expand_lx(lx)
+expand_lx <- function(
+    lx,
+    sage = c(0, 1, seq(5, 85, 5)),
+    max_age = 100
+) {
+  n <- length(sage)
+  if (any(diff(sage) <= 0)) {
+    stop("sage must be strictly increasing.")
+  }
+  if (sage[1] != 0 || sage[2] != 1 || diff(sage)[2] != 4 || any(diff(sage)[3:(n-1)] != 5)) {
+    stop("sage must be of the form c(0, 1, seq(5, last, 5)) with 5-year intervals after age 1.")
+  }
   if (!is.numeric(lx)) {
-    stop("`lx` must be a numeric vector.")
+    stop("lx must be a numeric vector.")
   }
-  if (length(lx) != 19) {
-    stop("`lx` must have a length of 19 corresponding to standard abridged
-         life table intervals.")
+  if (length(lx) != n) {
+    stop("lx and sage must have the same length.")
   }
-  if (any(lx <= 0)) {
-    stop("`lx` must contain only positive values.")
+  if (lx[1] < 0.2) {
+    warning("First value is small (< 0.2), assuming input is mx instead of lx.")
+    mx <- lx
+    lx_comp <- numeric(n)
+    lx_comp[1] <- 1
+    for (i in 1:(n - 1)) {
+      nn <- sage[i + 1] - sage[i]
+      if (i == 1) {
+        a <- 0.07 + 1.7 * mx[i]
+      } else if (i == 2) {
+        a <- 1.5
+      } else {
+        a <- nn / 2
+      }
+      q <- nn * mx[i] / (1 + (nn - a) * mx[i])
+      if (q > 1) q <- 1
+      lx_comp[i + 1] <- lx_comp[i] * (1 - q)
+    }
+    lx <- lx_comp
   }
-  ages <- c(0, 1, seq(5, 85, 5))
+  lx <- lx / lx[1]
+  if (any(lx < 0)) {
+    stop("lx cannot be negative.")
+  }
+  if (any(diff(lx) > 0)) {
+    stop("lx must be non-increasing.")
+  }
+  ages <- sage
   coef1 <- matrix(c(
     1, 0, 0, 0, 0, 0,
     .56203, .7176, -.4784, .283886, -.100716, .0156,
@@ -252,7 +253,6 @@ expand_lifetable <- function(lx) {
     -.018379, .1408, 1.001244, -.160914, .043116, -.005867,
     0, 0, 1, 0, 0, 0
   ), ncol = 6, byrow = TRUE)
-
   coef2 <- matrix(c(
     .008064, -.07392, .88704, .22176, -.04928, .006336,
     .011648, -.09984, .69888, .46592, -.08736, .010752,
@@ -260,214 +260,113 @@ expand_lifetable <- function(lx) {
     .006336, -.04928, .22176, .88704, -.07392, .008064,
     0, 0, 0, 1, 0, 0
   ), ncol = 6, byrow = TRUE)
-
-  clx <- numeric(101)
-  for (i in 1:10) {
-    clx[i] <- coef1[i, 1] * lx[2] + coef1[i, 2] * lx[3] + coef1[i, 3] * lx[4] +
-      coef1[i, 4] * lx[5] + coef1[i, 5] * lx[6] + coef1[i, 6] * lx[7]
-  }
-  for (m in 2:14) {
+  clx <- numeric(max_age + 1)
+  clx[1:10] <- coef1 %*% lx[2:7]
+  for (m in 2:(n - 5)) {
     x1 <- which(ages == 5 * m - 10)
     x2 <- which(ages == 5 * m - 5)
     x3 <- which(ages == 5 * m)
     x4 <- which(ages == 5 * m + 5)
     x5 <- which(ages == 5 * m + 10)
     x6 <- which(ages == 5 * m + 15)
-    for (i in 1:5) {
-      clx[5 * m + i] <- coef2[i, 1] * lx[x1] + coef2[i, 2] * lx[x2] +
-        coef2[i, 3] * lx[x3] + coef2[i, 4] * lx[x4] +
-        coef2[i, 5] * lx[x5] + coef2[i, 6] * lx[x6]
-    }
+    clx[5 * m + 1:5] <- coef2 %*% lx[c(x1, x2, x3, x4, x5, x6)]
   }
-
-  y <- log10(lx[c(1, 3:19)] / c(lx[c(3:19)], NA))
-  c <- (y / c(y[2:18], NA))^(-1 / 5)
-  logb <- y / (c^ages[c(1, 3:19)] * ((c^5) - 1))
-  b <- 10^logb
-  y <- c(y[1], NA, y[2:18])
-  c <- c(c[1], NA, c[2:18])
-  b <- c(b[1], NA, b[2:18])
-
-  for (i in seq(75, 75, 5)) {
-    S <- NA
+  y <- log10(lx[c(1, 3:n)] / c(lx[3:n], NA))
+  c_val <- (y / c(y[2:(n - 1)], NA)) ^ (-1 / 5)
+  logb <- y / (c_val ^ ages[c(1, 3:n)] * (c_val ^ 5 - 1))
+  b <- 10 ^ logb
+  y <- c(y[1], NA, y[2:(n - 1)])
+  c_val <- c(c_val[1], NA, c_val[2:(n - 1)])
+  b <- c(b[1], NA, b[2:(n - 1)])
+  parametric_start <- 5 * (n - 4)
+  open_start <- parametric_start + 5
+  for (i in seq(parametric_start, parametric_start, 5)) {
+    x <- which(ages == i)
+    S <- rep(NA, 5)
     for (k in 1:5) {
-      x <- which(ages == i)
-      S[k] <- b[x]^(1 - c[x]^(i + k - 1))
+      S[k] <- b[x] ^ (1 - c_val[x] ^ (i + k - 1))
     }
     for (k in 1:5) {
       clx[i + k - 1] <- lx[x] * S[k] / S[1]
-      if (i + k == 80) {
+      if (i + k == open_start) {
         clx[i + k] <- lx[x + 1]
       }
     }
   }
-
   SS <- S[1]
-
-  for (i in seq(1, 21, 1)) {
-    S[i] <- b[17]^(1 - c[17]^(i + 80 - 1))
+  extension_number <- max_age - open_start + 1
+  S <- rep(NA, extension_number + 1)
+  for (i in 1:(extension_number + 1)) {
+    S[i] <- b[x] ^ (1 - c_val[x] ^ (i + open_start - 1))
   }
-  for (i in seq(1, 21, 1)) {
-    clx[i + 80] <- lx[17] * S[i + 1] / SS
+  for (i in 1:extension_number) {
+    clx[open_start + i] <- lx[x] * S[i + 1] / SS
   }
-
-  for (i in 1:99) {
+  for (i in 1:max_age) {
+    if (is.na(clx[i]) || is.na(clx[i + 1])) next
     if (clx[i] < clx[i + 1]) {
       clx[i] <- clx[i + 1]
     }
   }
-  clx <- c(1, clx[1:99])
-  fitmx <- -log(c(clx[2:100], NA) / clx)
-  fitmx[100] <- -log(clx[100] / clx[99])
+  clx <- c(1, clx[1:max_age])
+  fitmx <- -log(c(clx[2:(max_age + 1)], NA) / clx)
+  fitmx[max_age + 1] <- -log(clx[max_age + 1] / clx[max_age])
   list(fitlx = clx, fitmx = fitmx)
 }
 
-#' Compute a life table from age-specific mortality rates
+#' Calculate ax for life table
 #'
-#' `lt()` constructs a life table based on a vector of age-specific mortality
-#' rates (mx), starting age, age group width, and specified sex. It calculates
-#' standard life table columns including the probability of dying (qx),
-#' number of survivors (lx), number of deaths (dx), person-years lived (Lx),
-#' total person-years remaining (Tx), and life expectancy (ex).
+#' `calc_ax()` calculates the average number of person-years lived in the interval
+#' by those dying in the interval (ax) based on age-specific mortality rates (mx),
+#' starting ages (sage), and sex.
 #'
-#' @param Dx description
-#' @param Cdx description
-#' @param Px Average population size.
 #' @param mx Numeric vector of age-specific mortality rates.
-#' @param sage Integer. Starting age of the first age group (default is 0).
-#' @param age_width Integer. Width of each age group in years; typically 1 or 5
-#'    (default is 5).
+#' @param sage Numeric vector of starting ages for the age groups.
 #' @param sex Character string specifying the sex: "male", "female", or "total"
-#'    (default is "male").
-#' @param sep_zero Logical. Indicates whether the age 0 group is separated from
-#'    the 1–4 age group (default is TRUE).
-#' @param cohort The size of the initial cohort.
+#' (default is "male").
 #'
-#' @return A data frame with the following columns:
-#' \describe{
-#'   \item{age}{Starting age of each age group.}
-#'   \item{mx}{Age-specific mortality rate.}
-#'   \item{qx}{Probability of dying between age x and x+n.}
-#'   \item{lx}{Number of survivors at exact age x, starting from a radix of 1.}
-#'   \item{dx}{Number of deaths between ages x and x+n.}
-#'   \item{Lx}{Person-years lived between ages x and x+n.}
-#'   \item{Tx}{Total person-years remaining after age x.}
-#'   \item{ex}{Life expectancy at exact age x.}
-#' }
+#' @return A numeric vector of ax values.
 #'
 #' @details
-#' The function uses standard demographic formulas to compute life table values.
-#' The average number of person-years lived in the interval by those dying in
-#' the interval (ax) is estimated using the `calc_ax()` function, which
-#' applies formulas based on the specified sex and age group width. The
-#' calculations assume a radix (starting population) of 1.
+#' For most age groups, \eqn{a_x = n_x / 2}, where \eqn{n_x} is the width
+#' of the age interval.
+#' For the infant group (age 0), ax is adjusted based on sex and m0:
+#' - Male: if m0 >= 0.1, ax=0.33; else 0.045 + 2.684 * m0
+#' - Female: if m0 >= 0.1, ax=0.35; else 0.053 + 2.8 * m0
+#' - Total: if m0 >= 0.1, ax=0.34; else 0.049 + 2.742 * m0
+#'
+#' @references 
+#' - Coale, A. J., Demeny, P., & Vaughan, B. (1983). Regional Model Life Tables
+#'   and Stable Populations (2nd ed.). New York: Academic Press.
+#' - Preston, S. H., Heuveline, P., & Guillot, M. (2001). Demography: Measuring
+#'   and Modeling Population Processes. Malden, MA: Blackwell Publishers.
 #'
 #' @export
 #'
 #' @examples
-#' # Example 1: Using mortality rates derived from death and population counts
-#' px <- c(
-#'   20005, 86920, 102502, 151494, 182932, 203107, 240289, 247076, 199665,
-#'   163820, 145382, 86789, 69368, 51207, 39112, 20509, 12301, 6586, 1909
-#' )
-#' dx <- c(
-#'   156, 58, 47, 49, 48, 68, 120, 162, 160, 294, 417, 522, 546, 628,
-#'   891, 831, 926, 731, 269
-#' )
-#' mx <- dx / px
-#' lt(mx, sage = 0, age_width = 5, sex = "male")
-#' 
-#' # Example 2: Using predefined mortality rates
-#' mx <- c(
-#'   0.01685, 0.00085, 0.00044, 0.00045, 0.00064, 0.00086, 0.00103,
-#'   0.00136, 0.00195, 0.00291, 0.00429, 0.00672, 0.00985, 0.01596,
-#'   0.02605, 0.04536, 0.07247, 0.12078, 0.17957, 0.25938, 0.25989
-#' )
-#' lt(mx, sage = 0, age_width = 5, sex = "total")
-#'
-lt2 <- function(Dx = NULL,
-                Cdx = NULL,
-                Px = NULL,
-                mx = NULL,
-                sage = 0,
-                sep_zero = TRUE,
-                age_width = 5,
-                sex = "male",
-                cohort = 100000
-                ) {
-  
-  if (!is.null(Dx) & !is.null(Px)) {
-    mx <- Dx / Px
-  }
-  
-  ## Calculate the number of age groups-'nn'.
+#' mx <- c(0.05, 0.01, 0.005) 
+#' sage <- c(0, 1, 5)
+#' calc_ax(mx, sage, "male")
+calc_ax <- function(mx, sage, sex = "male") {
   nn <- length(mx)
-  ax <- calc_ax(mx, sage, age_width, sex)
-  ax[1] <- 0.15
-  # calculate width of each age group
-  switch(as.character(age_width),
-         "1" = {
-           nx <- c(rep(1, nn - 1), Inf)
-           age <- c(sage, seq(1, nn - 1, 1))
-         },
-         "5" = {
-           if (sage == 0) {
-             nx <- c(1, 4, rep(5, nn - 3), Inf)
-             age <- c(sage, 1, seq(5, (nn - 2) * 5, 5))
-           } else {
-             nx <- c(ceiling(sage / 5) * 5 - sage, rep(5, nn - 2), Inf)
-             age <- c(sage, seq(ceiling(sage / 5) * 5, (nn - 1) * 5, 5))
-           }
-         }
-  )
-  ## Calculate age specific probability of death 'qx'.
-  qx <- nx * mx / (1 + (nx - ax) * mx)
-  qx[nn] <- 1
-
-  ## Calculate px 
-  if (!is.null(Cdx)){
-    cratio <- 1 - Cdx / Dx
-    ppx <-  1 - qx
-    pxi <- ppx ^ cratio
-    qx <- 1 - pxi
+  if (length(sage) != nn) {
+    stop("`sage` must have the same length as `mx`.")
   }
-
-  
-  if (nn > 1) {
-    lx <- c(1, cumprod(1 - qx[1:(nn - 1)])) * cohort
-    dx <- -diff(c(lx, 0))
-  } else {
-    lx <- dx <- cohort
+  sage <- as.numeric(sage)
+  if (any(diff(sage) <= 0)) {
+    stop("`sage` must be strictly increasing.")
   }
-  
-#  if (!is.null(Cdx)){
-#    lx <-  round(c(1, cumprod(pxi[-nn]))*100000)
-#    dx <- -diff(c(lx, 0))
-#  }
-  
-  #Lx <- nx * lx - dx * (nx - ax)
-  
-  Lx <- nx[-nn] / 2 * (lx[-nn] + lx[-1])
-  Lx[1] <- lx[2] + ax[1] * dx[1]
-  Lx[nn] <- lx[nn] / mx[nn]
-  Tx <- rev(cumsum(rev(Lx)))
-  ex <- Tx / lx
-  if (nn > 2) {
-    rx <- c(Lx[1] / lx[1], Lx[2:(nn - 1)] / Lx[1:(nn - 2)], Tx[nn] / Tx[nn - 1])
-  } else if (nn == 2) {
-    rx <- c(Lx[1] / lx[1], Tx[nn] / Tx[nn - 1])
-  } else {
-    rx <- c(Lx[1] / lx[1])
+  nx <- c(diff(sage), Inf)
+  ax <- nx / 2
+  if (sage[1] == 0) {
+    m0 <- mx[1]
+    if (sex == "male") {
+      ax[1] <- ifelse(m0 >= 0.1, 0.33, 0.045 + 2.684 * m0)
+    } else if (sex == "female") {
+      ax[1] <- ifelse(m0 >= 0.1, 0.35, 0.053 + 2.8 * m0)
+    } else {
+      ax[1] <- ifelse(m0 >= 0.1, 0.34, 0.049 + 2.742 * m0)
+    }
   }
-  if (age_width == 5) {
-    rx <- c(
-      0, (Lx[1] + Lx[2]) / 5 * lx[1], Lx[3] / (Lx[1] + Lx[2]),
-      Lx[4:(nn - 1)] / Lx[3:(nn - 2)], Tx[nn] / Tx[nn - 1]
-    )
-  }
-  result <- data.frame(
-    age = age, Px = Px, Dx = Dx, mx = mx, qx = qx, lx = lx,
-    dx = dx, Lx = Lx, Tx = Tx, ex = ex
-  )
-  return(result)
+  ax
 }

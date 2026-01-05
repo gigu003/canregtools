@@ -26,17 +26,23 @@
 #' esti_pop(pop1, pop2, c(2000, 2010))
 #'
 esti_pop <- function(pop1, pop2, period) {
-  # calculate the proportion of the population in each age group.
-  pop1 <- pop1 / sum(pop1)
-  pop2 <- pop2 / sum(pop2)
-  # transform the population data.
-  pop <- lapply(seq_along(pop1), function(i) c(pop1[i], pop2[i]))
-  res <- lapply(seq_along(pop), function(i) {
-    res <- approx(period, pop[[i]], xout = seq(period[1], period[2], 1))
-    res$y
-  })
-  res <- as.data.frame(matrix(unlist(res), ncol = (period[2] - period[1] + 1),
-                              byrow = TRUE))
-  colnames(res) <- seq(period[1], period[2], 1)
+  # Calculate proportions
+  pop1_prop <- pop1 / sum(pop1)
+  pop2_prop <- pop2 / sum(pop2)
+  
+  # Years sequence
+  years <- seq(period[1], period[2], 1)
+  n_years <- length(years)
+  
+  # Per-year increment (slope)
+  diff_prop <- pop2_prop - pop1_prop
+  increment <- diff_prop / (period[2] - period[1])
+  
+  # Vectorized interpolation: matrix of proportions (rows: age groups, columns: years)
+  props <- outer(increment, 0:(n_years - 1), "*") + pop1_prop
+  
+  # Convert to data frame and set column names
+  res <- as.data.frame(props)
+  colnames(res) <- years
   res
 }
