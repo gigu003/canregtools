@@ -72,7 +72,8 @@ or character strings.</p></dd>
 
 
 <dt id="arg-attr">attr<a class="anchor" aria-label="anchor" href="#arg-attr"></a></dt>
-<dd><p>A character vector of attributes to return. Options include:</p><ul><li><p><code>"registry"</code>: Cancer registry codes.</p></li>
+<dd><p>A character vector of attributes to return. Options include:</p><ul><li><p><code>"areacode"</code>: Original area codes.</p></li>
+<li><p><code>"registry"</code>: Cancer registry codes.</p></li>
 <li><p><code>"province"</code>: Province-level codes.</p></li>
 <li><p><code>"city"</code>: City-level codes.</p></li>
 <li><p><code>"area_type"</code>: Urban/rural classification.</p></li>
@@ -114,24 +115,9 @@ including 'province', city', 'area_type', and 'registry' attributes.</p>
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu"><a href="classify_areacode.html">classify_areacode</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"110000"</span>, <span class="st">"320500"</span>, <span class="st">"440300"</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $areacode</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "110000" "320500" "440300"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu">classify_areacode2</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"110000"</span>, <span class="st">"320500"</span>, <span class="st">"440300"</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $registry</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "110000" "320500" "440300"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $province</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "110000" "320000" "440000"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $city</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "110000" "320500" "440300"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $area_type</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "910000" "910000" "910000"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $region</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "720000" "740000" "760000"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"><span></span></span>
 </code></pre></div>

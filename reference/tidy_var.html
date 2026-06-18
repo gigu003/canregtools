@@ -61,6 +61,7 @@ national cancer registration standard of China: T/CHIA 18-2021.</p>
 <span>  label_type <span class="op">=</span> <span class="st">"full"</span>,</span>
 <span>  lang <span class="op">=</span> <span class="st">"code"</span>,</span>
 <span>  sep <span class="op">=</span> <span class="st">""</span>,</span>
+<span>  suffix <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  as_factor <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -91,6 +92,13 @@ or 'en', default is 'cn'.</p></dd>
 
 <dt id="arg-sep">sep<a class="anchor" aria-label="anchor" href="#arg-sep"></a></dt>
 <dd><p>A character string to separate the label.</p></dd>
+
+
+<dt id="arg-suffix">suffix<a class="anchor" aria-label="anchor" href="#arg-suffix"></a></dt>
+<dd><p>Logical. If <code>TRUE</code>, add a language-specific suffix to cancer
+labels when <code>var_name = "cancer"</code>: <code>"\u764c"</code> for Chinese labels and
+<code>" cancer"</code> for English labels. Some cancer categories such as sarcoma,
+lymphoma, leukemia, melanoma, and related groups do not receive a suffix.</p></dd>
 
 
 <dt id="arg-as-factor">as_factor<a class="anchor" aria-label="anchor" href="#arg-as-factor"></a></dt>
