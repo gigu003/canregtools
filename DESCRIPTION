@@ -2,21 +2,24 @@ Package: canregtools
 Title: Analyzing Population-Based Cancer Registry Data
 Version: 0.2.10
 Authors@R: 
-    person("Qiong", "Chen", , "chenq08@126.com", role = c("aut", "cre", "cph"),
-           comment = c(ORCID = "0000-0003-2401-0046",
-           affiliation = "Department of Cancer Epidemiology, The Affiliated
-           Cancer Hospital of Zhengzhou University & Henan Cancer Hospital,
-           Henan Cancer Registry in China"))
-Description: Tools for cleaning, analyzing, visualizing, and reporting data
-    from Population-Based Cancer Registries (PBCRs), with standardized workflows
-    for filtering, selecting, and restructuring data, designed for routine
-    registry operations.
+    person("Qiong", "Chen", email = "chenq08@126.com",
+           role = c("aut", "cre", "cph"),
+           comment = c(
+             ORCID = "0000-0003-2401-0046",
+             affiliation = "Department of Cancer Epidemiology, The Affiliated Cancer Hospital of Zhengzhou University & Henan Cancer Hospital, Henan Cancer Registry in China"
+           ))
+Description: Provides tools for working with Population-Based Cancer Registry
+    (PBCR) data, including cleaning, restructuring, classification, summary
+    tabulation, rate estimation, age-standardization, quality assessment,
+    visualization, and report preparation. It supports routine cancer registry
+    workflows based on standardized CanReg-style data structures and helps make
+    registry analyses more reproducible and consistent.
 License: MIT + file LICENSE
 URL: https://github.com/gigu003/canregtools,
     https://gigu003.github.io/canregtools/,
     https://canregtools.chenq.site
 BugReports: https://github.com/gigu003/canregtools/issues
-Date: 2023-12-01
+Date: 2026-06-18
 Depends: 
     R (>= 4.1.0)
 Imports:
@@ -38,4 +41,3 @@ Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.2
-VignetteBuilder: knitr

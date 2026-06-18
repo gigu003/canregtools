@@ -1,6 +1,8 @@
 # canregtools 0.2.10
 
 * Fix missing deaths variable from population data in cr_reframe() merging.
+* Improved package metadata in DESCRIPTION, including a more informative package description, author ORCID, and affiliation.
+* Updated CRAN submission metadata and removed the unused VignetteBuilder field to avoid CRAN check notes when no package vignette is provided.
 
 # canregtools 0.2.9
 
