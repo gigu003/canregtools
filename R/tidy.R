@@ -194,15 +194,23 @@ tidy_var <- function(
       return(labels)
     }
 
+    esophageal_cancer_codes <- as.character(c(10, 103))
     no_suffix_codes <- as.character(c(
       27, 52:58, 60, 61, 113, 124:126, 316:319, 333:336, 339
     ))
     suffix_values <- dplyr::case_when(
+      label_col %in% c("ename", "abbr_en") &
+        var_map[["code"]] %in% esophageal_cancer_codes ~ "",
       label_col %in% c("cname", "abbr_cn") &
         !var_map[["code"]] %in% no_suffix_codes ~ "\u764c",
       label_col %in% c("ename", "abbr_en") &
         !var_map[["code"]] %in% no_suffix_codes ~ " cancer",
       TRUE ~ ""
+    )
+    labels <- dplyr::case_when(
+      label_col %in% c("ename", "abbr_en") &
+        var_map[["code"]] %in% esophageal_cancer_codes ~ "Esophageal cancer",
+      TRUE ~ labels
     )
     paste0(labels, suffix_values)
   }

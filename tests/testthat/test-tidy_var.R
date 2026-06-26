@@ -53,6 +53,25 @@ test_that("tidy_var adds English suffix for cancer labels", {
   expect_true(all(grepl(" cancer$", res)))
 })
 
+test_that("tidy_var uses grammatical English label for esophageal cancer", {
+  x <- c("10", "103")
+
+  res <- tidy_var(x, var_name = "cancer", lang = "en", suffix = TRUE)
+  expect_equal(res, c("Esophageal cancer", "Esophageal cancer"))
+
+  res_no_suffix <- tidy_var(x, var_name = "cancer", lang = "en", suffix = FALSE)
+  expect_equal(res_no_suffix, c("Esophagus", "Esophagus"))
+
+  res_multi_lang <- tidy_var(
+    x,
+    var_name = "cancer",
+    lang = c("cn", "en"),
+    sep = " / ",
+    suffix = TRUE
+  )
+  expect_equal(res_multi_lang, c("食管癌 / Esophageal cancer", "食管癌 / Esophageal cancer"))
+})
+
 test_that("tidy_var does not add cancer suffix for excluded cancer codes", {
   x <- c("27", "52", "58", "124", "125", "316", "319", "333", "336")
   res_cn <- tidy_var(x, var_name = "cancer", lang = "cn", suffix = TRUE)

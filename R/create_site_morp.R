@@ -173,19 +173,85 @@ create_site_morp.fbswicd <- function(x,
                                      drop_nos = TRUE) {
   type <- match.arg(type)
   sitemorp <- purrr::pluck(x, "sitemorp")
-  strat_vars <- get_expr_vars(...)
+  input_strat_vars <- get_expr_vars(...)
+  strat_vars <- unique(c(input_strat_vars, "year", "sex", "cancer"))
+
+  special_c <- c(1, 7, 12, 19, 20, 23, 33, 37, 52, 55, 56,
+                   58, 61, 64, 65, 66, 73, 80, 97)
+  special_d <- c(24, 27, 34, 45)
+  special_icd10 <- c(sprintf("C%02d", special_c), sprintf("D%02d", special_d))
+
+  normalise_icd10_code <- function(icd10) {
+    icd10_3 <- substr(icd10, 1, 3)
+    dplyr::case_when(
+      icd10_3 %in% special_icd10 ~ icd10_3,
+      grepl("^C[0-9]{2}$", icd10) ~ paste0(icd10, ".9"),
+      TRUE ~ icd10
+    )
+  }
+
+  summarise_tp_column <- function(data, group_vars, var) {
+    data |>
+      dplyr::group_by(!!!rlang::syms(group_vars)) |>
+      dplyr::reframe(!!rlang::sym(var) := list(combine_tp(!!rlang::sym(var)))) |>
+      dplyr::ungroup()
+  }
+
+  create_total_rows <- function(data, total_var, total_value) {
+    data <- dplyr::filter(
+      data,
+      as.character(!!rlang::sym(total_var)) != as.character(total_value)
+    )
+    group_vars <- dplyr::setdiff(strat_vars, total_var)
+    icd10_total <- summarise_tp_column(data, group_vars, "icd10")
+    morp_total <- summarise_tp_column(data, group_vars, "morp")
+
+    dplyr::left_join(icd10_total, morp_total, by = group_vars) |>
+      dplyr::mutate(!!rlang::sym(total_var) := total_value) |>
+      dplyr::select(!!!rlang::syms(c(strat_vars, "icd10", "morp")))
+  }
+
+  if (!"year" %in% input_strat_vars) {
+    sitemorp <- dplyr::bind_rows(
+      sitemorp,
+      create_total_rows(sitemorp, "year", 9000L)
+    )
+  }
+
+  sitemorp <- dplyr::bind_rows(
+    sitemorp,
+    create_total_rows(sitemorp, "sex", 0L)
+  )
+
+  sitemorp <- dplyr::bind_rows(
+    sitemorp,
+    create_total_rows(sitemorp, "cancer", "60")
+  )
 
   get_morp_group <- function() {
-    if (!"cancer" %in% strat_vars) {
+    cancer_value <- as.character(dplyr::cur_group()[["cancer"]])
+
+    if (length(cancer_value) == 0 || is.na(cancer_value)) {
       return("60")
     }
 
-    cancer_value <- as.character(dplyr::cur_group()[["cancer"]])
     if (cancer_value %in% c("60", "125")) {
       cancer_value
     } else {
       "60"
     }
+  }
+
+  is_three_digit_icd10_group <- function() {
+    three_digit_icd10_groups <- c(
+      "126", "101", "124", "125", "122", "105",
+      "120", "107", "116", "110", "111", "112",
+      "60"
+    )
+    cancer_value <- as.character(dplyr::cur_group()[["cancer"]])
+    length(cancer_value) > 0 &&
+      !is.na(cancer_value) &&
+      cancer_value %in% three_digit_icd10_groups
   }
 
   res <- sitemorp |>
@@ -212,8 +278,21 @@ create_site_morp.fbswicd <- function(x,
           res <- combine_tp(x)
           res <- tibble(
             !!sym("icd10") := names(res),
-            count = unname(res)
-          )
+            count = unname(res))
+          res <- dplyr::mutate(
+            res,
+            !!sym("icd10") := normalise_icd10_code(!!sym("icd10"))
+          ) |>
+            group_by(!!sym("icd10")) |>
+            summarise(count = sum(count), .groups = "drop")
+          if (is_three_digit_icd10_group()) {
+            res <- dplyr::mutate(
+              res,
+              !!sym("icd10") := substr(!!sym("icd10"), 1, 3)
+            ) |>
+              group_by(!!sym("icd10")) |>
+              summarise(count = sum(count), .groups = "drop")
+          }
           if (wrap_subsite) {
             res <- dplyr::mutate(
               res,
@@ -230,6 +309,18 @@ create_site_morp.fbswicd <- function(x,
         }
       })
     )
+
+  if (!"year" %in% input_strat_vars) {
+    res <- dplyr::filter(res, !!rlang::sym("year") == 9000L)
+  }
+
+  if (!"sex" %in% input_strat_vars) {
+    res <- dplyr::filter(res, !!rlang::sym("sex") == 0L)
+  }
+
+  if (!"cancer" %in% input_strat_vars) {
+    res <- dplyr::filter(res, !!rlang::sym("cancer") == "60")
+  }
 
   if (!flatten) {
     return(res)

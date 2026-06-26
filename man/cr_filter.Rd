@@ -4,17 +4,23 @@
 \alias{cr_filter}
 \alias{cr_filter.canregs}
 \alias{cr_filter.canreg}
+\alias{cr_filter.fbswicds}
+\alias{cr_filter.fbswicd}
 \alias{cr_filter.asrs}
 \alias{cr_filter.age_rates}
 \alias{cr_filter.qualities}
 \alias{cr_filter.default}
-\title{Filter cases from objects of class \code{canreg} or \code{canregs}}
+\title{Filter rows from canregtools objects}
 \usage{
 cr_filter(.data, ..., drop = c("none"), part = "all")
 
-\method{cr_filter}{canregs}(.data, ..., part = "all")
+\method{cr_filter}{canregs}(.data, ..., drop = c("none"), part = "all")
 
-\method{cr_filter}{canreg}(.data, ..., part = "all")
+\method{cr_filter}{canreg}(.data, ..., drop = c("none"), part = "all")
+
+\method{cr_filter}{fbswicds}(.data, ..., drop = c("none"), part = "all")
+
+\method{cr_filter}{fbswicd}(.data, ..., drop = c("none"), part = "all")
 
 \method{cr_filter}{asrs}(.data, ..., drop = c("none"))
 
@@ -25,16 +31,22 @@ cr_filter(.data, ..., drop = c("none"), part = "all")
 \method{cr_filter}{default}(.data, ..., drop = c("none"))
 }
 \arguments{
-\item{.data}{An object with class of \code{canreg}, or \code{canregs}.}
+\item{.data}{An object with class of \code{canreg}, \code{canregs}, \code{fbswicd},
+\code{fbswicds}, or a data frame-like object.}
 
-\item{...}{Filtering conditions passed to \code{\link[dplyr:filter]{dplyr::filter()}}. These}
+\item{...}{Filtering conditions passed to \code{\link[dplyr:filter]{dplyr::filter()}}. These
+conditions are applied to selected components when all variables in the
+expressions are available in that component.}
 
-\item{drop}{Drop specific cancer categories.}
+\item{drop}{Drop specific cancer categories. Use \code{"total"} to remove total
+cancer categories and \code{"others"} to remove other/non-specific cancer
+categories when a selected component has a \code{cancer} column.}
 
 \item{part}{A character vector specifying which components of \code{.data} to
-filter. Must be one or more of \code{"FBcases"}, \code{"SWcases"}, or \code{"POP"}.
-Defaults to \code{"FBcases"}.
-conditions are applied to the selected components.}
+filter. For \code{canreg} objects, use one or more of \code{"FBcases"}, \code{"SWcases"},
+or \code{"POP"}. For \code{fbswicd} objects, use one or more of \code{"fbswicd"},
+\code{"sitemorp"}, \code{"pop"}, or \code{"exclude"}. Use \code{"all"} to filter all available
+components.}
 }
 \value{
 An object of the same class as \code{.data} (\code{canreg} or \code{canregs}) with
@@ -42,5 +54,5 @@ the specified components filtered accordingly. The structure and component
 order are preserved.
 }
 \description{
-Filter cases from objects of class \code{canreg} or \code{canregs}
+Filter rows from canregtools objects
 }
