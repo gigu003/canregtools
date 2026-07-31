@@ -100,12 +100,14 @@ will be included.</p></dd>
 
 
 <dt id="arg-areacode">areacode<a class="anchor" aria-label="anchor" href="#arg-areacode"></a></dt>
-<dd><p>Character. The administrative area code for the data. Default is <code>NULL</code>.</p></dd>
+<dd><p>Character. A registry or area identifier for the data.
+It is stored as a character vector and is not limited to administrative
+division codes. Default is <code>NULL</code>.</p></dd>
 
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>A <code>canreg</code> object (S3 class <code>canreg</code>) which is a list containing:</p><ul><li><p><code>areacode</code>: area code</p></li>
+    <p>A <code>canreg</code> object (S3 class <code>canreg</code>) which is a list containing:</p><ul><li><p><code>areacode</code>: registry or area identifier</p></li>
 <li><p><code>FBcases</code>: incidence data (S3 class <code>FBcases</code>)</p></li>
 <li><p><code>SWcases</code>: mortality data (S3 class <code>SWcases</code>)</p></li>
 <li><p><code>POP</code>: population data (S3 class <code>POP</code>)</p></li>
@@ -144,7 +146,7 @@ will be included.</p></dd>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.1.</p>
 </div>
 
       </footer></div>
