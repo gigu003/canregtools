@@ -55,28 +55,37 @@
 #' data("canregs")
 #' pop <- canregs[[1]]$POP
 #' draw_pyramid(pop, agegrp, rks, sex)
-#' 
+#'
 draw_pyramid <- function(
-    data,
-    x,
-    y,
-    group,
-    facet = NULL,
-    facet_label = NULL,
-    grid = NULL,
-    show_value = FALSE, show_prop = TRUE,
-    left_axis = NULL, right_axis = NULL,
-    left_label = NULL, right_label = NULL,
-    cgap = 0.3, cstep = 1, csize = 1,
-    labs = c("Males", "Ages", "Females"), gl = 2,
-    cadj = 0, cols = c("#006400", "#b32134"), dens = c(-1, -1),
-    main = "", ...
-    ) {
+  data,
+  x,
+  y,
+  group,
+  facet = NULL,
+  facet_label = NULL,
+  grid = NULL,
+  show_value = FALSE,
+  show_prop = TRUE,
+  left_axis = NULL,
+  right_axis = NULL,
+  left_label = NULL,
+  right_label = NULL,
+  cgap = 0.3,
+  cstep = 1,
+  csize = 1,
+  labs = c("Males", "Ages", "Females"),
+  gl = 2,
+  cadj = 0,
+  cols = c("#006400", "#b32134"),
+  dens = c(-1, -1),
+  main = "",
+  ...
+) {
   x_var <- rlang::enquo(x)
   y_var <- rlang::enquo(y)
   group_var <- rlang::enquo(group)
   facet_var <- rlang::enquo(facet)
-  
+
   # Split the data according to the facet var
   if (!rlang::quo_is_null(facet_var)) {
     data_splited <- data |>
@@ -95,7 +104,7 @@ draw_pyramid <- function(
     grid <- c(length(data_splited), 1)
   }
   par(mfrow = grid)
-  
+
   purrr::map(
     seq_along(data_splited),
     function(x) {
@@ -130,30 +139,39 @@ draw_pyramid <- function(
 #' @noRd
 #'
 pyramid <- function(
-    data,
-    x,
-    y,
-    group,
-    show_value = FALSE, show_prop = TRUE,
-    left_axis = NULL, right_axis = NULL,
-    left_label = NULL, right_label = NULL,
-    cgap = 0.3, cstep = 1, csize = 1,
-    labs = c("Males", "Ages", "Females"), gl = 2,
-    cadj = 0, cols = c("#006400", "#b32134"), dens = c(-1, -1),
-    main = "", ...
-    ) {
+  data,
+  x,
+  y,
+  group,
+  show_value = FALSE,
+  show_prop = TRUE,
+  left_axis = NULL,
+  right_axis = NULL,
+  left_label = NULL,
+  right_label = NULL,
+  cgap = 0.3,
+  cstep = 1,
+  csize = 1,
+  labs = c("Males", "Ages", "Females"),
+  gl = 2,
+  cadj = 0,
+  cols = c("#006400", "#b32134"),
+  dens = c(-1, -1),
+  main = "",
+  ...
+) {
   par(mar = c(0, 0, 2, 0))
   x_var <- rlang::enquo(x)
   y_var <- rlang::enquo(y)
   group_var <- rlang::enquo(group)
-  
+
   group_values <- dplyr::pull(data, !!group_var) |> unique()
   y_value <- purrr::map(group_values, function(x) {
     dplyr::filter(data, !!group_var == x) |> pull(!!y_var)
   })
-  
+
   x_value <- dplyr::pull(data, !!x_var) |> unique()
-  
+
   if (show_prop == TRUE) {
     ll <- y_value[[1]]
     rr <- y_value[[2]]
@@ -166,11 +184,10 @@ pyramid <- function(
     rr <- right_value
   }
 
-  
   if (is.null(left_axis)) {
     left_axis <- pretty(range(c(0, c(left_value, right_value))))
   }
-  
+
   if (is.null(right_axis)) {
     right_axis <- left_axis
   }
@@ -179,14 +196,18 @@ pyramid <- function(
   plot(
     c(-side - cgap / 2, side + cgap / 2),
     c(-0.2, 1.1),
-    type = "n", axes = FALSE, xlab = "", ylab = "", main = main)
+    type = "n",
+    axes = FALSE,
+    xlab = "",
+    ylab = "",
+    main = main
+  )
   max_left <- max(left_axis)
   min_left <- min(left_axis)
   range_left <- max_left - min_left
   max_right <- max(right_axis)
   min_right <- min(right_axis)
   range_right <- max_right - min_right
-
 
   # draw axis ticks for left axis
   segments(
@@ -208,68 +229,122 @@ pyramid <- function(
 
   # draw background grids
   if (!is.null(gl)) {
-    segments(-(left_axis - min_left) / range_left - cgap / 2, 0, -(left_axis - min_left) / range_left -
-               cgap / 2, 1, lty = gl, col = "blue", lwd = 0.2 * csize)
-    segments((right_axis - min_right) / range_right + cgap / 2, 0, (right_axis - min_right) / range_right +
-               cgap / 2, 1, lty = gl, col = "blue", lwd = 0.2 * csize)
+    segments(
+      -(left_axis - min_left) / range_left - cgap / 2,
+      0,
+      -(left_axis - min_left) / range_left - cgap / 2,
+      1,
+      lty = gl,
+      col = "blue",
+      lwd = 0.2 * csize
+    )
+    segments(
+      (right_axis - min_right) / range_right + cgap / 2,
+      0,
+      (right_axis - min_right) / range_right + cgap / 2,
+      1,
+      lty = gl,
+      col = "blue",
+      lwd = 0.2 * csize
+    )
   }
   # draw left axis line
-  lines(c(-1 - cgap / 2, -cgap / 2), c(-0.09, -0.09), lty = 1, lwd = 0.5*csize)
+  lines(
+    c(-1 - cgap / 2, -cgap / 2),
+    c(-0.09, -0.09),
+    lty = 1,
+    lwd = 0.5 * csize
+  )
   # draw right axis line
-  lines(c(1 + cgap / 2, cgap / 2), c(-0.09, -0.09), lty = 1, lwd = 0.5*csize)
+  lines(c(1 + cgap / 2, cgap / 2), c(-0.09, -0.09), lty = 1, lwd = 0.5 * csize)
   # draw gap left line
-  lines(c(-cgap / 2, -cgap / 2), c(0, 1.3), lty = 1, lwd = 0.4*csize)
+  lines(c(-cgap / 2, -cgap / 2), c(0, 1.3), lty = 1, lwd = 0.4 * csize)
   # draw gap left line
-  lines(c(cgap / 2, cgap / 2), c(0, 1.3), lty = 1, lwd = 0.4*csize)
+  lines(c(cgap / 2, cgap / 2), c(0, 1.3), lty = 1, lwd = 0.4 * csize)
 
   sign <- ifelse(show_prop == TRUE, "(%)", "")
-  text(-0.5 - cgap / 2, -0.18, paste(labs[1], sign),
+  text(
+    -0.5 - cgap / 2,
+    -0.18,
+    paste(labs[1], sign),
     pos = 3,
-    cex = csize * 1.1, font = 2
+    cex = csize * 1.1,
+    font = 2
   )
-  text(0.5 + cgap / 2, -0.18, paste(labs[3], sign),
+  text(
+    0.5 + cgap / 2,
+    -0.18,
+    paste(labs[3], sign),
     pos = 3,
-    cex = csize * 1.1, font = 2
+    cex = csize * 1.1,
+    font = 2
   )
   text(0, 1.05, labs[2], pos = 3, cex = csize * 1.2, font = 2)
   length_groups <- length(x_value)
   # draw center age labels
   for (i in 0:(length_groups - 1)) {
     if ((i %% cstep) == 0) {
-      text(0, i / length_groups + cadj, paste(x_value[i + 1]), pos = 3, cex = csize)
+      text(
+        0,
+        i / length_groups + cadj,
+        paste(x_value[i + 1]),
+        pos = 3,
+        cex = csize
+      )
     }
   }
   # draw the population number on two sides of pyramid
   if (show_value) {
     for (i in 0:(length_groups - 1)) {
       if ((i %% cstep) == 0) {
-        text(-1.15 - cgap / 2, i / length_groups + cadj, paste(ll[i + 1]),
-          pos = 3, cex = csize
+        text(
+          -1.15 - cgap / 2,
+          i / length_groups + cadj,
+          paste(ll[i + 1]),
+          pos = 3,
+          cex = csize
         )
-        text(1.15 + cgap / 2, i / length_groups + cadj, paste(rr[i + 1]),
-          pos = 3, cex = csize
+        text(
+          1.15 + cgap / 2,
+          i / length_groups + cadj,
+          paste(rr[i + 1]),
+          pos = 3,
+          cex = csize
         )
       }
     }
     # draw the total population number.
-    text(-cgap - 1, 1.06, paste("POP:", round(sum(ll, rr) / 10000, 2)),
-      pos = 4, cex = csize, font = 2
+    text(
+      -cgap - 1,
+      1.06,
+      paste("POP:", round(sum(ll, rr) / 10000, 2)),
+      pos = 4,
+      cex = csize,
+      font = 2
     )
     # draw the population proportion on left.
-    text(-0.5 - cgap / 2, 1.05, paste(round(sum(left_value), 2), sign),
-      pos = 3, cex = csize
+    text(
+      -0.5 - cgap / 2,
+      1.05,
+      paste(round(sum(left_value), 2), sign),
+      pos = 3,
+      cex = csize
     )
     # draw the population proportion on right.
-    text(0.5 + cgap / 2, 1.05, paste(round(sum(right_value), 2), sign),
-      pos = 3, cex = csize
+    text(
+      0.5 + cgap / 2,
+      1.05,
+      paste(round(sum(right_value), 2), sign),
+      pos = 3,
+      cex = csize
     )
   }
-  
+
   # Set the default left axis label
   if (is.null(left_label)) {
     left_label <- paste(
       formatC(left_axis, format = "g", big.mark = "g", big.interval = 3)
-      )
+    )
   }
   # Set the default right axis label
   if (is.null(right_label)) {
@@ -277,32 +352,47 @@ pyramid <- function(
       formatC(right_axis, format = "g", big.mark = "g", big.interval = 3)
     )
   }
-  
+
   # draw label for left axis
   text(
     -(left_axis - min_left) / range_left - cgap / 2,
     rep(-0.022, length(left_axis)),
     left_label,
-    pos = 1, cex = csize
+    pos = 1,
+    cex = csize
   )
   # draw label for right axis
   text(
     (right_axis - min_right) / range_right + cgap / 2,
     rep(-0.022, length(right_axis)),
-    right_label, pos = 1, cex = csize
+    right_label,
+    pos = 1,
+    cex = csize
   )
   bottom_y <- 0:(length_groups - 1) / length_groups
   top_y <- 1:length_groups / length_groups
   left_rect <- -(left_value - min_left) / range_left - cgap / 2
   # draw left bar
-  rect(left_rect, bottom_y, rep(-cgap / 2, length_groups), top_y,
-    col = cols[1], density = dens[1], border = "white",
+  rect(
+    left_rect,
+    bottom_y,
+    rep(-cgap / 2, length_groups),
+    top_y,
+    col = cols[1],
+    density = dens[1],
+    border = "white",
     lwd = 0.2 * csize
   )
   right_rect <- (right_value - min_right) / range_right + cgap / 2
   # draw right bar
-  rect(rep(cgap / 2, length_groups), bottom_y, right_rect, top_y,
-    col = cols[2], density = dens[2], border = "white",
+  rect(
+    rep(cgap / 2, length_groups),
+    bottom_y,
+    right_rect,
+    top_y,
+    col = cols[2],
+    density = dens[2],
+    border = "white",
     lwd = 0.2 * csize
   )
 }

@@ -45,9 +45,7 @@ create_quality <- function(x, ..., decimal = 2, collapse = TRUE) {
 #' qua <- create_quality(data, year, sex, cancer, cancer_type = "big")
 #' head(qua)
 #'
-create_quality.canreg <- function(x,
-                                  ...,
-                                  cancer_type = "big") {
+create_quality.canreg <- function(x, ..., cancer_type = "big") {
   count_canreg(x, cancer_type = cancer_type) |>
     create_quality(...)
 }
@@ -60,10 +58,12 @@ create_quality.canreg <- function(x,
 #' qua <- create_quality(canregs, year, sex, cancer, cancer_type = "big")
 #' head(qua)
 #'
-create_quality.canregs <- function(x,
-                                   ...,
-                                   cancer_type = "big",
-                                   collapse = TRUE) {
+create_quality.canregs <- function(
+  x,
+  ...,
+  cancer_type = "big",
+  collapse = TRUE
+) {
   count_canreg(x, cancer_type = cancer_type) |>
     create_quality(..., collapse = collapse)
 }
@@ -77,11 +77,9 @@ create_quality.canregs <- function(x,
 #' qua <- create_quality(fbsws, year, sex, cancer)
 #' head(qua)
 #'
-create_quality.fbswicds <- function(x,
-                                    ...,
-                                    decimal = 2,
-                                    collapse = TRUE) {
-  res <- purrr::map(x,
+create_quality.fbswicds <- function(x, ..., decimal = 2, collapse = TRUE) {
+  res <- purrr::map(
+    x,
     create_quality.fbswicd,
     ...,
     .progress = "Calculating quality indicies #"
@@ -106,8 +104,12 @@ create_quality.fbswicds <- function(x,
 create_quality.fbswicd <- function(x, ..., decimal = 2) {
   sex <- rlang::sym("sex")
   stats <- c("fbs", "sws", "mv", "dco", "ub", "sub", "mvs")
-  if ("ids" %in% names(x$fbswicd)) stats <- c(stats, "ids")
-  if ("mult" %in% names(x$fbswicd)) stats <- c(stats, "mult")
+  if ("ids" %in% names(x$fbswicd)) {
+    stats <- c(stats, "ids")
+  }
+  if ("mult" %in% names(x$fbswicd)) {
+    stats <- c(stats, "mult")
+  }
   s_vars1 <- rlang::syms(stats)
   s_vars2 <- s_vars1[3:length(s_vars1)]
   fbs <- rlang::sym("fbs")
@@ -139,38 +141,46 @@ create_quality.fbswicd <- function(x, ..., decimal = 2) {
       !!mort := prop(!!sws, !!popu, mp = 100000, decimal = decimal),
       !!popu := sum(!!popu),
       across(c(!!fbs, !!sws), ~ sum(.x)),
-      across(c(!!sws), ~ prop(.x, !!fbs, mp = 1, decimal = decimal),
-             .names = "mi"),
-      across(c(!!!s_vars2), ~ prop(.x, !!fbs, decimal = decimal),
-             .names = "{.col}")
+      across(
+        c(!!sws),
+        ~ prop(.x, !!fbs, mp = 1, decimal = decimal),
+        .names = "mi"
+      ),
+      across(
+        c(!!!s_vars2),
+        ~ prop(.x, !!fbs, decimal = decimal),
+        .names = "{.col}"
+      )
     ) |>
     mutate(across(where(is.numeric), ~ cr_replace_na(.x))) |>
     select(!!!gvars, !!popu, !!fbs, !!inci, !!sws, !!mort, !!mi, !!!s_vars2)
   attr(output, "class") <- c("quality", "tbl_df", "tbl", "data.frame")
-  
-  
+
   if ("death" %in% names(pop_modi)) {
     death <- pop_modi |>
       group_by(!!!rlang::syms(gvars2)) |>
-      reframe(ex = lt(death = !!rlang::sym("death"), pop = !!popu)$ex[1],
-              death = round(sum(!!rlang::sym("death"), na.rm = TRUE) /
-                              sum(!!rlang::sym("rks"), na.rm = TRUE) * 1000, 2)
-              ) |>
+      reframe(
+        ex = lt(death = !!rlang::sym("death"), pop = !!popu)$ex[1],
+        death = round(
+          sum(!!rlang::sym("death"), na.rm = TRUE) /
+            sum(!!rlang::sym("rks"), na.rm = TRUE) *
+            1000,
+          2
+        )
+      ) |>
       dplyr::relocate(death, .before = "ex")
   }
-  
 
   # Deal with group vars
   output <- post_vars(output) |> post_sex_specific_cancer()
   if (sex_not_pass) {
     output <- filter(output, !!sex == 0L)
   }
-  
+
   if (cancer_not_pass & "death" %in% names(pop_modi)) {
     output <- output |>
       left_join(death, by = join_by(!!!rlang::syms(gvars2)))
   }
-  
-  dplyr::arrange(output, !!!rlang::syms(gvars))
 
+  dplyr::arrange(output, !!!rlang::syms(gvars))
 }

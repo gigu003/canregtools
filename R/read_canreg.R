@@ -28,12 +28,15 @@
 #' canreg <- read_canreg(file_address, pop_type = "long")
 #' }
 #'
-read_canreg <- function(x,
-                        pop_type = "long",
-                        age_var = "agegroup",
-                        pop_var = "popu",
-                        death_var = "death"
-                        ) {
+read_canreg <- function(
+  x,
+  pop_type = "long",
+  age_var = "agegroup",
+  pop_var = "popu",
+  death_var = "death"
+) {
+  check_readxl()
+
   if (length(x) == 1 && dir.exists(x)) {
     files <- list.files(x, pattern = "\\.xlsx?$", full.names = TRUE)
     if (length(files) == 0) {
@@ -46,29 +49,37 @@ read_canreg <- function(x,
       stop("No valid Excel files provided.")
     }
   }
-  
-  
-  # Get the areacode in the file names
-  # names <- gsub("\\D", "", tools::file_path_sans_ext(basename(files)))
+
+  # Get the area or registry identifiers in the file names
   names <- sub("\\.[^.]+$", "", basename(files))
-  names <- gsub("\\D", "", names)
   # Read files
-  res <- purrr::map(files,
-                    read_file,
-                    pop_type = pop_type,
-                    age_var = age_var,
-                    pop_var = pop_var,
-                    death_var = death_var,
-                    .progress = "Reading canreg data #"
-                    )
+  res <- purrr::map(
+    files,
+    read_file,
+    pop_type = pop_type,
+    age_var = age_var,
+    pop_var = pop_var,
+    death_var = death_var,
+    .progress = "Reading canreg data #"
+  )
   names(res) <- names
   res <- purrr::compact(res)
-  
+
   if (length(res) == 1 && inherits(res[[1]], "canreg")) {
     return(res[[1]])
   }
-  
+
   structure(res, class = c("canregs", "list"))
+}
+
+check_readxl <- function() {
+  if (!requireNamespace("readxl", quietly = TRUE)) {
+    stop(
+      "Package 'readxl' is required to read Excel files with `read_canreg()`. ",
+      "Please install it with install.packages('readxl').",
+      call. = FALSE
+    )
+  }
 }
 
 #' Read and process a cancer registry Excel file
@@ -90,8 +101,7 @@ read_canreg <- function(x,
 #'
 #' @return A list of class `"canreg"` containing:
 #'   \describe{
-#'     \item{areacode}{Character string extracted from the file name (digits
-#'      only).}
+#'     \item{areacode}{Character string extracted from the file name stem.}
 #'     \item{FBcases}{A data frame of FB cases, with class `"FBcases"`.}
 #'     \item{SWcases}{A data frame of SW cases, with class `"SWcases"`.}
 #'     \item{POP}{A population data frame of class `"POP"` depending on the
@@ -99,33 +109,34 @@ read_canreg <- function(x,
 #'   }
 #' @keywords internal
 #' @noRd
-read_file <- function(x,
-                      pop_type = "long",
-                      age_var = "agegroup",
-                      pop_var = "popu",
-                      death_var = "death") {
+read_file <- function(
+  x,
+  pop_type = "long",
+  age_var = "agegroup",
+  pop_var = "popu",
+  death_var = "death"
+) {
   tryCatch(
     {
       fb <- read_sheet(x, sheet = "FB")
       sw <- read_sheet(x, sheet = "SW")
       fyear <- get_year(fb, date_var = "inciden")
-      
+
       pop <- switch(
         pop_type,
         "wide" = read_single_pop(x, year = fyear),
-        "long" = read_long_pop(x,
-                               pop_var = pop_var,
-                               age_var = age_var,
-                               death_var = death_var),
+        "long" = read_long_pop(
+          x,
+          pop_var = pop_var,
+          age_var = age_var,
+          death_var = death_var
+        ),
         stop("`pop_type` only can be 'long' or 'wide'")
       )
-      
-      #bsname <- tools::file_path_sans_ext(basename(x))
-      #areacode <- gsub("\\D", "", bsname)
+
       bsname <- sub("\\.[^.]+$", "", basename(x))
-      areacode <- gsub("\\D", "", bsname)
-      
-      
+      areacode <- as.character(bsname)
+
       structure(
         list(
           areacode = areacode,
@@ -153,14 +164,16 @@ read_file <- function(x,
 #' @param sheet Sheet name to read ("FB" or "SW").
 #' @param date_vars Character vector of column names to be parsed as Date.
 #'
-#' @return A data frame with standardized column names and date types, 
+#' @return A data frame with standardized column names and date types,
 #'   and class "FBcases" or "SWcases" (if applicable).
 #'
 #' @keywords internal
 #' @noRd
-read_sheet <- function(x,
-                       sheet = "FB",
-                       date_vars = c("inciden", "deathda", "birthda")) {
+read_sheet <- function(
+  x,
+  sheet = "FB",
+  date_vars = c("inciden", "deathda", "birthda")
+) {
   # Assign appropriate class
   sheet_class <- switch(
     sheet,
@@ -168,19 +181,20 @@ read_sheet <- function(x,
     "SW" = "SWcases",
     NULL
   )
-  
+
   # Read sheet and standardize column names
   res <- readxl::read_excel(x, sheet = sheet) |>
     dplyr::rename_all(tolower)
-  
+
   # Only convert columns that exist in the data
   date_vars_present <- intersect(tolower(date_vars), names(res))
   if (length(date_vars_present) > 0) {
-    res <- dplyr::mutate(res,
-                         dplyr::across(dplyr::any_of(date_vars_present),
-                                       as.Date))
+    res <- dplyr::mutate(
+      res,
+      dplyr::across(dplyr::any_of(date_vars_present), as.Date)
+    )
   }
-  
+
   if (!is.null(sheet_class)) {
     res <- structure(res, class = c(sheet_class, class(res)))
   }
@@ -207,7 +221,7 @@ read_single_pop <- function(x, year) {
   if (!is.numeric(year) || length(year) != 1) {
     stop("`year` must be a single numeric value.")
   }
-  
+
   # Try reading the population sheet
   pop <- tryCatch(
     readxl::read_excel(
@@ -217,32 +231,36 @@ read_single_pop <- function(x, year) {
       col_names = c("male", "female")
     ),
     error = function(e) {
-      stop("Failed to read 'POP' sheet from file: ",
-           x, "\n",
-           conditionMessage(e))
+      stop(
+        "Failed to read 'POP' sheet from file: ",
+        x,
+        "\n",
+        conditionMessage(e)
+      )
     }
   )
-  
+
   # Ensure correct number of rows
   if (nrow(pop) != 19) {
     stop("Expected 19 age groups in population sheet (B2:C20).")
   }
-  
+
   # Round and validate values
   pop <- round(pop)
   if (anyNA(pop)) {
-    message(paste0("Missing (NA) values found in population data.",
-                   "They will be treated as zeros.")
-            )
+    message(paste0(
+      "Missing (NA) values found in population data.",
+      "They will be treated as zeros."
+    ))
     pop[is.na(pop)] <- 0L
   }
-  
+
   # Construct tibble with age groups and sex
   res <- dplyr::tibble(
-    year   = rep(as.integer(year), 38),
-    sex    = rep(c(1L, 2L), each = 19),
+    year = rep(as.integer(year), 38),
+    sex = rep(c(1L, 2L), each = 19),
     agegrp = factor(rep(1:19, 2)),
-    rks    = as.integer(c(pop$male, pop$female))
+    rks = as.integer(c(pop$male, pop$female))
   )
   structure(res, class = c("POP", class(res)))
 }
@@ -265,13 +283,15 @@ read_single_pop <- function(x, year) {
 #'
 #' @return A data frame with columns: year, sex, agegrp (factor),
 #'    rks (population), death.
-#' 
+#'
 #' @keywords internal
 #' @noRd
-read_long_pop <- function(x,
-                          pop_var = "popu",
-                          age_var = "agegroup",
-                          death_var = "death") {
+read_long_pop <- function(
+  x,
+  pop_var = "popu",
+  age_var = "agegroup",
+  death_var = "death"
+) {
   # Deal with basic variables
   strat_vars <- rlang::syms(c("year", "sex"))
   pop_sym <- rlang::sym(pop_var)
@@ -280,22 +300,25 @@ read_long_pop <- function(x,
   rks <- rlang::sym("rks")
   death <- rlang::sym("death")
   agegrp <- rlang::sym("agegrp")
-  
+
   # Read pop data from excel file
   pop <- readxl::read_excel(x, sheet = "POP")
-  
+
   # Create column death_var if it does not exist
   if (!(death_var %in% names(pop))) {
     pop[[death_var]] <- 0L
   }
-  
+
   # Check existence of variables
   required_cols <- c("year", "sex", pop_var, age_var)
   missing_cols <- dplyr::setdiff(required_cols, names(pop))
   if (length(missing_cols) > 0) {
-    stop("Missing columns in 'POP' sheet: ", paste(missing_cols, collapse = ", "))
+    stop(
+      "Missing columns in 'POP' sheet: ",
+      paste(missing_cols, collapse = ", ")
+    )
   }
-  
+
   # Return the cleaned result
   res <- pop |>
     dplyr::mutate(

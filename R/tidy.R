@@ -6,7 +6,7 @@
 #' `1` for male, `2` for female, and `0` for total. It supports both Chinese
 #' and English labels. Optionally, the result can be returned as a factor with
 #' appropriate labels.
-#' 
+#'
 #' @param x A character or numeric vector containing gender information.
 #' @template lang
 #' @template as_factor
@@ -43,8 +43,11 @@ tidy_sex <- function(x, lang = "cn", as_factor = FALSE) {
   }
   valid_values <- sort(unique(na.omit(as.integer(x))))
   if (as_factor) {
-    factor(as.integer(x), levels = valid_values,
-           labels = labels[valid_values + 1])
+    factor(
+      as.integer(x),
+      levels = valid_values,
+      labels = labels[valid_values + 1]
+    )
   } else {
     return(as.integer(x))
   }
@@ -133,7 +136,7 @@ tidy_age <- function(x, unit = "year") {
 #'   names defined in `tidy_var_maps`.
 #' @template label_type
 #' @template lang
-#' @param sep A character string to separate the label. 
+#' @param sep A character string to separate the label.
 #' @param suffix Logical. If `TRUE`, add a language-specific suffix to cancer
 #'   labels when `var_name = "cancer"`: `"\u764c"` for Chinese labels and
 #'   `" cancer"` for English labels. Some cancer categories such as sarcoma,
@@ -157,14 +160,14 @@ tidy_age <- function(x, unit = "year") {
 #' tidy_var(occu, var_name = "occu", lang = "en", label_type = "abbr")
 #'
 tidy_var <- function(
-    x,
-    var_name = "occu",
-    label_type = "full",
-    lang = "code",
-    sep = "",
-    suffix = FALSE,
-    as_factor = FALSE
-    ) {
+  x,
+  var_name = "occu",
+  label_type = "full",
+  lang = "code",
+  sep = "",
+  suffix = FALSE,
+  as_factor = FALSE
+) {
   # Get the supported variable names from tidy_var_maps dictionary.
   supported_vars <- names(tidy_var_maps)
   var_name <- tolower(var_name)
@@ -173,13 +176,13 @@ tidy_var <- function(
   }
   var_map <- tidy_var_maps[[var_name]]
   x_trans <- tolower(x)
-  if (var_name %in% c("icd10", "topo")){
+  if (var_name %in% c("icd10", "topo")) {
     x_trans <- toupper(x)
   }
-  
+
   idx <- match(x_trans, var_map[["code"]])
   # Handle language settings
-  label_col <- sapply(std_lang(lang), function(x){
+  label_col <- sapply(std_lang(lang), function(x) {
     switch(
       x,
       "en" = if (label_type == "full") "ename" else "abbr_en",
@@ -196,19 +199,31 @@ tidy_var <- function(
 
     esophageal_cancer_codes <- as.character(c(10, 103))
     no_suffix_codes <- as.character(c(
-      27, 52:58, 60, 61, 113, 124:126, 316:319, 333:336, 339
+      27,
+      52:58,
+      60,
+      61,
+      113,
+      124:126,
+      316:319,
+      333:336,
+      339
     ))
     suffix_values <- dplyr::case_when(
-      label_col %in% c("ename", "abbr_en") &
+      label_col %in%
+        c("ename", "abbr_en") &
         var_map[["code"]] %in% esophageal_cancer_codes ~ "",
-      label_col %in% c("cname", "abbr_cn") &
+      label_col %in%
+        c("cname", "abbr_cn") &
         !var_map[["code"]] %in% no_suffix_codes ~ "\u764c",
-      label_col %in% c("ename", "abbr_en") &
+      label_col %in%
+        c("ename", "abbr_en") &
         !var_map[["code"]] %in% no_suffix_codes ~ " cancer",
       TRUE ~ ""
     )
     labels <- dplyr::case_when(
-      label_col %in% c("ename", "abbr_en") &
+      label_col %in%
+        c("ename", "abbr_en") &
         var_map[["code"]] %in% esophageal_cancer_codes ~ "Esophageal cancer",
       TRUE ~ labels
     )
@@ -219,17 +234,17 @@ tidy_var <- function(
     add_cancer_suffix(var_map[[col]], col)[idx]
   })
   if (length(label_col) > 1) {
-    res <- purrr::pmap_chr(res, paste, sep = sep)  
+    res <- purrr::pmap_chr(res, paste, sep = sep)
   } else {
     res <- unname(unlist(res))
   }
-  
+
   if (as_factor) {
-    levels <- lapply(label_col, function(x){
+    levels <- lapply(label_col, function(x) {
       add_cancer_suffix(var_map[[x]], x)[sort(na.omit(idx))]
     })
     if (length(label_col) > 1) {
-      levels <- purrr::pmap_chr(levels, paste, sep = sep)  
+      levels <- purrr::pmap_chr(levels, paste, sep = sep)
     } else {
       levels <- unname(unlist(levels))
     }

@@ -17,13 +17,16 @@ post_sex_specific_cancer <- function(x) {
   male_cancer <- c(38:41, 118:119, 207, 326:328)
   sex_specific_cancer <- x |>
     dplyr::filter(
-      as.numeric(!!sex) == 2 & !!cancer %in% female_cancer |
+      as.numeric(!!sex) == 2 &
+        !!cancer %in% female_cancer |
         as.numeric(!!sex) == 1 & !!cancer %in% male_cancer
     ) |>
-    mutate(!!sex := 0)
+    mutate(!!sex := 0L)
 
   res <- x |>
-    dplyr::filter(!(!!sex == 0 & !!cancer %in% c(male_cancer, female_cancer))) |>
+    dplyr::filter(
+      !(!!sex == 0 & !!cancer %in% c(male_cancer, female_cancer))
+    ) |>
     bind_rows(sex_specific_cancer) |>
     dplyr::filter(
       (!!sex == 1 & !!cancer %nin% female_cancer) |
@@ -32,12 +35,44 @@ post_sex_specific_cancer <- function(x) {
     )
 
   sex_not_cancer <- x |>
-    dplyr::filter((!!sex == 1 & !!cancer %in% female_cancer) |
-             (!!sex == 2 & !!cancer %in% male_cancer)) |>
-    mutate(across(!starts_with(c("areacode", "name", "year", "sex", "cancer",
-                                 "pop", "site", "type", "icd10", "rks",
-                                 "agegrp")), ~ 0))
-  bind_rows(res, sex_not_cancer)
+    dplyr::filter(
+      (!!sex == 1 & !!cancer %in% female_cancer) |
+        (!!sex == 2 & !!cancer %in% male_cancer)
+    ) |>
+    mutate(across(
+      !starts_with(c(
+        "areacode",
+        "name",
+        "year",
+        "sex",
+        "cancer",
+        "pop",
+        "site",
+        "type",
+        "icd10",
+        "rks",
+        "agegrp"
+      )),
+      ~0
+    ))
+  bind_rows(res, sex_not_cancer) |>
+    standardize_year_sex()
+}
+
+#' Standardize year and sex columns
+#'
+#' @noRd
+standardize_year_sex <- function(data) {
+  if (!is.data.frame(data)) {
+    return(data)
+  }
+  if ("year" %in% names(data)) {
+    data[["year"]] <- as.integer(data[["year"]])
+  }
+  if ("sex" %in% names(data)) {
+    data[["sex"]] <- as.integer(data[["sex"]])
+  }
+  data
 }
 
 #' Complete stratify variables
@@ -45,19 +80,21 @@ post_sex_specific_cancer <- function(x) {
 #' @noRd
 post_vars <- function(data) {
   stopifnot(is.data.frame(data))
-  
+
   defaults <- list(
     year = 9000L,
     sex = 0L,
     cancer = "60"
   )
-  
+
   for (var in names(defaults)) {
     if (var %nin% names(data)) {
       data[[var]] <- defaults[[var]]
     }
   }
-  dplyr::relocate(data, !!!rlang::syms(c("year", "sex", "cancer")))
+  data |>
+    standardize_year_sex() |>
+    dplyr::relocate(!!!rlang::syms(c("year", "sex", "cancer")))
 }
 
 #' Drop the total cancer
@@ -73,7 +110,7 @@ post_vars <- function(data) {
 #' data("canregs")
 #' qua <- create_quality(canregs, year, sex, cancer)
 #' qua2 <- qua |> drop_total()
-#' 
+#'
 drop_total <- function(x) {
   cancer <- rlang::sym("cancer")
   dplyr::filter(x, !!cancer %nin% c("60", "61"))
@@ -93,7 +130,7 @@ drop_total <- function(x) {
 #' data("canregs")
 #' asr <- create_quality(canregs, year, sex, cancer)
 #' asr2 <- asr |> drop_others()
-#' 
+#'
 drop_others <- function(x) {
   cancer <- rlang::sym("cancer")
   dplyr::filter(x, !!cancer %nin% c("0", "111", "126", "211"))

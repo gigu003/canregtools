@@ -19,15 +19,17 @@
 #' data("canregs")
 #' agerate <- create_age_rate(canregs, year, sex, cancer)
 #'
-create_age_rate <- function(x,
-                            ...,
-                            event = "fbs",
-                            cancer_type = "big",
-                            format = "long",
-                            mp = 100000,
-                            decimal = 6,
-                            show_pop = FALSE,
-                            collapse = TRUE) {
+create_age_rate <- function(
+  x,
+  ...,
+  event = "fbs",
+  cancer_type = "big",
+  format = "long",
+  mp = 100000,
+  decimal = 6,
+  show_pop = FALSE,
+  collapse = TRUE
+) {
   UseMethod("create_age_rate", x)
 }
 
@@ -39,10 +41,10 @@ create_age_rate <- function(x,
 #' agerate <- create_age_rate(data, year, sex)
 #'
 create_age_rate.canreg <- function(
-    x,
-    ...,
-    cancer_type = "big"
-    ) {
+  x,
+  ...,
+  cancer_type = "big"
+) {
   structure(
     count_canreg(x, cancer_type = cancer_type) |>
       create_age_rate(...),
@@ -57,11 +59,11 @@ create_age_rate.canreg <- function(
 #' agerate <- create_age_rate(canregs, year, cancer_type = "system")
 #'
 create_age_rate.canregs <- function(
-    x,
-    ...,
-    cancer_type = "big",
-    collapse = TRUE
-    ) {
+  x,
+  ...,
+  cancer_type = "big",
+  collapse = TRUE
+) {
   count_canreg(x, cancer_type = cancer_type) |>
     create_age_rate(..., collapse = collapse)
 }
@@ -74,16 +76,17 @@ create_age_rate.canregs <- function(
 #' agerate <- create_age_rate(fbsws, year, sex)
 #'
 create_age_rate.fbswicds <- function(
+  x,
+  ...,
+  event = "fbs",
+  format = "long",
+  mp = 100000,
+  decimal = 6,
+  show_pop = FALSE,
+  collapse = TRUE
+) {
+  res <- purrr::map(
     x,
-    ...,
-    event = "fbs",
-    format = "long",
-    mp = 100000,
-    decimal = 6,
-    show_pop = FALSE,
-    collapse = TRUE
-    ) {
-  res <- purrr::map(x,
     create_age_rate,
     ...,
     event = {{ event }},
@@ -97,7 +100,7 @@ create_age_rate.fbswicds <- function(
   if (collapse) {
     return(cr_merge(res))
   }
-  
+
   res
 }
 
@@ -109,14 +112,14 @@ create_age_rate.fbswicds <- function(
 #' fbsw <- count_canreg(data, cancer_type = "small")
 #' agerate <- create_age_rate(fbsw, year, sex, cancer)
 create_age_rate.fbswicd <- function(
-    x,
-    ...,
-    event = "fbs",
-    format = "long",
-    mp = 100000,
-    decimal = 6,
-    show_pop = FALSE
-    ) {
+  x,
+  ...,
+  event = "fbs",
+  format = "long",
+  mp = 100000,
+  decimal = 6,
+  show_pop = FALSE
+) {
   event <- rlang::sym(event)
   rks <- rlang::sym("rks")
   agegrp <- rlang::sym("agegrp")
@@ -178,9 +181,12 @@ create_age_rate.fbswicd <- function(
       ungroup() |>
       select(
         starts_with(c("year", "sex", "cancer")),
-        starts_with("f0"), starts_with("f"),
-        starts_with("p0"), starts_with("p"),
-        starts_with("r0"), starts_with("r")
+        starts_with("f0"),
+        starts_with("f"),
+        starts_with("p0"),
+        starts_with("p"),
+        starts_with("r0"),
+        starts_with("r")
       )
 
     if (!show_pop) {

@@ -33,7 +33,7 @@ For the infant group (age 0), ax is adjusted based on sex and m0:
 }
 }
 \examples{
-mx <- c(0.05, 0.01, 0.005) 
+mx <- c(0.05, 0.01, 0.005)
 sage <- c(0, 1, 5)
 calc_ax(mx, sage, "male")
 }

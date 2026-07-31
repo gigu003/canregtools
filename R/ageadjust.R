@@ -4,7 +4,7 @@
 #' the **direct method** of standardization. It allows for adjustment of crude
 #' disease or mortality rates to a standard population structure, enabling
 #' valid comparisons across populations with different age distributions. The
-#' function also supports computation of confidence intervals 
+#' function also supports computation of confidence intervals
 #' using gamma, normal, or log-normal methods, and returns both crude
 #' rate (CR) and ASR with associated variances and interval estimates.
 #'
@@ -28,26 +28,34 @@
 #' pop <- c(1000, 1200, 1100, 900)
 #' spop <- c(800, 1000, 1100, 900)
 #' ageadjust(cases, pop, stdpop = spop, mp = 100000)
-ageadjust <- function(count,
-                      pop,
-                      rate = NULL,
-                      stdpop = NULL,
-                      method = "gamma",
-                      conf_level = 0.95,
-                      mp = 100000) {
-  if (missing(count) == TRUE &&
-        !missing(pop) == TRUE &&
-        is.null(rate) == TRUE) {
+ageadjust <- function(
+  count,
+  pop,
+  rate = NULL,
+  stdpop = NULL,
+  method = "gamma",
+  conf_level = 0.95,
+  mp = 100000
+) {
+  if (
+    missing(count) == TRUE &&
+      !missing(pop) == TRUE &&
+      is.null(rate) == TRUE
+  ) {
     count <- rate * pop
   }
-  if (missing(pop) == TRUE &&
-        !missing(count) == TRUE &&
-        is.null(rate) == TRUE) {
+  if (
+    missing(pop) == TRUE &&
+      !missing(count) == TRUE &&
+      is.null(rate) == TRUE
+  ) {
     pop <- count / rate
   }
-  if (is.null(rate) == TRUE &&
-        !missing(count) == TRUE &&
-        !missing(pop) == TRUE) {
+  if (
+    is.null(rate) == TRUE &&
+      !missing(count) == TRUE &&
+      !missing(pop) == TRUE
+  ) {
     rate <- count / pop
   }
   alpha <- 1 - conf_level
@@ -65,16 +73,18 @@ ageadjust <- function(count,
 
   if (method == "gamma") {
     cr_lci <- mp * (qgamma(alpha / 2, shape = cr^2 / crvar) / (cr / crvar))
-    cr_uci <- mp * (qgamma(1 - alpha / 2,
-                           shape = 1 + cr^2 / crvar) / (cr / crvar))
+    cr_uci <- mp *
+      (qgamma(1 - alpha / 2, shape = 1 + cr^2 / crvar) / (cr / crvar))
     if (!is.null(stdpop)) {
-      asr_lci <- mp * (qgamma(alpha / 2,
-                              shape = asr^2 / asrvar) / (asr / asrvar))
-      asr_uci <- mp * (qgamma(1 - alpha / 2,
-        shape = ((asr + wm)^2) /
-          (asrvar + wm^2),
-        scale = (asrvar + wm^2) / (asr + wm)
-      ))
+      asr_lci <- mp *
+        (qgamma(alpha / 2, shape = asr^2 / asrvar) / (asr / asrvar))
+      asr_uci <- mp *
+        (qgamma(
+          1 - alpha / 2,
+          shape = ((asr + wm)^2) /
+            (asrvar + wm^2),
+          scale = (asrvar + wm^2) / (asr + wm)
+        ))
     }
   } else if (method == "normal") {
     cr_lci <- mp * (cr + qnorm(alpha / 2) * sqrt(crvar))
@@ -91,8 +101,10 @@ ageadjust <- function(count,
       asr_uci <- mp * exp(log(asr) - qnorm(alpha / 2) * sqrt(asrvar) / asr)
     }
   } else {
-    stop("Method specified was not supported.
-       The supported methods: gamma, normal and lognormal")
+    stop(
+      "Method specified was not supported.
+       The supported methods: gamma, normal and lognormal"
+    )
   }
 
   cr <- mp * cr
@@ -101,12 +113,22 @@ ageadjust <- function(count,
     asr <- mp * asr
     res <- list(
       cases = cases,
-      cr = cr, cr_var = crvar, cr_lci = cr_lci, cr_uci = cr_uci,
-      asr = asr, asr_var = asrvar, asr_lci = asr_lci, asr_uci = asr_uci
+      cr = cr,
+      cr_var = crvar,
+      cr_lci = cr_lci,
+      cr_uci = cr_uci,
+      asr = asr,
+      asr_var = asrvar,
+      asr_lci = asr_lci,
+      asr_uci = asr_uci
     )
   } else {
     res <- list(
-      cases = cases, cr = cr, cr_var = crvar, cr_lci = cr_lci, cr_uci = cr_uci
+      cases = cases,
+      cr = cr,
+      cr_var = crvar,
+      cr_lci = cr_lci,
+      cr_uci = cr_uci
     )
   }
   return(res)
@@ -114,7 +136,7 @@ ageadjust <- function(count,
 
 #' Calculate truncated age standardized rate
 #'
-#' Calculates the **truncated age-standardized rate** (ASR) over a specified 
+#' Calculates the **truncated age-standardized rate** (ASR) over a specified
 #' age range (e.g., 35–64 years). It uses the **direct method of
 #' standardization** by applying age-specific rates to a standard population
 #' within the truncated age group. This is particularly useful when comparing
@@ -143,14 +165,16 @@ ageadjust <- function(count,
 #' )
 #' stdpop <- c(2.4, 9.6, 10, 9, 9, 8, 8, 6, 6, 6, 6, 5, 4, 4, 3, 2, 1, 0.5, 0.5)
 #' truncrate(dx, px, stdpop, trunc_age = c(35, 64))
-truncrate <- function(cases,
-                      pop,
-                      stdpop = NULL,
-                      trunc_age = c(35, 64),
-                      agewidth = 5,
-                      sep_zero = TRUE,
-                      mp = 100,
-                      decimal = 2) {
+truncrate <- function(
+  cases,
+  pop,
+  stdpop = NULL,
+  trunc_age = c(35, 64),
+  agewidth = 5,
+  sep_zero = TRUE,
+  mp = 100,
+  decimal = 2
+) {
   if (length(cases) != length(pop)) {
     stop("Length of 'cases' and 'pop' must be the same.")
   }
@@ -170,14 +194,14 @@ truncrate <- function(cases,
 
   cases <- cases[pos_start:pos_end]
   pop <- pop[pos_start:pos_end]
-  
+
   # If stdpop is NULL, assume equal weights
   if (is.null(stdpop)) {
     stdpop <- rep(1, length(cases))
   } else {
     stdpop <- stdpop[pos_start:pos_end]
   }
-  
+
   rate <- cases / pop
   if (!is.null(stdpop)) {
     rate <- sum(rate * stdpop) / sum(stdpop)

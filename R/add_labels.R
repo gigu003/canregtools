@@ -7,14 +7,14 @@
 #' @param vars A character vector of variable names to label. Default includes
 #'   `"sex"`, `"cancer"`, and `"areacode"`.
 #' @param names A character vector contains the labels added.
-#' @template label_type 
+#' @template label_type
 #' @template lang
 #' @param sep String used to separate labels when multiple languages are
 #'    specified.
 #' @param suffix Logical. Passed to [tidy_var()]. If `TRUE`, add a
 #'   language-specific suffix to cancer labels when labeling `cancer`.
 #' @template as_factor
-#' 
+#'
 #' @return A data frame or tibble with labeled variables and reordered columns.
 #' @export
 #'
@@ -24,15 +24,15 @@
 #' asr <- add_labels(asr, label_type = "full", lang = "zh")
 #' asr <- add_labels(asr, label_type = "full", lang = "en")
 add_labels <- function(
-    x,
-    vars = c("sex", "cancer", "areacode"),
-    names = NULL,
-    label_type = "full",
-    lang = "zh",
-    sep = " ",
-    suffix = FALSE,
-    as_factor = TRUE
-    ) {
+  x,
+  vars = c("sex", "cancer", "areacode"),
+  names = NULL,
+  label_type = "full",
+  lang = "zh",
+  sep = " ",
+  suffix = FALSE,
+  as_factor = TRUE
+) {
   vars_exists <- vars %in% colnames(x)
   vars_in_x <- vars[vars_exists]
   if (is.null(names)) {
@@ -43,25 +43,32 @@ add_labels <- function(
       names <- paste0(vars_in_x, "_", paste(std_lang(lang), collapse = "_"))
     }
   }
-  
+
   label_type <- rep(label_type, length.out = length(vars_in_x))
-  
+
   new_cols <- purrr::map(seq_along(vars_in_x), function(id) {
-    tidy_var(pluck(x, vars_in_x[id]), var_name = vars_in_x[id],
-             label_type = label_type[id], lang = lang, sep = sep,
-             suffix = suffix,
-             as_factor = as_factor)
-    })
+    tidy_var(
+      pluck(x, vars_in_x[id]),
+      var_name = vars_in_x[id],
+      label_type = label_type[id],
+      lang = lang,
+      sep = sep,
+      suffix = suffix,
+      as_factor = as_factor
+    )
+  })
   names(new_cols) <- names
   res <- dplyr::bind_cols(
     x,
     as_tibble(new_cols)
   )
-  
-  for(name in seq_along(names)) {
-    res <- dplyr::relocate(res,
-                           !!rlang::sym(names[name]),
-                           .after = !!rlang::sym(vars_in_x[name]))
+
+  for (name in seq_along(names)) {
+    res <- dplyr::relocate(
+      res,
+      !!rlang::sym(names[name]),
+      .after = !!rlang::sym(vars_in_x[name])
+    )
   }
   res
 }
@@ -95,14 +102,14 @@ add_labels <- function(
 #'
 #' @export
 add_var_labels <- function(
-    x,
-    label_type = "abbr",
-    lang = "cn",
-    break_line = TRUE
+  x,
+  label_type = "abbr",
+  lang = "cn",
+  break_line = TRUE
 ) {
   x_lower <- tolower(x)
   var_map <- tidy_var_maps[["stats"]]
-  
+
   lang_code <- std_lang(lang)
   label_col <- switch(
     lang_code,
@@ -111,22 +118,26 @@ add_var_labels <- function(
     "code" = "code",
     "icd10" = "icd10"
   )
-  
+
   idx <- match(x_lower, var_map[["code"]])
   label <- var_map[idx, label_col]
   label <- unname(unlist(label))
   unit <- var_map[idx, "unit"]
   unit <- unname(unlist(unit))
-  
-  unit_label <- vapply(unit, function(u) {
-    switch(
-      as.character(u),
-      "1" = "",
-      "2" = if (break_line) "\n(1/10<sup>5</sup>)" else "(1/10<sup>5</sup>)",
-      "3" = if (break_line) "\n(%)" else "(%)",
-      ""
-    )
-  }, character(1))
-  
+
+  unit_label <- vapply(
+    unit,
+    function(u) {
+      switch(
+        as.character(u),
+        "1" = "",
+        "2" = if (break_line) "\n(1/10<sup>5</sup>)" else "(1/10<sup>5</sup>)",
+        "3" = if (break_line) "\n(%)" else "(%)",
+        ""
+      )
+    },
+    character(1)
+  )
+
   paste0(label, unit_label)
 }

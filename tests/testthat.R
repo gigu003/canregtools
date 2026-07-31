@@ -8,5 +8,4 @@
 
 library(testthat)
 library(canregtools)
-fbsws <- count_canreg(canregs)
 test_check("canregtools")

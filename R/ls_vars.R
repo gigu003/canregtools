@@ -16,7 +16,7 @@
 #'   - `abbr_cn`: An abbreviated description of the code label in Chinese.
 #'   - `abbr_en`: An abbreviated description of the code label in English.
 #' @export
-#' 
+#'
 #' @seealso [cr_reframe()], [summary()], [create_asr()]
 #'
 #' @examples
@@ -27,12 +27,13 @@ ls_vars <- function(type = "std") {
   valid_types <- names(tidy_var_maps)
   type <- match.arg(type, choices = valid_types)
   tidy_var_maps[[type]] |>
-      select(!!rlang::sym("code"),
-             !!rlang::sym("cname"),
-             !!rlang::sym("ename"),
-             !!rlang::sym("abbr_cn"),
-             !!rlang::sym("abbr_en")
-             )
+    select(
+      !!rlang::sym("code"),
+      !!rlang::sym("cname"),
+      !!rlang::sym("ename"),
+      !!rlang::sym("abbr_cn"),
+      !!rlang::sym("abbr_en")
+    )
 }
 
 #' list dictionary used in package
@@ -55,7 +56,7 @@ ls_dict <- function(dict = "registry") {
     dplyr::tibble(
       areacode = names(dict),
       value = unname(dict)
-    )  
+    )
   }
 }
 
@@ -80,11 +81,11 @@ ls_dict <- function(dict = "registry") {
 ls_dict_files <- function(full.names = FALSE, with_info = FALSE) {
   cache_dir <- tools::R_user_dir("canregtools", "config")
   all_files <- list.files(cache_dir, pattern = "\\.rds$", full.names = TRUE)
-  
+
   if (!with_info) {
     return(if (full.names) all_files else basename(all_files))
   }
-  
+
   dplyr::tibble(
     file = basename(all_files),
     size_kb = round(file.info(all_files)$size / 1024, 1),
@@ -101,7 +102,7 @@ ls_dict_files <- function(full.names = FALSE, with_info = FALSE) {
 #'
 #' @examples
 #' ls_attrs()
-#' 
+#'
 ls_attrs <- function() {
   c("registry", "region", "area_type", "province", "city")
 }
@@ -121,7 +122,7 @@ ls_attrs <- function() {
 #' del_dict_files("custom")
 del_dict_files <- function(dict = "custom") {
   addr <- dict_addr(dict)
-  
+
   if (file.exists(addr)) {
     file.remove(addr)
     message("Dictionary '", dict, "' deleted from cache.")

@@ -10,10 +10,10 @@
 #' @return A data frame or a list of data frames depending on `collapse`.
 #' @export
 get_pop <- function(
-    data,
-    sum_by = NULL,
-    collapse = FALSE
-    ) {
+  data,
+  sum_by = NULL,
+  collapse = FALSE
+) {
   UseMethod("get_pop", data)
 }
 
@@ -21,10 +21,10 @@ get_pop <- function(
 #' @method get_pop canreg
 #' @export
 get_pop.canreg <- function(
-    data,
-    sum_by = NULL,
-    collapse = FALSE
-    ) {
+  data,
+  sum_by = NULL,
+  collapse = FALSE
+) {
   getpop(data = data, sum_by = sum_by, pop = "POP")
 }
 
@@ -32,10 +32,10 @@ get_pop.canreg <- function(
 #' @method get_pop canregs
 #' @export
 get_pop.canregs <- function(
-    data,
-    sum_by = NULL,
-    collapse = FALSE
-    ) {
+  data,
+  sum_by = NULL,
+  collapse = FALSE
+) {
   res <- purrr::map(data, get_pop, sum_by)
   if (collapse) {
     res |> cmerge()
@@ -48,10 +48,10 @@ get_pop.canregs <- function(
 #' @method get_pop fbswicd
 #' @export
 get_pop.fbswicd <- function(
-    data,
-    sum_by = NULL,
-    collapse = FALSE
-    ) {
+  data,
+  sum_by = NULL,
+  collapse = FALSE
+) {
   getpop(data = data, sum_by = sum_by, pop = "pop")
 }
 
@@ -59,10 +59,10 @@ get_pop.fbswicd <- function(
 #' @method get_pop fbswicds
 #' @export
 get_pop.fbswicds <- function(
-    data,
-    sum_by = NULL,
-    collapse = FALSE
-    ) {
+  data,
+  sum_by = NULL,
+  collapse = FALSE
+) {
   res <- purrr::map(data, get_pop, sum_by)
   if (collapse) {
     res |> cmerge()
@@ -72,12 +72,12 @@ get_pop.fbswicds <- function(
 }
 
 #' @noRd
-#' 
+#'
 getpop <- function(
-    data,
-    sum_by = NULL,
-    pop = "POP"
-    ) {
+  data,
+  sum_by = NULL,
+  pop = "POP"
+) {
   df <- purrr::pluck(data, pop)
   if (is.null(sum_by)) {
     return(df)
@@ -89,19 +89,19 @@ getpop <- function(
         dplyr::all_of(get_sumvar(data)),
         function(x) sum(x, na.rm = TRUE)
       )
-      )
+    )
 }
 
 #' Get standardized population data
 #'
 #' Retrieves standardized population data for a specified standard from dict_maps.
 #'
-#' @param std Character string specifying the population standard. 
+#' @param std Character string specifying the population standard.
 #'   Supported values are "cn64", "cn82", "cn2000", "wld85", "wld2000".
 #'   Defaults to "wld85".
 #' @param sep_zero Logical value indicating whether age 0 should be treated
 #'      as a separate group.
-#' @return A vector or data structure containing the standardized population data 
+#' @return A vector or data structure containing the standardized population data
 #'   for the specified standard, or NULL if the standard is not supported.
 #' @examples
 #' \dontrun{

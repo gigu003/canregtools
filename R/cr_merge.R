@@ -31,10 +31,10 @@ cr_merge.canregs <- function(data) {
   areacode <- map_chr(data, "areacode") |> unique()
   fb <- cmerge(data, "FBcases")
   sw <- cmerge(data, "SWcases")
-  if ("SFcases" %in% names(data[[1]])){
+  if ("SFcases" %in% names(data[[1]])) {
     sf <- cmerge(data, "SFcases")
   }
-  
+
   pop_raw <- cmerge(data, "POP")
   possible_vars <- c("rks", "death")
   vars_exist <- intersect(possible_vars, names(pop_raw))
@@ -45,7 +45,8 @@ cr_merge.canregs <- function(data) {
     dplyr::group_by(!!!byvars) |>
     dplyr::reframe(
       dplyr::across(all_of(vars_exist), \(x) sum(x, na.rm = TRUE))
-    )
+    ) |>
+    standardize_year_sex()
 
   class(pop) <- c("POP", class(pop))
 
@@ -53,11 +54,11 @@ cr_merge.canregs <- function(data) {
     list(areacode = areacode, FBcases = fb, SWcases = sw),
     class = c("canreg", "list")
   )
-  
-  if ("SFcases" %in% names(data[[1]])){
+
+  if ("SFcases" %in% names(data[[1]])) {
     res <- append(res, list(SFcases = sf))
   }
-  
+
   res <- append(res, list(POP = pop))
   class(res) <- c("canreg", "list")
   return(res)
@@ -74,44 +75,60 @@ cr_merge.canregs <- function(data) {
 cr_merge.fbswicds <- function(data) {
   site <- rlang::sym("icd10")
   morp <- rlang::sym("morp")
-  accept_vars <- names(classify_areacode("410302"))
+  accept_vars <- area_code_vars()
   areacode <- unique(unlist(map(data, pluck("areacode"))))
   gvars <- c("year", "sex", "agegrp", "cancer")
-  
+
   svars <- c("fbs", "sws", "mv", "ub", "sub", "mvs", "dco")
-  
-  id_vars_exist <- all(unlist(lapply(data, function(x){
+
+  id_vars_exist <- all(unlist(lapply(data, function(x) {
     "ids" %in% names(x$fbswicd)
   })))
-  multi_vars_exist <- all(unlist(lapply(data, function(x){
+  multi_vars_exist <- all(unlist(lapply(data, function(x) {
     "mult" %in% names(x$fbswicd)
   })))
-  
-  if (id_vars_exist) svars <- c(svars, "ids")
-  if (multi_vars_exist) svars <- c(svars, "mult")
-  
+
+  if (id_vars_exist) {
+    svars <- c(svars, "ids")
+  }
+  if (multi_vars_exist) {
+    svars <- c(svars, "mult")
+  }
+
   fbswicd <- cmerge(data, nested = "fbswicd")
   fbswicd <- fbswicd |>
     group_by(!!!rlang::syms(gvars)) |>
-    reframe(across(c(!!!rlang::syms(svars)), ~ sum(.x, na.rm = TRUE)))
+    reframe(across(c(!!!rlang::syms(svars)), ~ sum(.x, na.rm = TRUE))) |>
+    standardize_year_sex()
   pop <- cmerge(data, nested = "pop")
-  sum_vars <- dplyr::setdiff(names(pop), c(accept_vars, "year", "sex", "agegrp")) |>
+  sum_vars <- dplyr::setdiff(
+    names(pop),
+    c(accept_vars, "year", "sex", "agegrp")
+  ) |>
     rlang::syms()
   pop <- pop |>
     group_by(!!!rlang::syms(dplyr::setdiff(gvars, "cancer"))) |>
-    reframe(across(c(!!!sum_vars), \(x) sum(x, na.rm = TRUE)))
+    reframe(across(c(!!!sum_vars), \(x) sum(x, na.rm = TRUE))) |>
+    standardize_year_sex()
   sitemorp <- cmerge(data, nested = "sitemorp")
   sitemorp <- sitemorp |>
     group_by(!!!rlang::syms(dplyr::setdiff(gvars, "agegrp"))) |>
     reframe(
       !!site := list(combine_tp(!!site)),
       !!morp := list(combine_tp(!!morp))
-    )
-  exclude = cmerge(data, nested = "exclude")
+    ) |>
+    standardize_year_sex()
+  exclude <- cmerge(data, nested = "exclude") |>
+    standardize_year_sex()
 
   structure(
-    list(areacode = areacode, fbswicd = fbswicd, sitemorp = sitemorp,
-         pop = pop, exclude = exclude),
+    list(
+      areacode = areacode,
+      fbswicd = fbswicd,
+      sitemorp = sitemorp,
+      pop = pop,
+      exclude = exclude
+    ),
     class = c("fbswicd", "list")
   )
 }
@@ -157,9 +174,11 @@ cr_merge.age_rates <- function(data) {
 #' @method cr_merge site_morps
 #' @export
 cr_merge.site_morps <- function(data) {
-  if (!is.data.frame(data[[1]]) &&
+  if (
+    !is.data.frame(data[[1]]) &&
       is.list(data[[1]]) &&
-      all(c("icd10", "morp") %in% names(data[[1]]))) {
+      all(c("icd10", "morp") %in% names(data[[1]]))
+  ) {
     return(list(
       icd10 = cmerge(data, nested = "icd10"),
       morp = cmerge(data, nested = "morp")
@@ -214,13 +233,16 @@ cmerge <- function(data, nested = NULL) {
   purrr::map_dfr(
     names(data),
     function(f) {
+      code <- purrr::pluck(data, f, "areacode", .default = f) |>
+        as.character()
       df <- if (is.null(nested)) {
         purrr::pluck(data, f)
       } else {
         purrr::pluck(data, f, nested)
       }
       df |>
-        mutate(!!areacode := as.integer(f), .before = everything())
+        mutate(!!areacode := code, .before = everything()) |>
+        standardize_year_sex()
     }
   )
 }

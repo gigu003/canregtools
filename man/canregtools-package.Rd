@@ -21,7 +21,12 @@ Useful links:
 
 }
 \author{
-\strong{Maintainer}: Qiong Chen \email{chenq08@126.com} (\href{https://orcid.org/0000-0003-2401-0046}{ORCID}) (Department of Cancer Epidemiology, The Affiliated Cancer Hospital of Zhengzhou University & Henan Cancer Hospital, Henan Cancer Registry in China) [copyright holder]
+\strong{Maintainer}: Qiong Chen \email{chenq08@126.com} (\href{https://orcid.org/0000-0003-2401-0046}{ORCID}) (affiliation: Department of Cancer Epidemiology, The Affiliated Cancer Hospital of Zhengzhou University & Henan Cancer Hospital, Henan Cancer Registry in China) [copyright holder]
+
+Authors:
+\itemize{
+  \item Qiong Chen \email{chenq08@126.com} (\href{https://orcid.org/0000-0003-2401-0046}{ORCID}) (affiliation: Department of Cancer Epidemiology, The Affiliated Cancer Hospital of Zhengzhou University & Henan Cancer Hospital, Henan Cancer Registry in China) [copyright holder]
+}
 
 }
 \keyword{internal}

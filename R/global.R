@@ -77,7 +77,10 @@ std_lang <- function(lang) {
   lang_map <- dict_maps[["lang"]]
   res <- unname(lang_map[tolower(lang)])
   if (any(is.na(res))) {
-    stop("Invalid language specification: ", paste(lang[is.na(res)], collapse = ", "))
+    stop(
+      "Invalid language specification: ",
+      paste(lang[is.na(res)], collapse = ", ")
+    )
   }
   res
 }
@@ -120,11 +123,11 @@ get_year <- function(x, date_var = "inciden") {
 #' @keywords internal
 get_sumvar <- function(x) {
   pop_name <- if (inherits(x, "canreg")) "POP" else "pop"
-  
+
   if (!pop_name %in% names(x)) {
     stop(sprintf("Component '%s' not found in object.", pop_name))
   }
-  
+
   data <- purrr::pluck(x, pop_name)
   intersect(c("rks", "death"), names(data))
 }
@@ -142,9 +145,9 @@ get_sumvar <- function(x) {
 get_expr_vars <- function(...) {
   conds <- enquos(...)
   # extract all variable names in expressions
-  conds |> 
-    purrr::map(~ all.vars(rlang::get_expr(.))) |> 
-    purrr::flatten_chr() |> 
+  conds |>
+    purrr::map(~ all.vars(rlang::get_expr(.))) |>
+    purrr::flatten_chr() |>
     unique()
 }
 
@@ -159,14 +162,17 @@ get_para_vars <- function(...) {
   args <- enquos(...)
   list(
     param = names(args),
-    value = map_chr(args, ~ {
-      expr <- get_expr(.x)
-      if (is.character(expr) && length(expr) == 1) {
-        expr                # 字符串直接取值
-      } else {
-        all.vars(expr)      # 符号提取变量名
+    value = map_chr(
+      args,
+      ~ {
+        expr <- get_expr(.x)
+        if (is.character(expr) && length(expr) == 1) {
+          expr # 字符串直接取值
+        } else {
+          all.vars(expr) # 符号提取变量名
+        }
       }
-    })
+    )
   )
 }
 
@@ -182,21 +188,24 @@ check_reframe_expr <- function(data, ...) {
   if (length(expr_list) == 0) {
     return(rep(TRUE, length(data)))
   }
-  
+
   # extract all variable names in expressions
   vars <- get_expr_vars(!!!expr_list)
-  
-  # apply the function 'classify_areacode2' to all variable names
+
+  # apply the function 'classify_areacode' to all variable names
   env_list <- rlang::set_names(
-    purrr::map(vars, ~ classify_areacode2(data, attr = .x)[[.x]]),
+    purrr::map(vars, ~ classify_areacode(data, attr = .x)[[.x]]),
     vars
   )
-  
+
   # construct evaluation environment
   eval_env <- rlang::new_data_mask(as.environment(env_list))
   # evaluate all expressions
-  results <- purrr::map(expr_list, ~ rlang::eval_tidy(rlang::get_expr(.), data = eval_env))
-  
+  results <- purrr::map(
+    expr_list,
+    ~ rlang::eval_tidy(rlang::get_expr(.), data = eval_env)
+  )
+
   # combine logical vectors
   reduce(results, `&`)
 }
@@ -217,13 +226,15 @@ get_cancer <- function(cancer_type = "all", sex = "all") {
     "system" = as.character(201:211),
     "gco" = as.character(301:338),
     "all" = as.character(c(1:59, 101:126, 201:211, 301:338)),
-    stop("Invalid cancer_type. Choose from 'small', 'big', 'system', 'gco', or 'all'.")
+    stop(
+      "Invalid cancer_type. Choose from 'small', 'big', 'system', 'gco', or 'all'."
+    )
   )
-  
+
   if (sex == "all") {
     return(cancer_ids)
   }
-  
+
   # Define sex-specific cancer sites
   sex_ids <- switch(
     sex,
@@ -231,7 +242,7 @@ get_cancer <- function(cancer_type = "all", sex = "all") {
     "female" = as.character(c(38:41, 118:119, 207, 326:328)),
     stop("Invalid sex. Choose from 'all', 'male', or 'female'.")
   )
-  
+
   # Return the intersection of cancer_ids and sex-specific IDs
   intersect(cancer_ids, sex_ids)
 }

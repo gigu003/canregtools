@@ -12,11 +12,13 @@
 #' @examples
 #' data("canregs")
 #' data <- cr_clean(canregs)
-#' 
-cr_clean <- function(x,
-                     age_breaks = c(0, 1, seq(5, 85, 5)),
-                     label_tail = NULL,
-                     cancer_type = "big") {
+#'
+cr_clean <- function(
+  x,
+  age_breaks = c(0, 1, seq(5, 85, 5)),
+  label_tail = NULL,
+  cancer_type = "big"
+) {
   UseMethod("cr_clean", x)
 }
 
@@ -25,12 +27,15 @@ cr_clean <- function(x,
 #' @export
 #' @examples
 #' data <- cr_clean(canregs, cancer_type = "small")
-#' 
-cr_clean.canregs <- function(x,
-                             age_breaks = c(0, 1, seq(5, 85, 5)),
-                             label_tail = NULL,
-                             cancer_type = "big") {
-  res <- purrr::map(x,
+#'
+cr_clean.canregs <- function(
+  x,
+  age_breaks = c(0, 1, seq(5, 85, 5)),
+  label_tail = NULL,
+  cancer_type = "big"
+) {
+  res <- purrr::map(
+    x,
     cr_clean,
     age_breaks = age_breaks,
     label_tail = label_tail,
@@ -46,13 +51,16 @@ cr_clean.canregs <- function(x,
 #' @export
 #' @examples
 #' data <- cr_clean(canregs[[1]], cancer_type = "big")
-#' 
-cr_clean.canreg <- function(x,
-                            age_breaks = c(0, 1, seq(5, 85, 5)),
-                            label_tail = NULL,
-                            cancer_type = "big") {
+#'
+cr_clean.canreg <- function(
+  x,
+  age_breaks = c(0, 1, seq(5, 85, 5)),
+  label_tail = NULL,
+  cancer_type = "big"
+) {
   areacode <- purrr::pluck(x, "areacode")
-  res <- purrr::map(x[2:4],
+  res <- purrr::map(
+    x[2:4],
     cr_clean,
     age_breaks = age_breaks,
     label_tail = label_tail,
@@ -69,11 +77,13 @@ cr_clean.canreg <- function(x,
 #' @examples
 #' fbcases <- purrr::pluck(canregs[[1]], "FBcases")
 #' fbcases <- cr_clean(fbcases)
-#' 
-cr_clean.FBcases <- function(x,
-                             age_breaks = c(0, 1, seq(5, 85, 5)),
-                             label_tail = NULL,
-                             cancer_type = "big") {
+#'
+cr_clean.FBcases <- function(
+  x,
+  age_breaks = c(0, 1, seq(5, 85, 5)),
+  label_tail = NULL,
+  cancer_type = "big"
+) {
   female_cancer <- c(29:37, 114:117, 206, 320:325)
   male_cancer <- c(38:41, 118:119, 207, 326:328)
 
@@ -87,11 +97,20 @@ cr_clean.FBcases <- function(x,
   topo <- rlang::sym("topo")
   cancer <- rlang::sym("cancer")
   agegrp <- rlang::sym("agegrp")
-  regi_num= rlang::sym("regi_num")
-  
+  regi_num <- rlang::sym("regi_num")
+
   sel_vars <- c("sex", "birthda", "inciden", "basi", "icd10", "morp", "topo")
-  stat_vars <- c("regi_num", "year", "sex", "agegrp", "basi", "icd10",
-                 "cancer", "morp", "topo")
+  stat_vars <- c(
+    "regi_num",
+    "year",
+    "sex",
+    "agegrp",
+    "basi",
+    "icd10",
+    "cancer",
+    "morp",
+    "topo"
+  )
   if ("id" %in% names(x)) {
     sel_vars <- c(sel_vars, "id")
     stat_vars <- c(stat_vars, "id")
@@ -112,8 +131,10 @@ cr_clean.FBcases <- function(x,
       !!icd10 := toupper(!!icd10),
       !!cancer := classify_icd10(!!icd10, cancer_type = cancer_type),
       !!topo := classify_topo(!!topo),
-      !!agegrp := cutage(!!age,
-        method = "interval", breaks = age_breaks,
+      !!agegrp := cutage(
+        !!age,
+        method = "interval",
+        breaks = age_breaks,
         label_tail = label_tail
       )
     ) |>
@@ -129,11 +150,13 @@ cr_clean.FBcases <- function(x,
 #' @examples
 #' swcases <- purrr::pluck(canregs[[1]], "SWcases")
 #' swcases <- cr_clean(swcases)
-#' 
-cr_clean.SWcases <- function(x,
-                             age_breaks = c(0, 1, seq(5, 85, 5)),
-                             label_tail = NULL,
-                             cancer_type = "big") {
+#'
+cr_clean.SWcases <- function(
+  x,
+  age_breaks = c(0, 1, seq(5, 85, 5)),
+  label_tail = NULL,
+  cancer_type = "big"
+) {
   year <- rlang::sym("year")
   age <- rlang::sym("age")
   sex <- rlang::sym("sex")
@@ -142,7 +165,7 @@ cr_clean.SWcases <- function(x,
   icd10 <- rlang::sym("icd10")
   cancer <- rlang::sym("cancer")
   agegrp <- rlang::sym("agegrp")
-  regi_num= rlang::sym("regi_num")
+  regi_num <- rlang::sym("regi_num")
   res <- x |>
     select(!!sex, !!birthda, !!deathda, !!icd10) |>
     mutate(
@@ -152,8 +175,10 @@ cr_clean.SWcases <- function(x,
       !!age := calc_age(!!birthda, !!deathda),
       !!icd10 := toupper(!!icd10),
       !!cancer := classify_icd10(!!icd10, cancer_type = cancer_type),
-      !!agegrp := cutage(age,
-        method = "interval", breaks = age_breaks,
+      !!agegrp := cutage(
+        age,
+        method = "interval",
+        breaks = age_breaks,
         label_tail = label_tail
       )
     ) |>
@@ -164,18 +189,19 @@ cr_clean.SWcases <- function(x,
 }
 
 
-
 #' @rdname cr_clean
 #' @method cr_clean POP
 #' @export
 #' @examples
 #' pop <- purrr::pluck(canregs[[1]], "POP")
 #' pop <- cr_clean(pop)
-#' 
-cr_clean.POP <- function(x,
-                         age_breaks = c(0, 1, seq(5, 85, 5)),
-                         label_tail = NULL,
-                         cancer_type = "big") {
+#'
+cr_clean.POP <- function(
+  x,
+  age_breaks = c(0, 1, seq(5, 85, 5)),
+  label_tail = NULL,
+  cancer_type = "big"
+) {
   year <- rlang::sym("year")
   sex <- rlang::sym("sex")
   agegrp <- rlang::sym("agegrp")
@@ -185,14 +211,16 @@ cr_clean.POP <- function(x,
   } else {
     sum_vars <- rlang::syms(c("rks"))
   }
-  reframe_agegrp <- cutage(seq(0, 92),
+  reframe_agegrp <- cutage(
+    seq(0, 92),
     method = "interval",
     breaks = age_breaks,
     label_tail = label_tail
   )
   if (nrow(x) == 0) {
     res <- expand_grid(
-      year = c(2021L), sex = c(1L, 2L),
+      year = c(2021L),
+      sex = c(1L, 2L),
       agegrp = unique(reframe_agegrp)
     ) |>
       mutate(rks = 0L, death = 0L)
@@ -205,9 +233,12 @@ cr_clean.POP <- function(x,
       group_by(!!year, !!sex) |>
       reframe(
         !!agegrp := reframe_agegrp,
-        across(c(!!!sum_vars), ~ as.integer(
-          expand_age_pop(.x, method = "natural")$y
-        ))
+        across(
+          c(!!!sum_vars),
+          ~ as.integer(
+            expand_age_pop(.x, method = "natural")$y
+          )
+        )
       ) |>
       group_by(!!year, !!sex, !!agegrp) |>
       reframe(across(c(!!!sum_vars), sum))
@@ -217,7 +248,7 @@ cr_clean.POP <- function(x,
       year = uniyear,
       sex = c(1L, 2L),
       agegrp = uniagegrp
-      ) |>
+    ) |>
       left_join(res, by = c("year", "sex", "agegrp")) |>
       mutate(across(c(!!!sum_vars), ~ dplyr::coalesce(.x, 0)))
   }

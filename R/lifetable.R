@@ -52,16 +52,15 @@
 #' lt(death = death, pop = pop, sage = c(0,1, seq(5, 85, 10)))
 #'
 lt <- function(
-    death = NULL,
-    cancer_death = NULL,
-    pop = NULL,
-    mx = NULL,
-    sage = c(0, 1, seq(5, 85, 5)),
-    sex = "total",
-    cohort = 100000,
-    qx_method = "constant"
+  death = NULL,
+  cancer_death = NULL,
+  pop = NULL,
+  mx = NULL,
+  sage = c(0, 1, seq(5, 85, 5)),
+  sex = "total",
+  cohort = 100000,
+  qx_method = "constant"
 ) {
-  
   # Handle input for mx
   if (!is.null(cancer_death)) {
     if (is.null(death) || is.null(pop)) {
@@ -82,37 +81,36 @@ lt <- function(
   } else if (is.null(mx)) {
     stop("Provide either mx, or death and pop (and optionally cancer_death)")
   }
-  
+
   # Calculate the number of age groups 'nn'
   nn <- length(mx)
-  
+
   if (length(sage) != nn) {
     stop("`sage` must have the same length as `mx`.")
   }
-  
+
   sage <- as.numeric(sage)
-  
+
   if (any(diff(sage) <= 0)) {
     stop("`sage` must be strictly increasing.")
   }
-  
+
   nx <- c(diff(sage), Inf)
   # Calculate ax
   ax <- calc_ax(mx, sage, sex)
-  
+
   # Calculate age specific probability of death 'qx'
   if (qx_method == "constant") {
     qx <- 1 - exp(-nx * mx)
   } else if (qx_method == "empirical") {
-
     qx <- nx * mx / (1 + (nx - ax) * mx)
   } else if (qx_method == "uniform") {
     qx <- nx * mx / (1 + nx / 2 * mx)
   }
-  
+
   qx[nn] <- 1
   qx[is.na(qx)] <- 0
-  
+
   # Calculate lx and dx
   if (nn > 1) {
     lx <- cohort * c(1, cumprod(1 - qx[1:(nn - 1)]))
@@ -120,20 +118,20 @@ lt <- function(
   } else {
     lx <- dx <- cohort
   }
-  
+
   # Calculate Lx
   Lx <- rep(NA, nn)
   for (i in 1:(nn - 1)) {
     Lx[i] <- nx[i] * lx[i + 1] + ax[i] * dx[i]
   }
   Lx[nn] <- lx[nn] / mx[nn]
-  
+
   # Calculate Tx and ex
   Tx <- rev(cumsum(rev(Lx)))
   ex <- Tx / lx
-  
+
   num_trunc <- ifelse(cohort == 1, 5, 2)
-  
+
   # Create result data frame
   result <- data.frame(
     age = sage,
@@ -145,12 +143,18 @@ lt <- function(
     Tx = round(Tx, num_trunc),
     ex = round(ex, 2)
   )
-  
+
   # Add optional columns
-  if (!is.null(pop)) result$pop <- pop
-  if (!is.null(death)) result$death <- death
-  if (!is.null(cancer_death)) result$cancer_death <- cancer_death
-  
+  if (!is.null(pop)) {
+    result$pop <- pop
+  }
+  if (!is.null(death)) {
+    result$death <- death
+  }
+  if (!is.null(cancer_death)) {
+    result$cancer_death <- cancer_death
+  }
+
   return(result)
 }
 
@@ -196,16 +200,23 @@ lt <- function(
 #' lx <- lx / 100000
 #' expand_lx(lx)
 expand_lx <- function(
-    lx,
-    sage = c(0, 1, seq(5, 85, 5)),
-    max_age = 100
+  lx,
+  sage = c(0, 1, seq(5, 85, 5)),
+  max_age = 100
 ) {
   n <- length(sage)
   if (any(diff(sage) <= 0)) {
     stop("sage must be strictly increasing.")
   }
-  if (sage[1] != 0 || sage[2] != 1 || diff(sage)[2] != 4 || any(diff(sage)[3:(n-1)] != 5)) {
-    stop("sage must be of the form c(0, 1, seq(5, last, 5)) with 5-year intervals after age 1.")
+  if (
+    sage[1] != 0 ||
+      sage[2] != 1 ||
+      diff(sage)[2] != 4 ||
+      any(diff(sage)[3:(n - 1)] != 5)
+  ) {
+    stop(
+      "sage must be of the form c(0, 1, seq(5, last, 5)) with 5-year intervals after age 1."
+    )
   }
   if (!is.numeric(lx)) {
     stop("lx must be a numeric vector.")
@@ -228,7 +239,9 @@ expand_lx <- function(
         a <- nn / 2
       }
       q <- nn * mx[i] / (1 + (nn - a) * mx[i])
-      if (q > 1) q <- 1
+      if (q > 1) {
+        q <- 1
+      }
       lx_comp[i + 1] <- lx_comp[i] * (1 - q)
     }
     lx <- lx_comp
@@ -241,25 +254,108 @@ expand_lx <- function(
     stop("lx must be non-increasing.")
   }
   ages <- sage
-  coef1 <- matrix(c(
-    1, 0, 0, 0, 0, 0,
-    .56203, .7176, -.4784, .283886, -.100716, .0156,
-    .273392, 1.047199, -.531911, .2992, -.103747, .015867,
-    .096491, 1.1088, -.328533, .1728, -.058358, .0088,
-    0, 1, 0, 0, 0, 0,
-    -.041667, .798, .354667, -.152, .048, -.007,
-    -.048872, .5616, .6656, -.240686, .072758, -.0104,
-    -.037281, .3332, .888533, -.2448, .070147, -.0098,
-    -.018379, .1408, 1.001244, -.160914, .043116, -.005867,
-    0, 0, 1, 0, 0, 0
-  ), ncol = 6, byrow = TRUE)
-  coef2 <- matrix(c(
-    .008064, -.07392, .88704, .22176, -.04928, .006336,
-    .011648, -.09984, .69888, .46592, -.08736, .010752,
-    .010752, -.08736, .46592, .69888, -.09984, .011648,
-    .006336, -.04928, .22176, .88704, -.07392, .008064,
-    0, 0, 0, 1, 0, 0
-  ), ncol = 6, byrow = TRUE)
+  coef1 <- matrix(
+    c(
+      1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      .56203,
+      .7176,
+      -.4784,
+      .283886,
+      -.100716,
+      .0156,
+      .273392,
+      1.047199,
+      -.531911,
+      .2992,
+      -.103747,
+      .015867,
+      .096491,
+      1.1088,
+      -.328533,
+      .1728,
+      -.058358,
+      .0088,
+      0,
+      1,
+      0,
+      0,
+      0,
+      0,
+      -.041667,
+      .798,
+      .354667,
+      -.152,
+      .048,
+      -.007,
+      -.048872,
+      .5616,
+      .6656,
+      -.240686,
+      .072758,
+      -.0104,
+      -.037281,
+      .3332,
+      .888533,
+      -.2448,
+      .070147,
+      -.0098,
+      -.018379,
+      .1408,
+      1.001244,
+      -.160914,
+      .043116,
+      -.005867,
+      0,
+      0,
+      1,
+      0,
+      0,
+      0
+    ),
+    ncol = 6,
+    byrow = TRUE
+  )
+  coef2 <- matrix(
+    c(
+      .008064,
+      -.07392,
+      .88704,
+      .22176,
+      -.04928,
+      .006336,
+      .011648,
+      -.09984,
+      .69888,
+      .46592,
+      -.08736,
+      .010752,
+      .010752,
+      -.08736,
+      .46592,
+      .69888,
+      -.09984,
+      .011648,
+      .006336,
+      -.04928,
+      .22176,
+      .88704,
+      -.07392,
+      .008064,
+      0,
+      0,
+      0,
+      1,
+      0,
+      0
+    ),
+    ncol = 6,
+    byrow = TRUE
+  )
   clx <- numeric(max_age + 1)
   clx[1:10] <- coef1 %*% lx[2:7]
   for (m in 2:(n - 5)) {
@@ -272,9 +368,9 @@ expand_lx <- function(
     clx[5 * m + 1:5] <- coef2 %*% lx[c(x1, x2, x3, x4, x5, x6)]
   }
   y <- log10(lx[c(1, 3:n)] / c(lx[3:n], NA))
-  c_val <- (y / c(y[2:(n - 1)], NA)) ^ (-1 / 5)
-  logb <- y / (c_val ^ ages[c(1, 3:n)] * (c_val ^ 5 - 1))
-  b <- 10 ^ logb
+  c_val <- (y / c(y[2:(n - 1)], NA))^(-1 / 5)
+  logb <- y / (c_val^ages[c(1, 3:n)] * (c_val^5 - 1))
+  b <- 10^logb
   y <- c(y[1], NA, y[2:(n - 1)])
   c_val <- c(c_val[1], NA, c_val[2:(n - 1)])
   b <- c(b[1], NA, b[2:(n - 1)])
@@ -284,7 +380,7 @@ expand_lx <- function(
     x <- which(ages == i)
     S <- rep(NA, 5)
     for (k in 1:5) {
-      S[k] <- b[x] ^ (1 - c_val[x] ^ (i + k - 1))
+      S[k] <- b[x]^(1 - c_val[x]^(i + k - 1))
     }
     for (k in 1:5) {
       clx[i + k - 1] <- lx[x] * S[k] / S[1]
@@ -297,13 +393,15 @@ expand_lx <- function(
   extension_number <- max_age - open_start + 1
   S <- rep(NA, extension_number + 1)
   for (i in 1:(extension_number + 1)) {
-    S[i] <- b[x] ^ (1 - c_val[x] ^ (i + open_start - 1))
+    S[i] <- b[x]^(1 - c_val[x]^(i + open_start - 1))
   }
   for (i in 1:extension_number) {
     clx[open_start + i] <- lx[x] * S[i + 1] / SS
   }
   for (i in 1:max_age) {
-    if (is.na(clx[i]) || is.na(clx[i + 1])) next
+    if (is.na(clx[i]) || is.na(clx[i + 1])) {
+      next
+    }
     if (clx[i] < clx[i + 1]) {
       clx[i] <- clx[i + 1]
     }
@@ -335,7 +433,7 @@ expand_lx <- function(
 #' - Female: if m0 >= 0.1, ax=0.35; else 0.053 + 2.8 * m0
 #' - Total: if m0 >= 0.1, ax=0.34; else 0.049 + 2.742 * m0
 #'
-#' @references 
+#' @references
 #' - Coale, A. J., Demeny, P., & Vaughan, B. (1983). Regional Model Life Tables
 #'   and Stable Populations (2nd ed.). New York: Academic Press.
 #' - Preston, S. H., Heuveline, P., & Guillot, M. (2001). Demography: Measuring
@@ -344,7 +442,7 @@ expand_lx <- function(
 #' @export
 #'
 #' @examples
-#' mx <- c(0.05, 0.01, 0.005) 
+#' mx <- c(0.05, 0.01, 0.005)
 #' sage <- c(0, 1, 5)
 #' calc_ax(mx, sage, "male")
 calc_ax <- function(mx, sage, sex = "male") {

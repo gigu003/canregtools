@@ -43,16 +43,20 @@ esti_fbswicd <- function(obj, pop = NULL) {
   esti_var <- c("mv", "ub", "sub", "dco", "m8000")
   fbsw <- purrr::pluck(obj, "fbswicd") |>
     mutate(across(all_of(esti_var), ~ cr_replace_na(.x / !!fbs)))
-  
+
   pop_modi <- pop
-  
+
   esti <- list(inci, mort, fbsw) |>
     purrr::reduce(left_join, by = join_by(!!!strat, !!agegrp)) |>
-    left_join(pop_modi, by = join_by(!!!rlang::syms(c("year", "sex", "agegrp")))) |>
-    mutate(fbs = round(inci * !!rks / 1e5),
-           sws = round(mort * !!rks / 1e5),
-           across(all_of(esti_var), ~ as.integer(cr_replace_na(round(.x * fbs))))
-           ) |>
+    left_join(
+      pop_modi,
+      by = join_by(!!!rlang::syms(c("year", "sex", "agegrp")))
+    ) |>
+    mutate(
+      fbs = round(inci * !!rks / 1e5),
+      sws = round(mort * !!rks / 1e5),
+      across(all_of(esti_var), ~ as.integer(cr_replace_na(round(.x * fbs))))
+    ) |>
     select(-!!rlang::sym("inci"), -!!rlang::sym("mort"), -!!rks)
   structure(
     list(

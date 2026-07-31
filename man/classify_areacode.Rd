@@ -4,11 +4,24 @@
 \alias{classify_areacode}
 \title{Classify codes for the administrative divisions of China}
 \usage{
-classify_areacode(x)
+classify_areacode(x, attr = area_code_vars())
 }
 \arguments{
 \item{x}{A vector of six-digit Chinese administrative area codes, either as numeric
 or character strings.}
+
+\item{attr}{A character vector of attributes to return. Defaults to all
+built-in area-code attributes. Options include:
+\itemize{
+\item \code{"areacode"}: Original area codes.
+\item \code{"registry"}: Cancer registry codes.
+\item \code{"province"}: Province-level codes.
+\item \code{"city"}: City-level codes.
+\item \code{"area_type"}: Urban/rural classification.
+\item \code{"region"}: Regional classification based on province.
+\item Any other string will be treated as a custom dictionary name written
+using \code{\link[=write_registry]{write_registry()}}.
+}}
 }
 \value{
 A list with the following named elements:
@@ -44,6 +57,7 @@ including 'province', city', 'area_type', and 'registry' attributes.
 }
 \examples{
 classify_areacode(c("110000", "320500", "440300"))
+classify_areacode(c("110000", "320500", "440300"), attr = "registry")
 
 }
 \seealso{

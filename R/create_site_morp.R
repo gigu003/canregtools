@@ -69,29 +69,33 @@
 #' create_site_morp(fbsw, year, sex, cancer, flatten = FALSE)
 #' }
 #' @export
-create_site_morp <- function(x,
-                             ...,
-                             type = c("icd10", "morp", "both"),
-                             flatten = TRUE,
-                             collapse = TRUE,
-                             wrap_subsite = FALSE,
-                             class_morp = TRUE,
-                             drop_nos = TRUE,
-                             cancer_type = "big") {
+create_site_morp <- function(
+  x,
+  ...,
+  type = c("icd10", "morp", "both"),
+  flatten = TRUE,
+  collapse = TRUE,
+  wrap_subsite = FALSE,
+  class_morp = TRUE,
+  drop_nos = TRUE,
+  cancer_type = "big"
+) {
   UseMethod("create_site_morp", x)
 }
 
 #' @rdname create_site_morp
 #' @method create_site_morp canreg
 #' @export
-create_site_morp.canreg <- function(x,
-                                    ...,
-                                    type = c("icd10", "morp", "both"),
-                                    flatten = TRUE,
-                                    wrap_subsite = FALSE,
-                                    class_morp = TRUE,
-                                    drop_nos = TRUE,
-                                    cancer_type = "big") {
+create_site_morp.canreg <- function(
+  x,
+  ...,
+  type = c("icd10", "morp", "both"),
+  flatten = TRUE,
+  wrap_subsite = FALSE,
+  class_morp = TRUE,
+  drop_nos = TRUE,
+  cancer_type = "big"
+) {
   type <- match.arg(type)
   count_canreg(x, cancer_type = cancer_type) |>
     create_site_morp(
@@ -107,15 +111,17 @@ create_site_morp.canreg <- function(x,
 #' @rdname create_site_morp
 #' @method create_site_morp canregs
 #' @export
-create_site_morp.canregs <- function(x,
-                                     ...,
-                                     type = c("icd10", "morp", "both"),
-                                     flatten = TRUE,
-                                     collapse = TRUE,
-                                     wrap_subsite = FALSE,
-                                     class_morp = TRUE,
-                                     drop_nos = TRUE,
-                                     cancer_type = "big") {
+create_site_morp.canregs <- function(
+  x,
+  ...,
+  type = c("icd10", "morp", "both"),
+  flatten = TRUE,
+  collapse = TRUE,
+  wrap_subsite = FALSE,
+  class_morp = TRUE,
+  drop_nos = TRUE,
+  cancer_type = "big"
+) {
   type <- match.arg(type)
   count_canreg(x, cancer_type = cancer_type) |>
     create_site_morp(
@@ -132,14 +138,16 @@ create_site_morp.canregs <- function(x,
 #' @rdname create_site_morp
 #' @method create_site_morp fbswicds
 #' @export
-create_site_morp.fbswicds <- function(x,
-                                      ...,
-                                      type = c("icd10", "morp", "both"),
-                                      flatten = TRUE,
-                                      collapse = TRUE,
-                                      wrap_subsite = FALSE,
-                                      class_morp = TRUE,
-                                      drop_nos = TRUE) {
+create_site_morp.fbswicds <- function(
+  x,
+  ...,
+  type = c("icd10", "morp", "both"),
+  flatten = TRUE,
+  collapse = TRUE,
+  wrap_subsite = FALSE,
+  class_morp = TRUE,
+  drop_nos = TRUE
+) {
   type <- match.arg(type)
   res <- purrr::map(
     x,
@@ -164,20 +172,41 @@ create_site_morp.fbswicds <- function(x,
 #' @rdname create_site_morp
 #' @method create_site_morp fbswicd
 #' @export
-create_site_morp.fbswicd <- function(x,
-                                     ...,
-                                     type = c("icd10", "morp", "both"),
-                                     flatten = TRUE,
-                                     wrap_subsite = FALSE,
-                                     class_morp = TRUE,
-                                     drop_nos = TRUE) {
+create_site_morp.fbswicd <- function(
+  x,
+  ...,
+  type = c("icd10", "morp", "both"),
+  flatten = TRUE,
+  wrap_subsite = FALSE,
+  class_morp = TRUE,
+  drop_nos = TRUE
+) {
   type <- match.arg(type)
   sitemorp <- purrr::pluck(x, "sitemorp")
   input_strat_vars <- get_expr_vars(...)
   strat_vars <- unique(c(input_strat_vars, "year", "sex", "cancer"))
 
-  special_c <- c(1, 7, 12, 19, 20, 23, 33, 37, 52, 55, 56,
-                   58, 61, 64, 65, 66, 73, 80, 97)
+  special_c <- c(
+    1,
+    7,
+    12,
+    19,
+    20,
+    23,
+    33,
+    37,
+    52,
+    55,
+    56,
+    58,
+    61,
+    64,
+    65,
+    66,
+    73,
+    80,
+    97
+  )
   special_d <- c(24, 27, 34, 45)
   special_icd10 <- c(sprintf("C%02d", special_c), sprintf("D%02d", special_d))
 
@@ -193,7 +222,9 @@ create_site_morp.fbswicd <- function(x,
   summarise_tp_column <- function(data, group_vars, var) {
     data |>
       dplyr::group_by(!!!rlang::syms(group_vars)) |>
-      dplyr::reframe(!!rlang::sym(var) := list(combine_tp(!!rlang::sym(var)))) |>
+      dplyr::reframe(
+        !!rlang::sym(var) := list(combine_tp(!!rlang::sym(var)))
+      ) |>
       dplyr::ungroup()
   }
 
@@ -244,8 +275,16 @@ create_site_morp.fbswicd <- function(x,
 
   is_three_digit_icd10_group <- function() {
     three_digit_icd10_groups <- c(
-      "126", "101", "124", "125", "122", "105",
-      "120", "107", "116", "110", "111", "112",
+      "126",
+      "101",
+      "124",
+      "125",
+      "122",
+      "120",
+      "107",
+      "116",
+      "111",
+      "112",
       "60"
     )
     cancer_value <- as.character(dplyr::cur_group()[["cancer"]])
@@ -278,7 +317,8 @@ create_site_morp.fbswicd <- function(x,
           res <- combine_tp(x)
           res <- tibble(
             !!sym("icd10") := names(res),
-            count = unname(res))
+            count = unname(res)
+          )
           res <- dplyr::mutate(
             res,
             !!sym("icd10") := normalise_icd10_code(!!sym("icd10"))

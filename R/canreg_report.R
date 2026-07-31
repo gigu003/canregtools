@@ -31,23 +31,28 @@
 #' report_data <- create_canreg_report_data(canregs, year = 2022)
 #' summary(report_data)
 #' }
-create_canreg_report_data <- function(data,
-                                      year,
-                                      province = NULL,
-                                      province_en = NULL,
-                                      population_total = NULL,
-                                      summary_codes = c(
-                                        all = "410000",
-                                        urban = "910000",
-                                        rural = "920000"
-                                      ),
-                                      cancer_codes = c(101:110, 112, 114:118, 120:125),
-                                      cancer_total_code = 60,
-                                      cancer_type = "big",
-                                      keep_source = TRUE,
-                                      include_age_registry = TRUE) {
+create_canreg_report_data <- function(
+  data,
+  year,
+  province = NULL,
+  province_en = NULL,
+  population_total = NULL,
+  summary_codes = c(
+    all = "410000",
+    urban = "910000",
+    rural = "920000"
+  ),
+  cancer_codes = c(101:110, 112, 114:118, 120:125),
+  cancer_total_code = 60,
+  cancer_type = "big",
+  keep_source = TRUE,
+  include_age_registry = TRUE
+) {
   if (!inherits(data, c("canregs", "fbswicds"))) {
-    stop("`data` must be an object of class 'canregs' or 'fbswicds'.", call. = FALSE)
+    stop(
+      "`data` must be an object of class 'canregs' or 'fbswicds'.",
+      call. = FALSE
+    )
   }
 
   summary_codes <- validate_summary_codes(summary_codes)
@@ -56,7 +61,11 @@ create_canreg_report_data <- function(data,
     data_registry <- cr_reframe(data, "registry")
     data_summary <- cr_reframe(data_registry, c("area_type", "province"))
     fbsw_registry <- count_canreg(data_registry, cancer_type = cancer_type)
-    fbsw_summary <- count_canreg(data_summary, label_tail = "", cancer_type = cancer_type)
+    fbsw_summary <- count_canreg(
+      data_summary,
+      label_tail = "",
+      cancer_type = cancer_type
+    )
   } else {
     fbsw_registry <- cr_reframe(data, "registry")
     fbsw_summary <- cr_reframe(fbsw_registry, c("area_type", "province"))
@@ -82,51 +91,83 @@ create_canreg_report_data <- function(data,
   }
 
   inci_summary <- create_asr(
-    fbsw_summary, !!year_sym, !!sex_sym, !!cancer_sym,
-    event = "fbs", collapse = TRUE
+    fbsw_summary,
+    !!year_sym,
+    !!sex_sym,
+    !!cancer_sym,
+    event = "fbs",
+    collapse = TRUE
   ) |>
     add_report_labels()
 
   mort_summary <- create_asr(
-    fbsw_summary, !!year_sym, !!sex_sym, !!cancer_sym,
-    event = "sws", collapse = TRUE
+    fbsw_summary,
+    !!year_sym,
+    !!sex_sym,
+    !!cancer_sym,
+    event = "sws",
+    collapse = TRUE
   ) |>
     add_report_labels()
 
   inci_registry <- create_asr(
-    fbsw_registry, !!year_sym, !!sex_sym, !!cancer_sym,
-    event = "fbs", collapse = TRUE
+    fbsw_registry,
+    !!year_sym,
+    !!sex_sym,
+    !!cancer_sym,
+    event = "fbs",
+    collapse = TRUE
   ) |>
     add_report_labels()
 
   mort_registry <- create_asr(
-    fbsw_registry, !!year_sym, !!sex_sym, !!cancer_sym,
-    event = "sws", collapse = TRUE
+    fbsw_registry,
+    !!year_sym,
+    !!sex_sym,
+    !!cancer_sym,
+    event = "sws",
+    collapse = TRUE
   ) |>
     add_report_labels()
 
   inci_age_summary <- create_age_rate(
-    fbsw_summary, !!year_sym, !!sex_sym, !!cancer_sym,
-    event = "fbs", collapse = TRUE
+    fbsw_summary,
+    !!year_sym,
+    !!sex_sym,
+    !!cancer_sym,
+    event = "fbs",
+    collapse = TRUE
   ) |>
     add_report_labels()
 
   mort_age_summary <- create_age_rate(
-    fbsw_summary, !!year_sym, !!sex_sym, !!cancer_sym,
-    event = "sws", collapse = TRUE
+    fbsw_summary,
+    !!year_sym,
+    !!sex_sym,
+    !!cancer_sym,
+    event = "sws",
+    collapse = TRUE
   ) |>
     add_report_labels()
 
   if (isTRUE(include_age_registry)) {
     inci_age_registry <- create_age_rate(
-      fbsw_registry, !!year_sym, !!sex_sym, !!cancer_sym,
-      event = "fbs", collapse = TRUE
+      fbsw_registry,
+      !!year_sym,
+      !!sex_sym,
+      !!cancer_sym,
+      event = "fbs",
+      collapse = TRUE
     ) |>
       add_report_labels()
 
     mort_age_registry <- create_age_rate(
-      fbsw_registry, !!year_sym, !!sex_sym, !!cancer_sym,
-      event = "sws", collapse = TRUE
+      fbsw_registry,
+      !!year_sym,
+      !!sex_sym,
+      !!cancer_sym,
+      event = "sws",
+      collapse = TRUE
     ) |>
       add_report_labels()
   } else {
@@ -134,22 +175,48 @@ create_canreg_report_data <- function(data,
     mort_age_registry <- NULL
   }
 
-  quality_summary <- create_quality(fbsw_summary, !!year_sym, collapse = TRUE) |>
+  quality_summary <- create_quality(
+    fbsw_summary,
+    !!year_sym,
+    collapse = TRUE
+  ) |>
     add_report_labels()
-  quality_registry <- create_quality(fbsw_registry, !!year_sym, collapse = TRUE) |>
+  quality_registry <- create_quality(
+    fbsw_registry,
+    !!year_sym,
+    collapse = TRUE
+  ) |>
     add_report_labels()
-  quality_cancer_summary <- create_quality(fbsw_summary, !!year_sym, !!cancer_sym, collapse = TRUE) |>
+  quality_cancer_summary <- create_quality(
+    fbsw_summary,
+    !!year_sym,
+    !!cancer_sym,
+    collapse = TRUE
+  ) |>
     add_report_labels()
-  quality_cancer_registry <- create_quality(fbsw_registry, !!year_sym, !!cancer_sym, collapse = TRUE) |>
+  quality_cancer_registry <- create_quality(
+    fbsw_registry,
+    !!year_sym,
+    !!cancer_sym,
+    collapse = TRUE
+  ) |>
     add_report_labels()
 
   pop_summary <- get_pop(fbsw_summary, "sex", collapse = TRUE) |>
     add_report_labels()
   pop_registry <- get_pop(fbsw_registry, "sex", collapse = TRUE) |>
     add_report_labels()
-  pop_age_summary <- get_pop(fbsw_summary, c("sex", "agegrp"), collapse = TRUE) |>
+  pop_age_summary <- get_pop(
+    fbsw_summary,
+    c("sex", "agegrp"),
+    collapse = TRUE
+  ) |>
     add_report_labels()
-  pop_age_registry <- get_pop(fbsw_registry, c("sex", "agegrp"), collapse = TRUE) |>
+  pop_age_registry <- get_pop(
+    fbsw_registry,
+    c("sex", "agegrp"),
+    collapse = TRUE
+  ) |>
     add_report_labels()
 
   meta <- list(
@@ -214,12 +281,7 @@ create_canreg_report_data <- function(data,
 #'
 #' @return An object of class `canreg_report`.
 #' @export
-new_canreg_report <- function(meta,
-                              source = NULL,
-                              pop,
-                              quality,
-                              inci,
-                              mort) {
+new_canreg_report <- function(meta, source = NULL, pop, quality, inci, mort) {
   structure(
     list(
       meta = meta,
@@ -247,14 +309,24 @@ validate_canreg_report <- function(x) {
   required_top <- c("meta", "pop", "quality", "inci", "mort")
   missing_top <- setdiff(required_top, names(x))
   if (length(missing_top) > 0) {
-    stop("Missing top-level components: ", paste(missing_top, collapse = ", "), call. = FALSE)
+    stop(
+      "Missing top-level components: ",
+      paste(missing_top, collapse = ", "),
+      call. = FALSE
+    )
   }
 
   required_event <- c("summary", "registry", "age_summary")
   for (event in c("inci", "mort")) {
     missing_event <- setdiff(required_event, names(x[[event]]))
     if (length(missing_event) > 0) {
-      stop("Missing components in `", event, "`: ", paste(missing_event, collapse = ", "), call. = FALSE)
+      stop(
+        "Missing components in `",
+        event,
+        "`: ",
+        paste(missing_event, collapse = ", "),
+        call. = FALSE
+      )
     }
   }
 
@@ -262,7 +334,13 @@ validate_canreg_report <- function(x) {
   for (event in c("inci", "mort")) {
     missing_cols <- setdiff(required_cols, names(x[[event]][["summary"]]))
     if (length(missing_cols) > 0) {
-      stop("Missing columns in `", event, "$summary`: ", paste(missing_cols, collapse = ", "), call. = FALSE)
+      stop(
+        "Missing columns in `",
+        event,
+        "$summary`: ",
+        paste(missing_cols, collapse = ", "),
+        call. = FALSE
+      )
     }
   }
 
@@ -275,7 +353,9 @@ print.canreg_report <- function(x, ...) {
   cat("A canreg_report object\n")
   cat("- Object version:", meta[["object_version"]], "\n")
   cat("- Data year:", meta[["year_data"]], "\n")
-  if (!is.null(meta[["province"]])) cat("- Province:", meta[["province"]], "\n")
+  if (!is.null(meta[["province"]])) {
+    cat("- Province:", meta[["province"]], "\n")
+  }
   cat("- Components: pop, quality, inci, mort\n")
   invisible(x)
 }
@@ -302,8 +382,19 @@ print.summary.canreg_report <- function(x, ...) {
   cat("Summary of canreg_report\n")
   cat("- Object version:", x[["object_version"]], "\n")
   cat("- Data year:", x[["year_data"]], "\n")
-  if (!is.null(x[["province"]])) cat("- Province:", x[["province"]], "\n")
-  cat("- Summary groups:", paste(names(x[["summary_codes"]]), x[["summary_codes"]], sep = "=", collapse = ", "), "\n")
+  if (!is.null(x[["province"]])) {
+    cat("- Province:", x[["province"]], "\n")
+  }
+  cat(
+    "- Summary groups:",
+    paste(
+      names(x[["summary_codes"]]),
+      x[["summary_codes"]],
+      sep = "=",
+      collapse = ", "
+    ),
+    "\n"
+  )
   cat("- Incidence summary rows:", x[["n_summary_rows_inci"]], "\n")
   cat("- Incidence registry rows:", x[["n_registry_rows_inci"]], "\n")
   cat("- Mortality summary rows:", x[["n_summary_rows_mort"]], "\n")
@@ -313,7 +404,8 @@ print.summary.canreg_report <- function(x, ...) {
 
 standardize_report_event <- function(event) {
   event <- match.arg(event, c("inci", "incidence", "mort", "mortality"))
-  switch(event,
+  switch(
+    event,
     incidence = "inci",
     inci = "inci",
     mortality = "mort",
@@ -322,8 +414,14 @@ standardize_report_event <- function(event) {
 }
 
 validate_summary_codes <- function(summary_codes) {
-  if (is.null(names(summary_codes)) || !all(c("all", "urban", "rural") %in% names(summary_codes))) {
-    stop("`summary_codes` must be a named vector containing all, urban, and rural.", call. = FALSE)
+  if (
+    is.null(names(summary_codes)) ||
+      !all(c("all", "urban", "rural") %in% names(summary_codes))
+  ) {
+    stop(
+      "`summary_codes` must be a named vector containing all, urban, and rural.",
+      call. = FALSE
+    )
   }
   summary_codes <- summary_codes[c("all", "urban", "rural")]
   stats::setNames(as.character(summary_codes), names(summary_codes))

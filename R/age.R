@@ -4,9 +4,9 @@
 #' methods: fixed interval (`"interval"`), equal distance (`"distance"`),
 #' or quantile-based grouping (`"quantile"`). Supports flexible labeling and
 #' language-specific suffixes.
-#' 
+#'
 #' @param x Numeric vector of ages.
-#' @param method Character. Grouping method: `"interval"` (custom breaks), 
+#' @param method Character. Grouping method: `"interval"` (custom breaks),
 #'   `"distance"` (uniform width), or `"quantile"` (equal-sized groups).
 #' @param length Integer. Width of age bands (used only
 #'    if `method = "distance"`). Default is 5.
@@ -35,17 +35,19 @@
 #' cutage(ages, method = "interval", breaks = c(0, 15, 30, 45, 60, 75, Inf))
 #' # Quantile-based grouping
 #' cutage(ages, method = "quantile")
-#' 
-cutage <- function(x,
-                   method = "distance",
-                   length = 5,
-                   maxage = 85,
-                   sep_zero = TRUE,
-                   breaks = c(seq(0, 85, 5)),
-                   labels = NULL,
-                   lang = "cn",
-                   label_tail = NULL,
-                   right = FALSE) {
+#'
+cutage <- function(
+  x,
+  method = "distance",
+  length = 5,
+  maxage = 85,
+  sep_zero = TRUE,
+  breaks = c(seq(0, 85, 5)),
+  labels = NULL,
+  lang = "cn",
+  label_tail = NULL,
+  right = FALSE
+) {
   x <- as.numeric(x)
   if (method == "interval") {
     if (is.null(breaks)) {
@@ -68,8 +70,10 @@ cutage <- function(x,
     breaks <- quantile(x, probs = seq(0, 1, 0.25))
     age_groups <- cut(x, breaks, right = right)
   } else {
-    stop("Invalid method. Supported methods are
-         'interval', 'distance', and 'quantile'.")
+    stop(
+      "Invalid method. Supported methods are
+         'interval', 'distance', and 'quantile'."
+    )
   }
 
   if (is.null(labels) && !is.null(age_groups)) {
@@ -115,7 +119,7 @@ cutage <- function(x,
 #'
 #' @return A numeric vector of ages in years, with the same length
 #'    as `birth_date` and `onset_date`.
-#' 
+#'
 #' @export
 #'
 #' @examples
@@ -137,7 +141,7 @@ cutage <- function(x,
 #' bdate[1] <- NA
 #' event[2] <- NA
 #' calc_age(bdate, event)[1:5]
-#' 
+#'
 calc_age <- function(birth_date, onset_date) {
   # Ensure both inputs are Date objects
   birth_date <- as.Date(birth_date)
@@ -161,15 +165,20 @@ calc_age <- function(birth_date, onset_date) {
   onset_day <- as.numeric(format(onset_date[valid_idx], "%d"))
 
   age[valid_idx] <- onset_year - birth_year
-  age[valid_idx][onset_month < birth_month |
-                   (onset_month == birth_month & onset_day < birth_day)] <-
-    age[valid_idx][onset_month < birth_month |
-                   (onset_month == birth_month & onset_day < birth_day)] - 1
+  age[valid_idx][
+    onset_month < birth_month |
+      (onset_month == birth_month & onset_day < birth_day)
+  ] <-
+    age[valid_idx][
+      onset_month < birth_month |
+        (onset_month == birth_month & onset_day < birth_day)
+    ] -
+    1
   age
 }
 
 #' Expand population data from 5-year age groups to single-year ages
-#' 
+#'
 #' `expand_age_pop` transforms population data aggregated in age groups into
 #' estimates for single-year ages. It utilizes interpolation methods to
 #' distribute the grouped data across individual ages, ensuring consistency
@@ -187,7 +196,7 @@ calc_age <- function(birth_date, onset_date) {
 #'   \item \code{"natural"}: Natural spline interpolation.
 #' }
 #' The default is \code{"linear"}.
-#' 
+#'
 #' @importFrom stats aggregate approx quantile spline
 #'
 #' @return A data frame with two columns:
@@ -195,7 +204,7 @@ calc_age <- function(birth_date, onset_date) {
 #'   \item{\code{x}}{Integer ages from 0 to 92.}
 #'   \item{\code{y}}{Estimated population counts for each single-year age.}
 #' }
-#' 
+#'
 #' @export
 #'
 #' @examples
@@ -238,7 +247,9 @@ expand_age_pop <- function(x, method = "linear") {
       diff[3:18] <- round(diff[3:18] / 5)
       diff[19] <- round(diff[19] / 8)
       diff <- c(
-        diff[1], rep(diff[2], 4), rep(diff[3:18], each = 5),
+        diff[1],
+        rep(diff[2], 4),
+        rep(diff[3:18], each = 5),
         rep(diff[19], 8)
       )
       y3 <- round(ds$y - diff)
@@ -249,4 +260,3 @@ expand_age_pop <- function(x, method = "linear") {
   }
   return(ds)
 }
-

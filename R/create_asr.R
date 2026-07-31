@@ -32,17 +32,19 @@
 #' data("canregs")
 #' asr_inci <- create_asr(canregs, event = "fbs", year, sex, cancer)
 #' asr_mort <- create_asr(canregs, event = "sws", year, sex, cancer)
-#' 
-create_asr <- function(x,
-                       ...,
-                       event = "fbs",
-                       std = c("cn2000", "wld85"),
-                       cancer_type = "big",
-                       mp = 100000,
-                       decimal = 2,
-                       show_var = FALSE,
-                       show_ci = FALSE,
-                       collapse = TRUE) {
+#'
+create_asr <- function(
+  x,
+  ...,
+  event = "fbs",
+  std = c("cn2000", "wld85"),
+  cancer_type = "big",
+  mp = 100000,
+  decimal = 2,
+  show_var = FALSE,
+  show_ci = FALSE,
+  collapse = TRUE
+) {
   UseMethod("create_asr", x)
 }
 
@@ -99,18 +101,21 @@ create_asr.canreg <- function(x, ..., cancer_type = "big") {
 #' fbsws <- count_canreg(canregs)
 #' asrs <- create_asr(fbsws, event = "sws", year, sex, cancer)
 #'
-create_asr.fbswicds <- function(x,
-                                ...,
-                                event = "fbs",
-                                std = c("cn2000", "wld85"),
-                                mp = 100000,
-                                decimal = 2,
-                                show_pop = FALSE,
-                                show_var = FALSE,
-                                show_ci = FALSE,
-                                collapse = TRUE) {
+create_asr.fbswicds <- function(
+  x,
+  ...,
+  event = "fbs",
+  std = c("cn2000", "wld85"),
+  mp = 100000,
+  decimal = 2,
+  show_pop = FALSE,
+  show_var = FALSE,
+  show_ci = FALSE,
+  collapse = TRUE
+) {
   group_var <- rlang::enquos(...)
-  res <- purrr::map(x,
+  res <- purrr::map(
+    x,
     create_asr.fbswicd,
     !!!group_var,
     event = {{ event }},
@@ -138,15 +143,17 @@ create_asr.fbswicds <- function(x,
 #' fbsw <- count_canreg(canregs[[1]])
 #' asr <- create_asr(fbsw, event = "sws", year, sex, cancer)
 #'
-create_asr.fbswicd <- function(x,
-                               ...,
-                               event = "fbs",
-                               std = c("cn2000", "wld85"),
-                               mp = 100000,
-                               decimal = 2,
-                               show_pop = FALSE,
-                               show_var = FALSE,
-                               show_ci = FALSE) {
+create_asr.fbswicd <- function(
+  x,
+  ...,
+  event = "fbs",
+  std = c("cn2000", "wld85"),
+  mp = 100000,
+  decimal = 2,
+  show_pop = FALSE,
+  show_var = FALSE,
+  show_ci = FALSE
+) {
   if (!check_group_vars(x, ..., quiet = FALSE)) {
     stop("group vars not supported.")
   }
@@ -188,23 +195,36 @@ create_asr.fbswicd <- function(x,
   # calculate age standardized rate.
   res <- data_pre |>
     group_by(!!!group_var) |>
-    reframe(across(!!event,
-                   list(no_cases = ~ sum(.x, na.rm = TRUE),
-                        pop = ~ sum(!!pop)), .names = "{.fn}"),
-            across(!!!std, list(truncr = ~ truncrate(!!event,
-                                                     !!pop,
-                                                     stdpop = .x,
-                                                     mp = mp,
-                                                     decimal = decimal)),
-                   .names = "{.fn}_{.col}"),
-            across(!!!std, list(model = ~ list(ageadjust(!!event, !!pop,
-                                                   stdpop = .x, mp = mp))),
-                   .names = "{.col}"),
-            cumur = cumrate(!!event, !!pop, mp = 100)[[1]]
-            ) |>
+    reframe(
+      across(
+        !!event,
+        list(no_cases = ~ sum(.x, na.rm = TRUE), pop = ~ sum(!!pop)),
+        .names = "{.fn}"
+      ),
+      across(
+        !!!std,
+        list(
+          truncr = ~ truncrate(
+            !!event,
+            !!pop,
+            stdpop = .x,
+            mp = mp,
+            decimal = decimal
+          )
+        ),
+        .names = "{.fn}_{.col}"
+      ),
+      across(
+        !!!std,
+        list(model = ~ list(ageadjust(!!event, !!pop, stdpop = .x, mp = mp))),
+        .names = "{.col}"
+      ),
+      cumur = cumrate(!!event, !!pop, mp = 100)[[1]]
+    ) |>
     rowwise() |>
     mutate(
-      across(!!!std,
+      across(
+        !!!std,
         list(
           asr = ~ .x[["asr"]],
           asr_var = ~ .x[["asr_var"]],
@@ -213,7 +233,8 @@ create_asr.fbswicd <- function(x,
         ),
         .names = "{.fn}_{.col}"
       ),
-      across(!!stdvar1,
+      across(
+        !!stdvar1,
         list(
           cr = ~ .x[["cr"]],
           cr_var = ~ .x[["cr_var"]],
@@ -232,15 +253,24 @@ create_asr.fbswicd <- function(x,
       across(
         starts_with(c("asr", "cr", "cumur", "truncr")) &
           !contains("var"),
-        ~ round(.x, digits = decimal)),
+        ~ round(.x, digits = decimal)
+      ),
       across(where(is.numeric), ~ cr_replace_na(.x))
     ) |>
-    select(c(all_of(gvars), starts_with(c(
-      "pop", "no_cases", "cr", "cr_var", "cr_lci",
-      "cr_uci", "asr", "truncr", "cumur"
-    ))))
-
-
+    select(c(
+      all_of(gvars),
+      starts_with(c(
+        "pop",
+        "no_cases",
+        "cr",
+        "cr_var",
+        "cr_lci",
+        "cr_uci",
+        "asr",
+        "truncr",
+        "cumur"
+      ))
+    ))
 
   # Remove columns of "population" if show_pop is set to FALSE
   if (!show_pop) {
@@ -263,7 +293,7 @@ create_asr.fbswicd <- function(x,
   # add rank and proportion
   if ("cancer" %in% gvars) {
     rank <- rlang::sym("rank")
-    
+
     rank <- filter(res, !!rlang::sym("cancer") %nin% c(60L, 61L)) |>
       select(!!!group_var, !!rlang::sym("cr")) |>
       group_by(!!!group_var2) |>
@@ -273,8 +303,10 @@ create_asr.fbswicd <- function(x,
       group_by(!!!group_var2) |>
       mutate(
         prop = round(
-        !!rlang::sym("no_cases") / max(!!rlang::sym("no_cases")) * 100, 2)
-        ) |>
+          !!rlang::sym("no_cases") / max(!!rlang::sym("no_cases")) * 100,
+          2
+        )
+      ) |>
       left_join(rank, by = gvars)
   }
 

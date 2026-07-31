@@ -22,11 +22,11 @@
 #' @export
 #'
 cr_filter <- function(
-    .data,
-    ...,
-    drop = c("none"),
-    part = "all"
-    ) {
+  .data,
+  ...,
+  drop = c("none"),
+  part = "all"
+) {
   UseMethod("cr_filter", .data)
 }
 
@@ -34,11 +34,7 @@ cr_filter <- function(
 #' @method cr_filter canregs
 #' @export
 #'
-cr_filter.canregs <- function(.data,
-                              ...,
-                               drop = c("none"),
-                              part = "all"
-                              ) {
+cr_filter.canregs <- function(.data, ..., drop = c("none"), part = "all") {
   conds <- rlang::enquos(...)
   res <- purrr::map(
     .data,
@@ -46,7 +42,8 @@ cr_filter.canregs <- function(.data,
     !!!conds,
     drop = drop,
     part = part
-    ) |> compact()
+  ) |>
+    compact()
   structure(
     res,
     class = class(.data)
@@ -57,11 +54,7 @@ cr_filter.canregs <- function(.data,
 #' @method cr_filter canreg
 #' @export
 #'
-cr_filter.canreg <- function(.data,
-                             ...,
-                              drop = c("none"),
-                             part = "all"
-                             ) {
+cr_filter.canreg <- function(.data, ..., drop = c("none"), part = "all") {
   valid_parts <- dplyr::setdiff(names(.data), "areacode")
   part <- normalize_cr_filter_part(part, valid_parts)
   conds <- rlang::enquos(...)
@@ -75,14 +68,14 @@ cr_filter.canreg <- function(.data,
       updated_part <- pluck(res, type)
       if ("year" %in% expr_vars && "year" %nin% names(updated_part)) {
         updated_part <- updated_part |>
-          mutate(year = format(!!rlang::sym("inciden"), "%Y"))
+          mutate(year = as.integer(format(!!rlang::sym("inciden"), "%Y")))
         added_year <- TRUE
       }
     } else if (type == "SWcases") {
       updated_part <- pluck(res, type)
       if ("year" %in% expr_vars && "year" %nin% names(updated_part)) {
         updated_part <- updated_part |>
-          mutate(year = format(!!rlang::sym("deathda"), "%Y"))
+          mutate(year = as.integer(format(!!rlang::sym("deathda"), "%Y")))
         added_year <- TRUE
       }
     }
@@ -92,7 +85,7 @@ cr_filter.canreg <- function(.data,
         filter(!!!conds) |>
         apply_cr_filter_drop(drop) |>
         remove_cr_filter_year(added_year)
-      }
+    }
   }
 
   empty <- !all(purrr::map_lgl(res[c("FBcases", "SWcases")], has_rows))
@@ -104,18 +97,14 @@ cr_filter.canreg <- function(.data,
   structure(
     res,
     class = c("canreg", "list")
-    )
+  )
 }
 
 #' @rdname cr_filter
 #' @method cr_filter fbswicds
 #' @export
 #'
-cr_filter.fbswicds <- function(.data,
-                               ...,
-                               drop = c("none"),
-                               part = "all"
-                               ) {
+cr_filter.fbswicds <- function(.data, ..., drop = c("none"), part = "all") {
   conds <- rlang::enquos(...)
   res <- purrr::map(
     .data,
@@ -123,7 +112,8 @@ cr_filter.fbswicds <- function(.data,
     !!!conds,
     drop = drop,
     part = part
-  ) |> compact()
+  ) |>
+    compact()
   structure(
     res,
     class = class(.data)
@@ -134,11 +124,7 @@ cr_filter.fbswicds <- function(.data,
 #' @method cr_filter fbswicd
 #' @export
 #'
-cr_filter.fbswicd <- function(.data,
-                              ...,
-                              drop = c("none"),
-                              part = "all"
-                              ) {
+cr_filter.fbswicd <- function(.data, ..., drop = c("none"), part = "all") {
   valid_parts <- dplyr::setdiff(names(.data), "areacode")
   part <- normalize_cr_filter_part(part, valid_parts)
   conds <- rlang::enquos(...)
@@ -175,10 +161,10 @@ cr_filter.fbswicd <- function(.data,
 #' @export
 #'
 cr_filter.asrs <- function(
-    .data,
-    ...,
-    drop = c("none")
-    ) {
+  .data,
+  ...,
+  drop = c("none")
+) {
   conds <- rlang::enquos(...)
   res <- purrr::map(
     .data,
@@ -209,10 +195,10 @@ cr_filter.qualities <- cr_filter.asrs
 #' @export
 #'
 cr_filter.default <- function(
-    .data,
-    ...,
-    drop = c("none")
-    ) {
+  .data,
+  ...,
+  drop = c("none")
+) {
   conds <- rlang::enquos(...)
   res <- filter(.data, !!!conds)
   if ("total" %in% drop & "cancer" %in% colnames(.data)) {
@@ -224,7 +210,7 @@ cr_filter.default <- function(
   structure(
     res,
     class = class(.data)
-    )
+  )
 }
 
 #' Normalize `part` argument for cr_filter methods
@@ -236,14 +222,19 @@ normalize_cr_filter_part <- function(part, valid_parts) {
   }
   if ("all" %in% part) {
     if (length(part) > 1) {
-      stop('`part = "all"` cannot be combined with other part names.', call. = FALSE)
+      stop(
+        '`part = "all"` cannot be combined with other part names.',
+        call. = FALSE
+      )
     }
     return(valid_parts)
   }
   if (any(!part %in% valid_parts)) {
-    stop("Unsupported part name(s): ",
-         paste(part[!part %in% valid_parts], collapse = ", "),
-         call. = FALSE)
+    stop(
+      "Unsupported part name(s): ",
+      paste(part[!part %in% valid_parts], collapse = ", "),
+      call. = FALSE
+    )
   }
   part
 }

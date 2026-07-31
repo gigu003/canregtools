@@ -40,28 +40,50 @@ cr_grid <- function() {
       axis.title = element_blank(),
       axis.text = element_text(size = 9, face = "bold.italic"),
       plot.title = element_text(face = "bold", size = 14, hjust = 0.5),
-      plot.subtitle = element_text(face = "bold.italic", size = 12,
-                                   hjust = 0.5),
+      plot.subtitle = element_text(
+        face = "bold.italic",
+        size = 12,
+        hjust = 0.5
+      ),
       panel.border = element_rect(colour = "blue", fill = NA, linetype = 2),
       panel.background = element_rect(fill = "aliceblue"),
-      panel.grid.major.x = element_line(colour = "steelblue", linetype = 3,
-                                        size = 0.5),
+      panel.grid.major.x = element_line(
+        colour = "steelblue",
+        linetype = 3,
+        size = 0.5
+      ),
       panel.grid.minor.x = element_blank(),
-      panel.grid.major.y =  element_line(colour = "steelblue", linetype = 3,
-                                         size = 0.5),
+      panel.grid.major.y = element_line(
+        colour = "steelblue",
+        linetype = 3,
+        size = 0.5
+      ),
       panel.grid.minor.y = element_blank()
     )
 }
 
-bbarplot <- function(data, x, y, fill, facet, label,
-                     xlab = "年份", ylab = "发病数/死亡数",
-                     title = "历年发病数(死亡数)变化情况",
-                     caption = "caption") {
-  ggplot(data, aes(x = factor({{x}}), y = {{y}})) +
-    geom_bar(aes(fill = {{fill}}), stat = "identity", position = "dodge") +
-    facet_grid({{facet}}, scales = "free_y") +
-    geom_text(aes(label = {{y}}), vjust = 2, color = "white", size = 2.5) +
-    geom_text(aes(label = {{label}}), vjust = 4, color = "black", size = 2.5) +
+bbarplot <- function(
+  data,
+  x,
+  y,
+  fill,
+  facet,
+  label,
+  xlab = "年份",
+  ylab = "发病数/死亡数",
+  title = "历年发病数(死亡数)变化情况",
+  caption = "caption"
+) {
+  ggplot(data, aes(x = factor({{ x }}), y = {{ y }})) +
+    geom_bar(aes(fill = {{ fill }}), stat = "identity", position = "dodge") +
+    facet_grid({{ facet }}, scales = "free_y") +
+    geom_text(aes(label = {{ y }}), vjust = 2, color = "white", size = 2.5) +
+    geom_text(
+      aes(label = {{ label }}),
+      vjust = 4,
+      color = "black",
+      size = 2.5
+    ) +
     theme_classic() +
     xlab(xlab) +
     ylab(ylab) +
@@ -77,18 +99,29 @@ bbarplot <- function(data, x, y, fill, facet, label,
     )
 }
 
-bscatter <- function(data, x, y, fill, label, facet,
-                     xlab = "年份",
-                     ylab = "部位",
-                     title = "",
-                     caption = "") {
-  ggplot(data, aes(x = {{x}}, y = {{y}})) +
-    geom_tile(aes(fill = {{fill}})) +
-    geom_text(aes(label = {{label}}), vjust = 1.5, color = "black",
-              size = 2.5) +
+bscatter <- function(
+  data,
+  x,
+  y,
+  fill,
+  label,
+  facet,
+  xlab = "年份",
+  ylab = "部位",
+  title = "",
+  caption = ""
+) {
+  ggplot(data, aes(x = {{ x }}, y = {{ y }})) +
+    geom_tile(aes(fill = {{ fill }})) +
+    geom_text(
+      aes(label = {{ label }}),
+      vjust = 1.5,
+      color = "black",
+      size = 2.5
+    ) +
     scale_x_discrete(position = "top") +
     scale_fill_gradient(low = "white", high = "purple") +
-    facet_wrap({{facet}}, strip.position = "bottom") +
+    facet_wrap({{ facet }}, strip.position = "bottom") +
     labs(x = xlab, y = ylab, title = title, caption = caption) +
     cr_color_block()
 }

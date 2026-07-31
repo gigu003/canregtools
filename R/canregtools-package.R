@@ -51,7 +51,6 @@
 #' @importFrom purrr pluck
 #' @importFrom purrr reduce
 #' @importFrom purrr flatten_chr
-#' @importFrom readxl read_excel
 #' @importFrom rlang :=
 #' @importFrom rlang enquo
 #' @importFrom rlang enquos

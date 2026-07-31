@@ -25,13 +25,13 @@
 #' @export
 #' @examples
 #' write_registry(list('410302' = '410301'))
-#' 
+#'
 write_registry <- function(
-    x = NULL,
-    dict = "registry",
-    cache_refresh = FALSE,
-    quiet = TRUE
-    ) {
+  x = NULL,
+  dict = "registry",
+  cache_refresh = FALSE,
+  quiet = TRUE
+) {
   UseMethod("write_registry", x)
 }
 
@@ -46,22 +46,24 @@ write_registry <- function(
 #' area_type = rep("urban", 6)
 #' )
 #' write_registry(registry_dict)
-#' 
+#'
 write_registry.data.frame <- function(
-    x = NULL,
-    dict = "registry",
-    cache_refresh = FALSE,
-    quiet = TRUE
-    ) {
+  x = NULL,
+  dict = "registry",
+  cache_refresh = FALSE,
+  quiet = TRUE
+) {
   vars_exist <- all(c("areacode", dict) %in% colnames(x))
   if (vars_exist) {
     res <- as.character(x[[dict]])
     names(res) <- as.character(x[["areacode"]])
   }
-  write_registry.character(res,
-                           dict = dict,
-                           cache_refresh = cache_refresh,
-                           quiet = quiet)
+  write_registry.character(
+    res,
+    dict = dict,
+    cache_refresh = cache_refresh,
+    quiet = quiet
+  )
 }
 
 #' @rdname write_registry
@@ -78,19 +80,21 @@ write_registry.data.frame <- function(
 #' '410307' = '410301'
 #' )
 #' write_registry(dict)
-#' 
+#'
 write_registry.list <- function(
   x = NULL,
   dict = "registry",
   cache_refresh = FALSE,
   quiet = TRUE
-  ) {
+) {
   c_x <- as.character(x)
   names(c_x) <- names(x)
-  write_registry.character(c_x,
-                           dict = dict,
-                           cache_refresh = cache_refresh,
-                           quiet = quiet)
+  write_registry.character(
+    c_x,
+    dict = dict,
+    cache_refresh = cache_refresh,
+    quiet = quiet
+  )
 }
 
 #' @rdname write_registry
@@ -100,19 +104,21 @@ write_registry.list <- function(
 #' # Registry attributes using built-in information
 #' dict <- NULL
 #' write_registry(dict)
-#' 
+#'
 write_registry.NULL <- function(
   x = NULL,
   dict = "registry",
   cache_refresh = FALSE,
   quiet = TRUE
-  ) {
+) {
   dict_name <- paste0("areacode_", dict)
   default_dict <- dict_maps[[dict_name]]
-  write_registry.character(x = default_dict,
-                           dict = dict,
-                           cache_refresh = cache_refresh,
-                           quiet = quiet)
+  write_registry.character(
+    x = default_dict,
+    dict = dict,
+    cache_refresh = cache_refresh,
+    quiet = quiet
+  )
 }
 
 #' @rdname write_registry
@@ -120,35 +126,37 @@ write_registry.NULL <- function(
 #' @export
 #' @examples
 #' # Registry attributes stored in named character vector with areacode as
-#' # name and attributes as values 
+#' # name and attributes as values
 #' dict <- rep("410301", 5)
 #' names(dict) <- c("410302", "410303", "410304", "410305", "410306")
 #' write_registry(dict)
-#' 
+#'
 write_registry.character <- function(
   x = NULL,
   dict = "registry",
   cache_refresh = FALSE,
   quiet = TRUE
-  ) {
+) {
   # Validate dictionary type
-  if (!is.character(dict) || length(dict) != 1 || is.na(dict) || !nzchar(dict)) {
+  if (
+    !is.character(dict) || length(dict) != 1 || is.na(dict) || !nzchar(dict)
+  ) {
     stop("'dict' must be a non-empty character string of length 1.")
   }
-  
+
   # Validate input vector
   if (!is.null(x)) {
     if (!is.character(x) || is.null(names(x))) {
       stop("'x' must be a named character vector.")
     }
   }
-  
+
   # Compose dictionary file path and default map name
   dict_file <- dict_addr(dict = dict)
   dict_name <- paste0("areacode_", dict)
-  
+
   default_dict <- dict_maps[[dict_name]] %||% character(0)
-  
+
   # Load existing dictionary or fallback to predefined map. Avoid reading a
   # non-existent file because readRDS() emits a low-level gzfile() warning.
   dict_data <- if (cache_refresh && is.null(x)) {
@@ -160,8 +168,10 @@ write_registry.character <- function(
       readRDS(dict_file),
       error = function(e) {
         warning(
-          "Failed to read existing dictionary at '", dict_file,
-          "'. Starting fresh. Reason: ", conditionMessage(e),
+          "Failed to read existing dictionary at '",
+          dict_file,
+          "'. Starting fresh. Reason: ",
+          conditionMessage(e),
           call. = FALSE
         )
         default_dict
@@ -170,20 +180,26 @@ write_registry.character <- function(
   } else {
     default_dict
   }
-  
+
   #existing_keys <- intersect(names(x), names(dict_data))
   existing_keys <- names(x)[names(x) %in% names(dict_data)]
   if (length(existing_keys) > 0) {
     if (!quiet) {
-      message(length(existing_keys), " entries will be overwritten. Example(s):")
-      print(utils::head(dplyr::tibble(
-        areacode = existing_keys,
-        old = unlist(dict_data[existing_keys], use.names = FALSE),
-        new = unlist(x[existing_keys], use.names = FALSE)
-      ), 5))
+      message(
+        length(existing_keys),
+        " entries will be overwritten. Example(s):"
+      )
+      print(utils::head(
+        dplyr::tibble(
+          areacode = existing_keys,
+          old = unlist(dict_data[existing_keys], use.names = FALSE),
+          new = unlist(x[existing_keys], use.names = FALSE)
+        ),
+        5
+      ))
     }
   }
-  
+
   # Update the dictionary with new key-value pairs
   dict_data[names(x)] <- x
   # Save the updated dictionary
@@ -222,21 +238,23 @@ write_registry.character <- function(
 #' }
 write_areacode <- function(x = NULL, cache_refresh = FALSE) {
   dict_file <- dict_addr(dict = "areacode")
-  
+
   # Load or refresh the dictionary
   if (cache_refresh || !file.exists(dict_file)) {
     label_areacode <- tidy_var_maps[["areacode"]]
   } else {
     label_areacode <- readRDS(dict_file)
   }
-  
+
   # If new values provided
   if (!missing(x) && !is.null(x)) {
-    stopifnot(all(c("areacode", "cname", "ename", "abbr_cn", "abbr_en") %in% names(x)))
-    
+    stopifnot(all(
+      c("areacode", "cname", "ename", "abbr_cn", "abbr_en") %in% names(x)
+    ))
+
     areacode_sym <- rlang::sym("areacode")
     areacode_vec <- purrr::pluck(x, "areacode")
-    
+
     # Overlap check
     overlapping <- dplyr::intersect(label_areacode$areacode, areacode_vec)
     if (length(overlapping) > 0) {
@@ -250,18 +268,21 @@ write_areacode <- function(x = NULL, cache_refresh = FALSE) {
         5
       ))
     }
-    
+
     # Remove old entries with the same areacode
-    label_areacode <- dplyr::filter(label_areacode, !!areacode_sym %nin% areacode_vec)
-    
+    label_areacode <- dplyr::filter(
+      label_areacode,
+      !!areacode_sym %nin% areacode_vec
+    )
+
     # Skip certain province/region codes
     skip_codes <- paste0(c(91:92, 72:79), "0000")
     new_areacode <- dplyr::filter(x, !!areacode_sym %nin% skip_codes)
-    
+
     # Combine and save
     label_areacode <- dplyr::bind_rows(label_areacode, new_areacode)
   }
-  
+
   saveRDS(label_areacode, dict_file)
   invisible(NULL)
 }

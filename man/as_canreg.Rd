@@ -32,12 +32,14 @@ it can be derived from \code{regi_data}.}
 \item{year}{Optional numeric vector. If specified, only cases or deaths from these years
 will be included.}
 
-\item{areacode}{Character. The administrative area code for the data. Default is \code{NULL}.}
+\item{areacode}{Character. A registry or area identifier for the data.
+It is stored as a character vector and is not limited to administrative
+division codes. Default is \code{NULL}.}
 }
 \value{
 A \code{canreg} object (S3 class \code{canreg}) which is a list containing:
 \itemize{
-\item \code{areacode}: area code
+\item \code{areacode}: registry or area identifier
 \item \code{FBcases}: incidence data (S3 class \code{FBcases})
 \item \code{SWcases}: mortality data (S3 class \code{SWcases})
 \item \code{POP}: population data (S3 class \code{POP})

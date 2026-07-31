@@ -99,7 +99,7 @@ dict <- NULL
 write_registry(dict)
 
 # Registry attributes stored in named character vector with areacode as
-# name and attributes as values 
+# name and attributes as values
 dict <- rep("410301", 5)
 names(dict) <- c("410302", "410303", "410304", "410305", "410306")
 write_registry(dict)

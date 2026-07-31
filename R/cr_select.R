@@ -61,14 +61,14 @@ cr_select.asrs <- function(data, ..., index = names(data)) {
   if (length(conds) == 0) {
     return(data_index)
   }
-  
+
   vars <- get_expr_vars(!!!conds)
   if (all(vars %in% ls_vars("reframe")[["code"]])) {
     isnot <- check_reframe_expr(names(data), !!!conds)
     res <- data_index[isnot]
   } else if (length(conds) > 0) {
     res <- purrr::keep(data_index, check_conds, !!!conds)
-  } 
+  }
   structure(compact(res), class = class(data))
 }
 
@@ -91,7 +91,7 @@ cr_select.fbswicds <- function(data, ..., index = names(data)) {
     data[index],
     class = class(data)
   )
-  
+
   conds <- rlang::enquos(...)
   if (length(conds) == 0) {
     return(data_index)
@@ -101,10 +101,10 @@ cr_select.fbswicds <- function(data, ..., index = names(data)) {
     isnot <- check_reframe_expr(names(data), !!!conds)
     res <- data_index[isnot]
   } else if (length(conds) > 0) {
-      qua <- create_quality(data_index, collapse = FALSE)
-      qua1 <- purrr::keep(qua, check_conds, !!!conds)
-      res <- data[names(qua1)]
-    }
+    qua <- create_quality(data_index, collapse = FALSE)
+    qua1 <- purrr::keep(qua, check_conds, !!!conds)
+    res <- data[names(qua1)]
+  }
   structure(compact(res), class = class(data))
 }
 

@@ -39,34 +39,38 @@
 #' asr <- cr_filter(asr, drop = c("total", "others"))
 #' draw_barchart(asr, x = cancer, y = cr, group =  year, facet = sex)
 draw_barchart <- function(
-    data,
-    x,
-    y,
-    group = NULL,
-    facet = NULL,
-    facet_label = NULL,
-    y_label = NULL,
-    rev_group = FALSE,
-    grid = NULL,
-    topn = NULL,
-    axis = NULL,
-    bar_side = NULL,
-    bar_way = NULL,
-    gap = NULL,
-    csize = 0.8, space = 0.9, adj = -0.01, gl = NULL,
-    cols = NULL,
-    palette = "Peach",
-    x_label_side = 1,
-    legend = FALSE,
-    legend_label = NULL,
-    legend_pos = c(0.4, 0.2),
-    dens = c(-1, -1), overlay = FALSE
-    ) {
+  data,
+  x,
+  y,
+  group = NULL,
+  facet = NULL,
+  facet_label = NULL,
+  y_label = NULL,
+  rev_group = FALSE,
+  grid = NULL,
+  topn = NULL,
+  axis = NULL,
+  bar_side = NULL,
+  bar_way = NULL,
+  gap = NULL,
+  csize = 0.8,
+  space = 0.9,
+  adj = -0.01,
+  gl = NULL,
+  cols = NULL,
+  palette = "Peach",
+  x_label_side = 1,
+  legend = FALSE,
+  legend_label = NULL,
+  legend_pos = c(0.4, 0.2),
+  dens = c(-1, -1),
+  overlay = FALSE
+) {
   x_var <- rlang::enquo(x)
   y_var <- rlang::enquo(y)
   group_var <- rlang::enquo(group)
   facet_var <- rlang::enquo(facet)
-  
+
   if (!quo_is_null(facet_var)) {
     data_splited <- data |>
       arrange(!!facet_var) |>
@@ -79,15 +83,19 @@ draw_barchart <- function(
     data_splited <- list(data)
     facet_label <- names(data_splited)
   }
-  
+
   facet_length <- length(data_splited)
-  if (facet_length == 2 & is.null(bar_side)) x_label_side <- 2
-  
-  if (is.null(gap)) gap <- ifelse(x_label_side == 1, 0.6, 0.1)
+  if (facet_length == 2 & is.null(bar_side)) {
+    x_label_side <- 2
+  }
+
+  if (is.null(gap)) {
+    gap <- ifelse(x_label_side == 1, 0.6, 0.1)
+  }
   max_y <- max(dplyr::pull(data, {{ y }}))
   axis <- pretty(c(0, max_y))
   way <- ifelse(facet_length == 2 & is.null(bar_side), 2, 1)
-  
+
   if (length(facet_label) == 2) {
     if (is.null(bar_side)) {
       sides <- c(1, 2)
@@ -96,15 +104,17 @@ draw_barchart <- function(
       sides <- rep(bar_side, facet_length)
       over_lay <- c(FALSE, FALSE)
     }
-    } else {
+  } else {
     sides <- rep(bar_side, facet_length)
     over_lay <- rep(FALSE, facet_length)
   }
-  
+
   plotbar <- function(i) {
     # arrange data by group_var and plot_var.
     facet_data <- data_splited[[i]]
-    if (is.null(topn)) topn <- nrow(facet_data)
+    if (is.null(topn)) {
+      topn <- nrow(facet_data)
+    }
     draw_bar(
       facet_data,
       x = !!x_var,
@@ -118,7 +128,10 @@ draw_barchart <- function(
       bar_way = way,
       overlay = over_lay[i],
       gap = gap,
-      csize = csize, space = space, adj = adj, gl = gl,
+      csize = csize,
+      space = space,
+      adj = adj,
+      gl = gl,
       cols = cols,
       palette = palette,
       legend = ifelse(i == 1, TRUE, FALSE),
@@ -128,53 +141,62 @@ draw_barchart <- function(
       y_label = facet_label[i]
     )
   }
-  
+
   if (is.null(grid) & !quo_is_null(facet_var) & !facet_length == 2) {
     grid <- c(1, facet_length)
   }
   par(mfrow = grid)
-  
+
   for (i in 1:facet_length) {
     plotbar(i)
   }
-  
+
   par(mfrow = c(1, 1))
 }
 
 #' Draw bar chart
 #' @noRd
 draw_bar <- function(
-    data,
-    x,
-    y,
-    group = NULL,
-    rev_group = FALSE,
-    axis = NULL,
-    topn = 10,
-    y_label = NULL,
-    bar_side = NULL,
-    x_label_side = 1,
-    bar_way = 1,
-    gap = ifelse(x_label_side == 1, 0.6, 0.1),
-    csize = 0.8, space = 0.9, adj = -0.004, gl = NULL,
-    cols = NULL,
-    palette = "Peach",
-    legend = FALSE,
-    legend_label = NULL,
-    legend_pos = c(0.4, 0.15),
-    dens = c(-1, -1), overlay = FALSE, ...
-    ) {
+  data,
+  x,
+  y,
+  group = NULL,
+  rev_group = FALSE,
+  axis = NULL,
+  topn = 10,
+  y_label = NULL,
+  bar_side = NULL,
+  x_label_side = 1,
+  bar_way = 1,
+  gap = ifelse(x_label_side == 1, 0.6, 0.1),
+  csize = 0.8,
+  space = 0.9,
+  adj = -0.004,
+  gl = NULL,
+  cols = NULL,
+  palette = "Peach",
+  legend = FALSE,
+  legend_label = NULL,
+  legend_pos = c(0.4, 0.15),
+  dens = c(-1, -1),
+  overlay = FALSE,
+  ...
+) {
   par(mar = c(0, 0, 1, 0))
   x_var <- rlang::enquo(x)
   y_var <- rlang::enquo(y)
-  if (is.null(y_label)) y_label <- rlang::as_name(y_var)
+  if (is.null(y_label)) {
+    y_label <- rlang::as_name(y_var)
+  }
   group_var <- rlang::enquo(group)
   if (quo_is_null(group_var)) {
     data <- dplyr::arrange(data, !!y_var) |>
       slice_tail(n = topn)
     if (is.null(bar_side)) bar_side <- 1
   } else {
-    if (is.null(bar_side)) bar_side <- 1
+    if (is.null(bar_side)) {
+      bar_side <- 1
+    }
     group_value <- unique(dplyr::pull(data, !!group_var))
     x_order <- dplyr::filter(data, !!group_var == group_value[1]) |>
       arrange(!!y_var) |>
@@ -184,11 +206,11 @@ draw_bar <- function(
       filter(!!x_var %in% x_order) |>
       arrange(!!group_var, !!x_var)
   }
-  
+
   if (quo_is_null(group_var)) {
     y_value <- list(
       dplyr::pull(data, !!y_var)
-      )
+    )
     if (quo_is_null(x_var)) {
       x_value <- seq(1, length(y_value[[1]]))
     } else {
@@ -196,20 +218,26 @@ draw_bar <- function(
     }
   } else {
     y_value <- lapply(
-      group_split(data, !!group_var), function(x) {
+      group_split(data, !!group_var),
+      function(x) {
         dplyr::pull(x, !!y_var)
-      })
-    if (rev_group) y_value <- rev(y_value)
+      }
+    )
+    if (rev_group) {
+      y_value <- rev(y_value)
+    }
     if (quo_is_null(x_var)) {
       x_value <- seq(1, length(y_value[[1]]))
     } else {
       x_value <- lapply(
-        group_split(data, !!group_var), function(x) {
+        group_split(data, !!group_var),
+        function(x) {
           dplyr::pull(x, !!x_var)
-        })[[1]]
+        }
+      )[[1]]
     }
   }
-  
+
   if (is.null(axis)) {
     axis <- pretty(c(0, 1.005 * max(unlist(y_value))))
   }
@@ -236,7 +264,7 @@ draw_bar <- function(
   } else {
     cols <- cols[1:length(y_value)]
   }
-  
+
   max_axis <- max(axis)
   min_axis <- min(axis)
   range_axis <- max_axis - min_axis
@@ -256,15 +284,22 @@ draw_bar <- function(
   # draw axis line
   lines(axis_loc, c(1.02, 1.02), lty = 1)
   # draw axis tick label
-  text(ticks_loc, rep(1.02, length(ticks_loc)),
+  text(
+    ticks_loc,
+    rep(1.02, length(ticks_loc)),
     paste(formatC(axis, format = "g")),
-    pos = 3, cex = csize * 0.9
+    pos = 3,
+    cex = csize * 0.9
   )
   # draw axis label
-  text(axis_label_loc, 1.08,
+  text(
+    axis_label_loc,
+    1.08,
     #paste(ifelse(bar_side == 1, y_label[1], y_label[2])),
     y_label,
-    pos = 3, cex = csize, font = 2
+    pos = 3,
+    cex = csize,
+    font = 2
   )
 
   # draw grid lines
@@ -277,20 +312,26 @@ draw_bar <- function(
   VT <- 1:Ci / Ci # calculate vertical end position fro each group
   # draw the side label
   if (x_label_side == 1) {
-    text(ifelse(bar_side == 1, -gap / 2, gap / 2), (VB + VT) / 2 + adj,
+    text(
+      ifelse(bar_side == 1, -gap / 2, gap / 2),
+      (VB + VT) / 2 + adj,
       as.character(x_value),
-      pos = ifelse(bar_side == 1, 4, 2), cex = csize * 0.9
+      pos = ifelse(bar_side == 1, 4, 2),
+      cex = csize * 0.9
     )
   } else {
-    text(axis_loc[1], (VB + VT) / 2 + adj,
+    text(
+      axis_loc[1],
+      (VB + VT) / 2 + adj,
       as.character(x_value),
-      pos = ifelse(bar_side == 1, 2, 4), cex = csize * 0.9
+      pos = ifelse(bar_side == 1, 2, 4),
+      cex = csize * 0.9
     )
   }
 
   VT <- (VT - (VT - VB) * (1 - space))
   h <- (VT - VB) / length(y_value)
-  
+
   # draw the left bar
   left_ <- lapply(y_value, function(x) -(x - min_axis) / range_axis - gap / 2)
   bottom_ <- lapply(1:length(y_value), function(i) VB + (i - 1) * h)
@@ -298,14 +339,26 @@ draw_bar <- function(
 
   if (bar_side == 1) {
     for (i in 1:length(y_value)) {
-      rect(left_[[i]], bottom_[[i]], rep(-gap / 2, Ci), top_[[i]],
-        col = rev(cols)[i], border = rev(cols)[i], density = dens[1]
+      rect(
+        left_[[i]],
+        bottom_[[i]],
+        rep(-gap / 2, Ci),
+        top_[[i]],
+        col = rev(cols)[i],
+        border = rev(cols)[i],
+        density = dens[1]
       )
     }
   } else {
     for (i in 1:length(y_value)) {
-      rect(-rep(-gap / 2, Ci), bottom_[[i]], -left_[[i]], top_[[i]],
-        col = rev(cols)[i], border = rev(cols)[i], density = dens[1]
+      rect(
+        -rep(-gap / 2, Ci),
+        bottom_[[i]],
+        -left_[[i]],
+        top_[[i]],
+        col = rev(cols)[i],
+        border = rev(cols)[i],
+        density = dens[1]
       )
     }
   }
@@ -313,14 +366,17 @@ draw_bar <- function(
     if (is.null(legend_label) && !rlang::quo_is_null(group_var)) {
       legend_label <- rev(levels(factor(dplyr::pull(data, !!group_var))))
     }
-    if (rev_group) legend_label <- rev(legend_label)
+    if (rev_group) {
+      legend_label <- rev(legend_label)
+    }
     legend(
-      ifelse(bar_side == 1,
-             -legend_pos[1] - gap / 2,
-             legend_pos[1] + gap / 2
-             ), legend_pos[2],
-      legend = legend_label, border = "transparent",
-      bty = "n", fill = cols, cex = csize * 0.8
+      ifelse(bar_side == 1, -legend_pos[1] - gap / 2, legend_pos[1] + gap / 2),
+      legend_pos[2],
+      legend = legend_label,
+      border = "transparent",
+      bty = "n",
+      fill = cols,
+      cex = csize * 0.8
     )
   }
 }

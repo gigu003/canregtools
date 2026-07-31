@@ -319,7 +319,7 @@ qua2 |>
 ```{r}
 qua2 |>
   filter(sex == "合计", year == params$year) |>
-  mutate(area_type = classify_areacode(areacode)$area_type) |>
+  mutate(area_type = classify_areacode(areacode, attr = "area_type")[["area_type"]]) |>
   select(area_type, cancer_cn, cancer, mv) |>
   left_join(stdd, by = c("area_type", "cancer")) |>
   arrange(desc(mv.y)) |>
@@ -364,7 +364,7 @@ qua2 |>
 ```{r}
 qua2 |>
   filter(sex == "合计", year == params$year) |>
-  mutate(area_type = classify_areacode(areacode)$area_type) |>
+  mutate(area_type = classify_areacode(areacode, attr = "area_type")[["area_type"]]) |>
   select(area_type, cancer_cn, cancer, mi) |>
   left_join(stdd, by = c("area_type", "cancer")) |>
   arrange(desc(mi.y)) |>

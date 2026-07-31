@@ -18,26 +18,33 @@
 #' classify_icd10(icd10, cancer_type = "small")
 #' classify_icd10(icd10, cancer_type = "system")
 #' classify_icd10(icd10, cancer_type = "gco")
-classify_icd10 <- function(x,
-                           cancer_type = "big",
-                           lang = "code",
-                           label_type = "abbr",
-                           as_factor = FALSE) {
+classify_icd10 <- function(
+  x,
+  cancer_type = "big",
+  lang = "code",
+  label_type = "abbr",
+  as_factor = FALSE
+) {
   cancer_type <- tolower(cancer_type)
   valid_types <- c("small", "big", "system", "gco")
   if (!cancer_type %in% valid_types) {
-    stop("Invalid cancer_type. Valid options: ",
-         paste(valid_types, collapse = ", "))
+    stop(
+      "Invalid cancer_type. Valid options: ",
+      paste(valid_types, collapse = ", ")
+    )
   }
   dict_icd10_code <- dict_maps[["icd10_code"]]
   clean_x <- toupper(substr(x, 1, 3))
   idx <- match(clean_x, dict_icd10_code[["icd10"]])
   res <- dict_icd10_code[idx, cancer_type]
   res <- unname(unlist(res))
-  res <- tidy_var(res,
-      var_name = "cancer", lang = lang,
-      label_type = label_type, as_factor = as_factor
-    )
+  res <- tidy_var(
+    res,
+    var_name = "cancer",
+    lang = lang,
+    label_type = label_type,
+    as_factor = as_factor
+  )
 
   return(res)
 }
@@ -59,105 +66,8 @@ classify_icd10 <- function(x,
 #'
 #' @param x A vector of six-digit Chinese administrative area codes, either as numeric
 #'   or character strings.
-#'
-#' @return A list with the following named elements:
-#'
-#' * `areacode`: Validated area codes. Invalid entries are replaced with `NA`.
-#' * `registry`: Registry codes corresponding to each area, using a built-in
-#'    or cached dictionary.
-#' * `province`: Province-level codes formed by taking the first two digits and
-#'    appending `"0000"`.
-#' * `city`: City-level codes formed by taking the first four digits and
-#'    appending `"00"`.
-#' * `area_type`: Urban-rural classification codes: `"910000"` for urban,
-#'    `"920000"` for rural. This can be updated using [write_registry()]
-#'    function which stored the dictionary in (`area_type_dict.rds`)
-#' * `region`: Region classification codes derived from province codes,
-#'    ending in `"0000"`.
-#'
-#' @export
-#'
-#' @seealso [write_registry()]
-#' @examples
-#' classify_areacode(c("110000", "320500", "440300"))
-#'
-classify_areacode <- function(x) {
-  x <- as.character(x)
-  prov2 <- substr(x, 1, 2)
-  city4 <- substr(x, 1, 4)
-  digit5 <- substr(x, 5, 5)
-
-  # Validation Province code
-  valid_prov <- prov2 %in% sprintf("%02d", c(
-    11:15, 21:23, 31:37, 41:46,
-    50:54, 61:65, 71, 81, 82
-  ))
-  valid_format <- nchar(x) == 6 & !is.na(x) & !grepl("[^0-9]", x)
-  check <- valid_prov & valid_format
-  x[!check] <- NA_character_
-
-  # Generate province, city, and region code
-  prov_codes <- ifelse(check, paste0(prov2, "0000"), NA_character_)
-  city_codes <- ifelse(check, paste0(city4, "00"), NA_character_)
-  # Generate region codes
-  pp <- ifelse(check, prov2, NA_character_)
-  region_code <- unname(dict_maps[["prov_region"]][pp])
-  region_code <- paste0(region_code, "0000")
-
-  # Get address that store the dictionary in canregtools
-  cache_dir <- tools::R_user_dir("canregtools", "config")
-  dict_area_type_addr <- file.path(cache_dir, "area_type_dict.rds")
-  dict_registry_addr <- file.path(cache_dir, "registry_dict.rds")
-
-  # Generate area_type codes
-  area_type_codes <- ifelse(check & digit5 %in% c("0", "1"), "910000", "920000")
-  if (file.exists(dict_area_type_addr)) {
-    dict_area_type <- readRDS(dict_area_type_addr)
-    type_logi <- x %in% names(dict_area_type)
-    urban_rural <- tolower(unlist(dict_area_type[x[type_logi]]))
-    area_type_codes[type_logi] <- urban_rural
-  }
-
-  # Generate registry code
-  registry_codes <- x
-  if (!file.exists(dict_registry_addr)) {
-    write_registry()
-  }
-  registry_dict_temp <- readRDS(dict_registry_addr)
-  regi_logi <- x %in% names(registry_dict_temp)
-  registry_codes[regi_logi] <- unlist(registry_dict_temp[x[regi_logi]])
-  registry_codes <- unlist(registry_codes)
-
-  # Return the results
-  list(
-    areacode = x,
-    registry = registry_codes,
-    province = prov_codes,
-    city = city_codes,
-    area_type = area_type_codes,
-    region = region_code
-  )
-}
-
-
-#' Classify codes for the administrative divisions of China
-#'
-#' Categorizes six-digit administrative division codes of the People's Republic
-#' of China (as per GB/T 2260-2007) into several structured components,
-#' including province, city, area type (urban/rural), registry code, and
-#' regional classification.
-#'
-#' This function standardizes and validates area codes, identifies their
-#' administrative levels, and attaches metadata used in cancer registration
-#' systems. It also supports external dictionaries (from the `canregtools`
-#' configuration folder) to provide more accurate classification of area types
-#' and registry mapping. Classify Codes for the administrative divisions of
-#' the People's Republic of China(GB/T 2260-2007) into different categories,
-#' including 'province', city', 'area_type', and 'registry' attributes.
-#'
-#' @param x A vector of six-digit Chinese administrative area codes, either as numeric
-#'   or character strings.
-#' @param attr A character vector of attributes to return. Options include:
+#' @param attr A character vector of attributes to return. Defaults to all
+#'   built-in area-code attributes. Options include:
 #'   - `"areacode"`: Original area codes.
 #'   - `"registry"`: Cancer registry codes.
 #'   - `"province"`: Province-level codes.
@@ -186,33 +96,55 @@ classify_areacode <- function(x) {
 #'
 #' @seealso [write_registry()]
 #' @examples
-#' classify_areacode2(c("110000", "320500", "440300"))
+#' classify_areacode(c("110000", "320500", "440300"))
+#' classify_areacode(c("110000", "320500", "440300"), attr = "registry")
 #'
-classify_areacode2 <- function(x, attr = "registry") {
-  if (!is.character(attr) || length(attr) == 0 || any(is.na(attr)) ||
-      any(!nzchar(attr))) {
-    stop("'attr' must be a non-empty character vector without NA or empty values.")
+classify_areacode <- function(x, attr = area_code_vars()) {
+  if (
+    !is.character(attr) ||
+      length(attr) == 0 ||
+      any(is.na(attr)) ||
+      any(!nzchar(attr))
+  ) {
+    stop(
+      "'attr' must be a non-empty character vector without NA or empty values."
+    )
   }
-  
+
   x <- as.character(x)
   raw_x <- x
   prov2 <- substr(x, 1, 2)
   # Validation Province code
-  valid_prov <- prov2 %in% sprintf("%02d", c(
-    11:15, 21:23, 31:37, 41:46,
-    50:54, 61:65, 71, 81, 82
-  ))
+  valid_prov <- prov2 %in%
+    sprintf(
+      "%02d",
+      c(
+        11:15,
+        21:23,
+        31:37,
+        41:46,
+        50:54,
+        61:65,
+        71,
+        81,
+        82
+      )
+    )
   valid_format <- nchar(x) == 6 & !is.na(x) & !grepl("[^0-9]", x)
   check <- valid_prov & valid_format
   x[!check] <- NA_character_
-  
+
   get_codes <- function(f) {
     if (f == "areacode") {
       return(raw_x)
     } else if (f == "region") {
       pp <- ifelse(check, prov2, NA_character_)
       region_code <- unname(dict_maps[["prov_region"]][pp])
-      return(paste0(region_code, "0000"))
+      return(ifelse(
+        is.na(region_code),
+        NA_character_,
+        paste0(region_code, "0000")
+      ))
     } else if (f == "province") {
       return(ifelse(check, paste0(prov2, "0000"), NA_character_))
     } else if (f == "city") {
@@ -241,8 +173,10 @@ classify_areacode2 <- function(x, attr = "registry") {
           readRDS(dict_file),
           error = function(e) {
             stop(
-              "Failed to read area_type dictionary at '", dict_file,
-              "'. Reason: ", conditionMessage(e),
+              "Failed to read area_type dictionary at '",
+              dict_file,
+              "'. Reason: ",
+              conditionMessage(e),
               call. = FALSE
             )
           }
@@ -256,16 +190,21 @@ classify_areacode2 <- function(x, attr = "registry") {
       custom_codes <- x
       dict_file <- dict_addr(f)
       if (!file.exists(dict_file)) {
-        stop(paste0("Custom dictionary not found. ",
-                    "Use `write_registry(..., dict = '", f, "')` to create one.")
-             )
+        stop(paste0(
+          "Custom dictionary not found. ",
+          "Use `write_registry(..., dict = '",
+          f,
+          "')` to create one."
+        ))
       }
       dict <- tryCatch(
         readRDS(dict_file),
         error = function(e) {
           stop(
-            "Failed to read custom dictionary at '", dict_file,
-            "'. Reason: ", conditionMessage(e),
+            "Failed to read custom dictionary at '",
+            dict_file,
+            "'. Reason: ",
+            conditionMessage(e),
             call. = FALSE
           )
         }
@@ -276,10 +215,14 @@ classify_areacode2 <- function(x, attr = "registry") {
       return(custom_codes)
     }
   }
-  
+
   res <- purrr::map(attr, get_codes)
   names(res) <- attr
   return(res)
+}
+
+area_code_vars <- function() {
+  c("areacode", "registry", "province", "city", "area_type", "region")
 }
 
 
@@ -313,12 +256,14 @@ classify_areacode2 <- function(x, attr = "registry") {
 #' morp <- c("8000", "8040", "8170")
 #' beha <- c("3", "3", "3")
 #' child_code <- classify_childhood(topo, morp, beha, type = "main")
-#' 
-classify_childhood <- function(topo,
-                               morp,
-                               beha,
-                               type = "sub",
-                               version = "v2005") {
+#'
+classify_childhood <- function(
+  topo,
+  morp,
+  beha,
+  type = "sub",
+  version = "v2005"
+) {
   topo <- toupper(topo)
   morp <- gsub("[^0-9]", "", morp)
   if (version == "v2005") {
@@ -353,7 +298,7 @@ find_pos <- function(x) {
 
 #' Classify ICD-O-3 morphology codes into categories
 #'
-#' @param x Character vector of ICD-O-3 morphology codes. 
+#' @param x Character vector of ICD-O-3 morphology codes.
 #'   Values not present in the internal dictionary will be returned as `"99"`.
 #' @param group Morphology grouping system. `"60"` uses the broad
 #'   morphology grouping dictionary; `"125"` uses leukemia-specific
@@ -374,7 +319,7 @@ classify_morp <- function(x, group = c("60", "125")) {
   } else {
     morp_dict <- dict_maps[["60"]]
   }
-  
+
   res <- unname(morp_dict[as.character(x)])
   res[is.na(res)] <- "99"
   res
@@ -382,7 +327,7 @@ classify_morp <- function(x, group = c("60", "125")) {
 
 #' Classify ICD-O-3 topography codes into categories
 #'
-#' @param x Character vector of ICD-O-3 topography codes. 
+#' @param x Character vector of ICD-O-3 topography codes.
 #'   Values not present in the internal dictionary will be returned as `NA`.
 #' @param cancer_type Cancer type.
 #'
@@ -395,17 +340,34 @@ classify_topo <- function(x, cancer_type = "big") {
   topo[topo == "C15.0"] <- "C15.3"
   topo[topo == "C15.1"] <- "C15.4"
   topo[topo == "C15.2"] <- "C15.5"
-  
+
   if (cancer_type == "big") {
-    single_topo <- paste0("C", c(
-      11, 15, 16, 22, 25, 32, 33, 34, 
-      43, 50, 53, 56, 61, 62, 67, 73
-    ))
-    
+    single_topo <- paste0(
+      "C",
+      c(
+        11,
+        15,
+        16,
+        22,
+        25,
+        32,
+        33,
+        34,
+        43,
+        50,
+        53,
+        56,
+        61,
+        62,
+        67,
+        73
+      )
+    )
+
     res <- ifelse(substr(topo, 1, 3) %in% single_topo, topo, substr(topo, 1, 3))
   } else {
     res <- substr(topo, 1, 3)
   }
-  
+
   return(res)
 }

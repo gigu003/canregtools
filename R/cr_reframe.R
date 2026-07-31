@@ -32,7 +32,7 @@ cr_reframe <- function(x, strat = "registry") {
 cr_reframe.canregs <- function(x, strat = "registry") {
   areacodes <- unique(unlist(map(x, pluck("areacode"))))
   new <- map(strat, function(a) {
-    pluck(classify_areacode2(areacodes, attr = a), a)
+    pluck(classify_areacode(areacodes, attr = a), a)
   })
   nnew <- map(new, unique)
   res <- map(seq_along(nnew), function(b) {
@@ -70,7 +70,7 @@ cr_reframe.canregs <- function(x, strat = "registry") {
 cr_reframe.fbswicds <- function(x, strat = "registry") {
   areacodes <- unique(unlist(map(x, pluck("areacode"))))
   new_code <- map(strat, function(a) {
-    pluck(classify_areacode2(areacodes, attr = a), a)
+    pluck(classify_areacode(areacodes, attr = a), a)
   })
   tran_code <- map(new_code, unique)
   res <- map(seq_along(tran_code), function(b) {
@@ -94,7 +94,6 @@ cr_reframe.fbswicds <- function(x, strat = "registry") {
 }
 
 
-
 #' Merge registry attributes into an `fbswicd` object
 #'
 #' @param x An object with class of `fbswicd`
@@ -102,13 +101,17 @@ cr_reframe.fbswicds <- function(x, strat = "registry") {
 #' @returns A `fbswicd` object is augmented with registry metadata
 #' @noRd
 full_fbswicd <- function(x) {
-  areacode_info <- as.data.frame(classify_areacode2(x[["areacode"]]))
+  areacode_info <- as.data.frame(classify_areacode(x[["areacode"]]))
   fbswicd <- bind_cols(areacode_info, x[["fbswicd"]])
   sitemorp <- bind_cols(areacode_info, x[["sitemorp"]])
   pop <- bind_cols(areacode_info, x[["pop"]])
   structure(
-    list(areacode = x[["areacode"]], fbswicd = fbswicd, sitemorp = sitemorp,
-         pop = pop),
+    list(
+      areacode = x[["areacode"]],
+      fbswicd = fbswicd,
+      sitemorp = sitemorp,
+      pop = pop
+    ),
     class = c("fbswicd", "list")
   )
 }
@@ -123,10 +126,14 @@ full_fbswicd <- function(x) {
 #'    summed across vectors.
 #' @export
 combine_tp <- function(object) {
-  if (!is.list(object)) stop("input object must be a list.")
-  if (!all(sapply(object, function(x) {
-    is.numeric(x) && !is.null(names(x))
-  }))) {
+  if (!is.list(object)) {
+    stop("input object must be a list.")
+  }
+  if (
+    !all(sapply(object, function(x) {
+      is.numeric(x) && !is.null(names(x))
+    }))
+  ) {
     stop("All elements in the list must be named numeric vectors.")
   }
   all_names <- unique(unlist(lapply(object, names)))

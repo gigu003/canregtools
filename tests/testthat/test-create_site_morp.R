@@ -18,29 +18,40 @@ test_that("create_site_morp always returns year, sex, and cancer strata", {
   fbsw <- structure(list(sitemorp = sm), class = c("fbswicd", "list"))
 
   by_year <- create_site_morp(fbsw, year, class_morp = FALSE)
-  expect_true(all(c("year", "sex", "cancer", "icd10", "count") %in% names(by_year)))
-  expect_false(any(by_year$year == 9000L))
-  expect_true(all(by_year$sex == 0L))
-  expect_true(all(by_year$cancer == "60"))
+  expect_contains(names(by_year), c("year", "sex", "cancer", "icd10", "count"))
+  expect_equal(intersect(by_year$year, 9000L), integer())
+  expect_equal(unique(by_year$sex), 0L)
+  expect_equal(unique(by_year$cancer), "60")
 
   by_year_sex <- create_site_morp(fbsw, year, sex, class_morp = FALSE)
-  expect_true(all(c("year", "sex", "cancer", "icd10", "count") %in% names(by_year_sex)))
-  expect_false(any(by_year_sex$year == 9000L))
+  expect_contains(
+    names(by_year_sex),
+    c("year", "sex", "cancer", "icd10", "count")
+  )
+  expect_equal(intersect(by_year_sex$year, 9000L), integer())
   expect_equal(sort(unique(by_year_sex$sex)), c(0L, 1L, 2L))
-  expect_true(all(by_year_sex$cancer == "60"))
+  expect_equal(unique(by_year_sex$cancer), "60")
 
   by_year_cancer <- create_site_morp(fbsw, year, cancer, class_morp = FALSE)
-  expect_true(all(c("year", "sex", "cancer", "icd10", "count") %in% names(by_year_cancer)))
-  expect_false(any(by_year_cancer$year == 9000L))
-  expect_true(all(by_year_cancer$sex == 0L))
+  expect_contains(
+    names(by_year_cancer),
+    c("year", "sex", "cancer", "icd10", "count")
+  )
+  expect_equal(intersect(by_year_cancer$year, 9000L), integer())
+  expect_equal(unique(by_year_cancer$sex), 0L)
   expect_equal(sort(unique(by_year_cancer$cancer)), c("101", "102", "60"))
 
   by_sex_cancer <- create_site_morp(fbsw, sex, cancer, class_morp = FALSE)
-  expect_true(all(by_sex_cancer$year == 9000L))
+  expect_equal(unique(by_sex_cancer$year), 9000L)
   expect_equal(sort(unique(by_sex_cancer$sex)), c(0L, 1L, 2L))
   expect_equal(sort(unique(by_sex_cancer$cancer)), c("101", "102", "60"))
   expect_equal(
-    dplyr::filter(by_sex_cancer, sex == 0L, cancer == "60", icd10 == "C15")$count,
+    dplyr::filter(
+      by_sex_cancer,
+      sex == 0L,
+      cancer == "60",
+      icd10 == "C15"
+    )$count,
     10L
   )
 })
@@ -68,14 +79,17 @@ test_that("create_site_morp collapses ICD-10 to three characters for selected ca
   res_101 <- dplyr::filter(res, sex == 1L, cancer == "101")
   expect_equal(dplyr::filter(res_101, icd10 == "C15")$count, 5L)
   expect_equal(dplyr::filter(res_101, icd10 == "C16")$count, 4L)
-  expect_false(any(grepl("\\.", res_101$icd10)))
+  expect_equal(grep("\\.", res_101$icd10, value = TRUE), character())
 
   res_126 <- dplyr::filter(res, sex == 1L, cancer == "126")
   expect_equal(dplyr::filter(res_126, icd10 == "C18")$count, 11L)
-  expect_false(any(grepl("\\.", res_126$icd10)))
+  expect_equal(grep("\\.", res_126$icd10, value = TRUE), character())
 
   res_102 <- dplyr::filter(res, sex == 1L, cancer == "102")
-  expect_true(all(c("C18.1", "C18.2") %in% res_102$icd10))
+  expect_setequal(
+    intersect(c("C18.1", "C18.2"), res_102$icd10),
+    c("C18.1", "C18.2")
+  )
 })
 
 test_that("create_site_morp normalises special and incomplete ICD-10 codes", {
@@ -102,5 +116,5 @@ test_that("create_site_morp normalises special and incomplete ICD-10 codes", {
   expect_equal(dplyr::filter(res_102, icd10 == "C15.1")$count, 3L)
   expect_equal(dplyr::filter(res_102, icd10 == "C80")$count, 9L)
   expect_equal(dplyr::filter(res_102, icd10 == "D24")$count, 13L)
-  expect_false(any(res$icd10 %in% c("C80.9", "D24.0")))
+  expect_equal(intersect(res$icd10, c("C80.9", "D24.0")), character())
 })

@@ -29,18 +29,18 @@ esti_pop <- function(pop1, pop2, period) {
   # Calculate proportions
   pop1_prop <- pop1 / sum(pop1)
   pop2_prop <- pop2 / sum(pop2)
-  
+
   # Years sequence
   years <- seq(period[1], period[2], 1)
   n_years <- length(years)
-  
+
   # Per-year increment (slope)
   diff_prop <- pop2_prop - pop1_prop
   increment <- diff_prop / (period[2] - period[1])
-  
+
   # Vectorized interpolation: matrix of proportions (rows: age groups, columns: years)
   props <- outer(increment, 0:(n_years - 1), "*") + pop1_prop
-  
+
   # Convert to data frame and set column names
   res <- as.data.frame(props)
   colnames(res) <- years
