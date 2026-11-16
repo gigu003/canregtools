@@ -98,7 +98,14 @@ test_that("project directories isolate dictionaries and reads do not create file
   expect_length(ls_dict_files(), 0L)
   write_registry(c("410103" = "GROUP-A"))
   expect_identical(classify_areacode("410103", "registry")$registry, "GROUP-A")
-  expect_identical(dirname(ls_dict_files(full.names = TRUE)), project_a)
+  expect_identical(
+    normalizePath(
+      dirname(ls_dict_files(full.names = TRUE)),
+      winslash = "/",
+      mustWork = TRUE
+    ),
+    normalizePath(project_a, winslash = "/", mustWork = TRUE)
+  )
   expect_identical(
     ls_dict_files(with_info = TRUE)$path,
     ls_dict_files(full.names = TRUE)
