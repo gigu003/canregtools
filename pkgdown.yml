@@ -1,5 +1,9 @@
 pandoc: 3.8.3
 pkgdown: 2.2.1
 pkgdown_sha: ~
-articles: {}
-last_built: 2026-07-31T13:52Z
+articles:
+  using-canregtools: using-canregtools.html
+last_built: 2026-11-16T06:56Z
+urls:
+  reference: https://gigu003.github.io/canregtools/reference
+  article: https://gigu003.github.io/canregtools/articles

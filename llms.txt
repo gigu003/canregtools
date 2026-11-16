@@ -1,0 +1,322 @@
+# canregtools
+
+## Overview
+
+Canregtools is an R package designed to streamline the analysis workflow
+for Population-Based Cancer Registry (PBCR) data. It aims to improve the
+efficiency, accuracy, and reproducibility of cancer registry data
+processing, thereby supporting standardized, and routine PBCR analytical
+workflows.
+
+## Install
+
+Currently, the package is not available on CRAN, but you can install the
+development version of canregtools from
+<https://gigu003.r-universe.dev/>.
+
+``` r
+
+install.packages('canregtools', repos = c('https://gigu003.r-universe.dev', 'https://cloud.r-project.org'))
+```
+
+## View the vignette
+
+After installing `canregtools`, list the available vignettes or open the
+main user guide directly:
+
+``` r
+
+browseVignettes("canregtools")
+vignette("using-canregtools", package = "canregtools")
+```
+
+The vignette explains the `canreg` and `fbswicd` objects,
+data-management functions such as
+[`cr_select()`](https://gigu003.github.io/canregtools/reference/cr_select.md)
+and
+[`cr_filter()`](https://gigu003.github.io/canregtools/reference/cr_filter.md),
+and the workflow for calculating rates and quality indicators. It is
+also available in the package website at
+[`articles/using-canregtools.html`](https://gigu003.github.io/canregtools/articles/using-canregtools.html).
+
+## Usage
+
+``` r
+
+library(canregtools)
+data("canregs")
+registry <- canregs[[1]]
+summary_object <- count_canreg(registry, cancer_type = "big")
+
+asr <- create_asr(summary_object, year, sex, cancer)
+quality <- create_quality(summary_object, cancer)
+age_rate <- create_age_rate(summary_object)
+```
+
+Registry dictionaries can be isolated by project. User overrides are
+combined with built-in defaults and take effect immediately:
+
+``` r
+
+options(canregtools.dict_dir = file.path("config", "canregtools"))
+mapping <- data.frame(
+  regicode = c("410103", "410307"),
+  area_type = c("910000", "920000"),
+  hdi = c("high", "low")
+)
+cr_map(mapping, attr = c("area_type", "hdi"))
+ls_dict("hdi")
+```
+
+Use
+[`write_regicode()`](https://gigu003.github.io/canregtools/reference/write_regicode.md)
+for multilingual registry labels and
+[`reset_dict()`](https://gigu003.github.io/canregtools/reference/reset_dict.md)
+to clear overrides with a backup. Legacy files are backed up on their
+next update; see the vignette for migration details.
+
+The main workflow is:
+
+``` text
+Excel/data frames -> canreg(s) -> fbswicd(s)
+                  -> rates, quality indicators, and reports
+```
+
+For detailed input requirements, data-management functions, validation,
+and reproducible analysis options, see the [`using-canregtools`
+vignette](https://gigu003.github.io/canregtools/articles/using-canregtools.html).
+
+# Package index
+
+## Registry objects and data preparation
+
+- [`as_canreg()`](https://gigu003.github.io/canregtools/reference/as_canreg.md)
+  : Construct a canreg object
+
+- [`read_canreg()`](https://gigu003.github.io/canregtools/reference/read_canreg.md)
+  : Read cancer registration data
+
+- [`as_fbswicd()`](https://gigu003.github.io/canregtools/reference/as_fbswicd.md)
+  :
+
+  Construct `fbswicd` objects from summary data frames
+
+- [`count_canreg()`](https://gigu003.github.io/canregtools/reference/count_canreg.md)
+  :
+
+  Count and classify `canreg` data
+
+- [`cr_clean()`](https://gigu003.github.io/canregtools/reference/cr_clean.md)
+  : Clean canreg data.
+
+- [`cr_combine()`](https://gigu003.github.io/canregtools/reference/cr_combine.md)
+  : Combine cancer registry collections
+
+- [`cr_filter()`](https://gigu003.github.io/canregtools/reference/cr_filter.md)
+  : Filter rows from canregtools objects
+
+- [`cr_merge()`](https://gigu003.github.io/canregtools/reference/cr_merge.md)
+  :
+
+  Merge elements from objects of class `canregs`, `fbswicds`, or `asrs`
+
+- [`cr_map()`](https://gigu003.github.io/canregtools/reference/cr_map.md)
+  : Set registry grouping mappings for cr_reframe
+
+- [`cr_reframe()`](https://gigu003.github.io/canregtools/reference/cr_reframe.md)
+  : Reframe data of class canregs or fbswicds
+
+- [`cr_rename()`](https://gigu003.github.io/canregtools/reference/cr_rename.md)
+  : Rename registries in a registry collection
+
+- [`cr_select()`](https://gigu003.github.io/canregtools/reference/cr_select.md)
+  :
+
+  Select elements from objects with class `"canregs"`, or `"fbswicds"`
+
+- [`esti_fbswicd()`](https://gigu003.github.io/canregtools/reference/esti_fbswicd.md)
+  : Estimate object of fbswicd
+
+- [`esti_pop()`](https://gigu003.github.io/canregtools/reference/esti_pop.md)
+  : Estimating population structure using interpolation method.
+
+- [`get_pop()`](https://gigu003.github.io/canregtools/reference/get_pop.md)
+  : Subset or summarize population data
+
+## Validation
+
+- [`validate_cases()`](https://gigu003.github.io/canregtools/reference/validate_cases.md)
+  [`validate_population()`](https://gigu003.github.io/canregtools/reference/validate_cases.md)
+  [`validate_canreg()`](https://gigu003.github.io/canregtools/reference/validate_cases.md)
+  [`validate_fbswicd()`](https://gigu003.github.io/canregtools/reference/validate_cases.md)
+  : Validate cancer registry data
+
+- [`is_valid_canreg()`](https://gigu003.github.io/canregtools/reference/is_valid_canreg.md)
+  : Test whether a validation result contains no errors
+
+- [`validate_canreg_report()`](https://gigu003.github.io/canregtools/reference/validate_canreg_report.md)
+  :
+
+  Validate a `canreg_report` object
+
+## Age splitting and rates
+
+- [`calc_age()`](https://gigu003.github.io/canregtools/reference/calc_age.md)
+  : Calculate the actual age in completed years between two dates
+- [`ageadjust()`](https://gigu003.github.io/canregtools/reference/ageadjust.md)
+  : Calculate the age standardized rate using the direct method
+- [`benchmark_age_split()`](https://gigu003.github.io/canregtools/reference/benchmark_age_split.md)
+  : Blindly benchmark age-splitting methods against a single-age
+  schedule
+- [`create_age_rate()`](https://gigu003.github.io/canregtools/reference/create_age_rate.md)
+  : Calculate age specific rate
+- [`create_asr()`](https://gigu003.github.io/canregtools/reference/create_asr.md)
+  : Calculate age-standardized rate (ASR)
+- [`cumrate()`](https://gigu003.github.io/canregtools/reference/cumrate.md)
+  : Calculate the cumulative incidence or mortality rate
+- [`cumrisk()`](https://gigu003.github.io/canregtools/reference/cumrisk.md)
+  : Calculate the cumulative risk
+- [`cutage()`](https://gigu003.github.io/canregtools/reference/cutage.md)
+  : Group ages into categories
+- [`expand_age_pop()`](https://gigu003.github.io/canregtools/reference/expand_age_pop.md)
+  : Expand grouped population to single-year ages while preserving an
+  open group
+- [`expand_open_age_pop()`](https://gigu003.github.io/canregtools/reference/expand_open_age_pop.md)
+  : Expand one open-ended population age group
+- [`expand_lx()`](https://gigu003.github.io/canregtools/reference/expand_lx.md)
+  : Expand a five-year abridged life table to a complete life table
+- [`get_stdpop()`](https://gigu003.github.io/canregtools/reference/get_stdpop.md)
+  : Get standardized population data
+- [`truncrate()`](https://gigu003.github.io/canregtools/reference/truncrate.md)
+  : Calculate truncated age standardized rate
+
+## Quality and statistical comparisons
+
+- [`create_quality()`](https://gigu003.github.io/canregtools/reference/create_quality.md)
+  : Calculate quality indicators
+- [`compare_mi()`](https://gigu003.github.io/canregtools/reference/compare_mi.md)
+  : Compare mortality-to-incidence ratios across registries
+- [`compare_mv()`](https://gigu003.github.io/canregtools/reference/compare_mv.md)
+  : Compare morphologically verified percentages across registries
+- [`compare_rate()`](https://gigu003.github.io/canregtools/reference/compare_rate.md)
+  : Compare incidence or mortality rates
+- [`cr_test()`](https://gigu003.github.io/canregtools/reference/cr_test.md)
+  : Run cancer-registry quality tests
+- [`detect_anomaly()`](https://gigu003.github.io/canregtools/reference/detect_anomaly.md)
+  : Detect unusual annual rates or quality indicators
+- [`create_site_morp()`](https://gigu003.github.io/canregtools/reference/create_site_morp.md)
+  : Count ICD-10 site and morphology groups by strata
+
+## Classification and labels
+
+- [`add_labels()`](https://gigu003.github.io/canregtools/reference/add_labels.md)
+  : Add variable labels for data set.
+- [`add_var_labels()`](https://gigu003.github.io/canregtools/reference/add_var_labels.md)
+  : Add Variable Labels with Units
+- [`calc_ax()`](https://gigu003.github.io/canregtools/reference/calc_ax.md)
+  : Calculate ax for life table
+- [`classify_areacode()`](https://gigu003.github.io/canregtools/reference/classify_areacode.md)
+  : Classify codes for the administrative divisions of China
+- [`classify_childhood()`](https://gigu003.github.io/canregtools/reference/classify_childhood.md)
+  : Classify childhood cancer according to the ICCC3 standards
+- [`classify_icd10()`](https://gigu003.github.io/canregtools/reference/classify_icd10.md)
+  : Classify ICD10 codes to cancer categories
+- [`classify_morp()`](https://gigu003.github.io/canregtools/reference/classify_morp.md)
+  : Classify ICD-O-3 morphology codes into categories
+- [`classify_topo()`](https://gigu003.github.io/canregtools/reference/classify_topo.md)
+  : Classify ICD-O-3 topography codes into categories
+- [`combine_tp()`](https://gigu003.github.io/canregtools/reference/combine_tp.md)
+  : Sum named numeric vectors
+- [`drop_others()`](https://gigu003.github.io/canregtools/reference/drop_others.md)
+  : Drop “other” cancer codes
+- [`drop_total()`](https://gigu003.github.io/canregtools/reference/drop_total.md)
+  : Drop the total cancer
+- [`tidy_age()`](https://gigu003.github.io/canregtools/reference/tidy_age.md)
+  : Tidy age description
+- [`tidy_sex()`](https://gigu003.github.io/canregtools/reference/tidy_sex.md)
+  : Tidy gender variable
+- [`tidy_var()`](https://gigu003.github.io/canregtools/reference/tidy_var.md)
+  : Reformat variable values for Cancer Registration in China
+
+## Reports and visualization
+
+- [`create_canreg_report_data()`](https://gigu003.github.io/canregtools/reference/create_canreg_report_data.md)
+  : Create a standardized cancer registry report data object
+
+- [`create_report()`](https://gigu003.github.io/canregtools/reference/create_report.md)
+  : Render standardized cancer registry reports from built-in templates
+
+- [`new_canreg_report()`](https://gigu003.github.io/canregtools/reference/new_canreg_report.md)
+  :
+
+  Construct a `canreg_report` object
+
+- [`draw_barchart()`](https://gigu003.github.io/canregtools/reference/draw_barchart.md)
+  : Draw Grouped Bar Charts with Facets
+
+- [`draw_dumbbell()`](https://gigu003.github.io/canregtools/reference/draw_dumbbell.md)
+  : Plot dumbbell chart
+
+- [`draw_linechart()`](https://gigu003.github.io/canregtools/reference/draw_linechart.md)
+  : Draw a Custom Line Chart Using Base R
+
+- [`draw_pyramid()`](https://gigu003.github.io/canregtools/reference/draw_pyramid.md)
+  : Plot a population pyramid
+
+## Dictionaries and utilities
+
+- [`del_dict_files()`](https://gigu003.github.io/canregtools/reference/del_dict_files.md)
+  : Delete a dictionary file from canregtools config
+
+- [`ls_attrs()`](https://gigu003.github.io/canregtools/reference/ls_attrs.md)
+  :
+
+  list built-in attributes name used in
+  [`cr_reframe()`](https://gigu003.github.io/canregtools/reference/cr_reframe.md)
+
+- [`ls_dict()`](https://gigu003.github.io/canregtools/reference/ls_dict.md)
+  : list dictionary used in package
+
+- [`ls_dict_files()`](https://gigu003.github.io/canregtools/reference/ls_dict_files.md)
+  : List dictionary files used by canregtools
+
+- [`ls_vars()`](https://gigu003.github.io/canregtools/reference/ls_vars.md)
+  : List variable names and their descriptions by category
+
+- [`reset_dict()`](https://gigu003.github.io/canregtools/reference/reset_dict.md)
+  : Reset user dictionary overrides
+
+- [`lt()`](https://gigu003.github.io/canregtools/reference/lt.md) :
+  Construct a life table from age-specific mortality rates
+
+- [`write_regicode()`](https://gigu003.github.io/canregtools/reference/write_regicode.md)
+  : Write custom registry identifier labels to dictionary
+
+- [`write_registry()`](https://gigu003.github.io/canregtools/reference/write_registry.md)
+  : Write registry attributes to a user-defined dictionary
+
+## Data
+
+- [`canregs`](https://gigu003.github.io/canregtools/reference/canregs.md)
+  :
+
+  Example Population-Based Cancer Registry Data (`canregs`)
+
+- [`ci5_xii_china`](https://gigu003.github.io/canregtools/reference/ci5_xii_china.md)
+  : CI5-XII China reference data for registry comparisons
+
+- [`quality`](https://gigu003.github.io/canregtools/reference/quality.md)
+  : Quality Indicators from the China Cancer Registry Annual Report
+
+## Summary methods
+
+- [`summary(`*`<canreg>`*`)`](https://gigu003.github.io/canregtools/reference/summary.md)
+  [`summary(`*`<canregs>`*`)`](https://gigu003.github.io/canregtools/reference/summary.md)
+  : Summary object of class 'canreg'
+
+# Articles
+
+### Guides
+
+- [Using canregtools for Population-Based Cancer Registry
+  Analysis](https://gigu003.github.io/canregtools/articles/using-canregtools.md):
