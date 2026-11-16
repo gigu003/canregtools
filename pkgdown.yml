@@ -3,7 +3,7 @@ pkgdown: 2.2.1
 pkgdown_sha: ~
 articles:
   using-canregtools: using-canregtools.html
-last_built: 2026-11-16T07:41Z
+last_built: 2026-11-16T08:01Z
 urls:
   reference: https://gigu003.github.io/canregtools/reference
   article: https://gigu003.github.io/canregtools/articles
