@@ -9,3 +9,6 @@ docs
 inst/doc
 data-raw/
 .positai
+
+/.quarto/
+**/*.quarto_ipynb
