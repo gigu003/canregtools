@@ -9,6 +9,18 @@ test_that("classify_icd10 maps ICD10 codes to cancer categories", {
     classify_icd10(icd10, cancer_type = "small"),
     c("10", "21", "59")
   )
+  expect_equal(
+    classify_icd10(
+      c("C00", "C15.2", "C44", "C86", "D45", "D46", "C80"),
+      cancer_type = "ci5"
+    ),
+    c("401", "410", "425", "453", "459", "460", "461")
+  )
+  expect_equal(
+    tidy_var(c("401", "60", "61"), var_name = "cancer", lang = "en"),
+    c("Lip", "All Cancers", "All Cancers excl. non-melanoma skin cancer ")
+  )
+  expect_identical(get_cancer("ci5"), as.character(401:461))
 })
 
 test_that("classify_icd10 validates cancer_type", {
@@ -18,17 +30,28 @@ test_that("classify_icd10 validates cancer_type", {
 })
 
 test_that("classify_areacode returns requested built-in attributes", {
-  areacodes <- c("110000", "320500", "bad")
+  regicodes <- c("110000", "320500", "bad")
   result <- classify_areacode(
-    areacodes,
-    attr = c("areacode", "province", "city", "region")
+    regicodes,
+    attr = c("regicode", "province", "city", "region")
   )
 
-  expect_named(result, c("areacode", "province", "city", "region"))
-  expect_equal(result$areacode, areacodes)
+  expect_named(result, c("regicode", "province", "city", "region"))
+  expect_equal(result$regicode, c("110000", "320500", NA_character_))
   expect_equal(result$province, c("110000", "320000", NA_character_))
   expect_equal(result$city, c("110000", "320500", NA_character_))
   expect_equal(result$region, c("720000", "740000", NA_character_))
+})
+
+test_that("classify_areacode keeps international identifiers out of China strata", {
+  result <- classify_areacode(
+    "IARC-GB-001",
+    attr = c("regicode", "province", "registry")
+  )
+
+  expect_equal(result$regicode, NA_character_)
+  expect_equal(result$province, NA_character_)
+  expect_equal(result$registry, NA_character_)
 })
 
 test_that("classify_areacode validates attr", {

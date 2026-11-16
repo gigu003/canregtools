@@ -107,17 +107,17 @@ test_that("tidy_var errors when var_name is unsupported", {
 
 test_that("tidy_sex handles basic gender terms", {
   input <- c("male", "female", "man", "woman", "men", "women")
-  expect_equal(tidy_sex(input), c(1, 2, 1, 2, 1, 2))
+  expect_equal(tidy_sex(input), c("1", "2", "1", "2", "1", "2"))
 })
 
 test_that("tidy_sex handles numeric input as string", {
   input <- c("1", "2", "0")
-  expect_equal(tidy_sex(input), c(1, 2, 0))
+  expect_equal(tidy_sex(input), c("1", "2", "0"))
 })
 
 test_that("tidy_sex handles Chinese gender labels", {
   input <- c("男", "女", "合", "合计")
-  expect_equal(tidy_sex(input), c(1, 2, 0, 0))
+  expect_equal(tidy_sex(input), c("1", "2", "0", "0"))
 })
 
 test_that("tidy_sex returns factors with Chinese labels", {
@@ -136,7 +136,7 @@ test_that("tidy_sex returns factors with English labels", {
 
 test_that("tidy_sex handles unknown input as NA", {
   input <- c("unknown", "other", "x")
-  expect_equal(tidy_sex(input), rep(NA_integer_, 3))
+  expect_equal(tidy_sex(input), rep(NA_character_, 3))
 })
 
 # Define test cases for tidy_age function

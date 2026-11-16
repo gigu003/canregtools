@@ -6,11 +6,12 @@
 \usage{
 as_canreg(
   regi_data = NULL,
-  incidence = NULL,
-  mortality = NULL,
-  population = NULL,
+  inci = NULL,
+  mort = NULL,
+  pop = NULL,
   year = NULL,
-  areacode = NULL
+  regicode = NULL,
+  regicode_var = NULL
 )
 }
 \arguments{
@@ -18,54 +19,67 @@ as_canreg(
 \itemize{
 \item \code{inciden}: date of diagnosis
 \item \code{deathda}: date of death
-If provided, \code{incidence} and \code{mortality} will be automatically derived.
+If provided, \code{inci} and \code{mort} will be automatically derived.
 }}
 
-\item{incidence}{A data frame containing incidence (case) data. If not provided,
+\item{inci}{A data frame containing incidence (case) data. If not provided,
 it can be derived from \code{regi_data}.}
 
-\item{mortality}{A data frame containing mortality (death) data. If not provided,
+\item{mort}{A data frame containing mortality (death) data. If not provided,
 it can be derived from \code{regi_data}.}
 
-\item{population}{A data frame containing population data. This is required.}
+\item{pop}{A data frame containing population data. This is required.}
 
-\item{year}{Optional numeric vector. If specified, only cases or deaths from these years
-will be included.}
+\item{year}{Optional vector of four-digit calendar years or inclusive
+\code{"YYYY-YYYY"} periods. If specified, only cases or deaths from those
+calendar years will be included, for both raw and separate input tables.
+Incidence uses \code{inciden} and mortality uses \code{deathda}; missing event dates
+are excluded when filtering. Population rows are not filtered.}
 
-\item{areacode}{Character. A registry or area identifier for the data.
+\item{regicode}{Character. A registry or area identifier for the data.
 It is stored as a character vector and is not limited to administrative
 division codes. Default is \code{NULL}.}
+
+\item{regicode_var}{Optional character string naming the column that
+identifies registries in all supplied data frames. When provided, the
+data are split by this column and one \code{canreg} object is created per
+registry. A single registry still returns a \code{canreg}; multiple registries
+return a named \code{canregs} object.}
 }
 \value{
-A \code{canreg} object (S3 class \code{canreg}) which is a list containing:
-\itemize{
-\item \code{areacode}: registry or area identifier
-\item \code{FBcases}: incidence data (S3 class \code{FBcases})
-\item \code{SWcases}: mortality data (S3 class \code{SWcases})
-\item \code{POP}: population data (S3 class \code{POP})
-}
+A \code{canreg} object (S3 class \code{canreg}) or, when multiple registry
+codes are found with \code{regicode_var}, a named \code{canregs} object. Each
+\code{canreg} contains \code{regicode}, \code{FBcases}, \code{SWcases}, and \code{POP}.
 }
 \description{
 This function constructs a \code{canreg} object, which contains cancer registry data,
 including incidence, mortality, and population information.
 Users can provide either a raw \code{regi_data} data frame containing \code{inciden} and \code{deathda} columns,
-or supply \code{incidence} and \code{mortality} data frames directly.
+or supply \code{inci} and \code{mort} data frames directly.
 }
 \examples{
 \dontrun{
 # Using raw registry data
 canreg_obj <- as_canreg(
   regi_data = my_registry_df,
-  population = my_population_df,
+  pop = my_population_df,
   year = 2023,
-  areacode = "410100"
+  regicode = "410100"
+)
+
+# Build one canreg per registry using a grouping column
+canregs_obj <- as_canreg(
+  inci = incidence_df,
+  mort = mortality_df,
+  pop = population_df,
+  regicode_var = "registry_id"
 )
 
 # Using separate incidence and mortality data frames
 canreg_obj <- as_canreg(
-  incidence = my_incidence_df,
-  mortality = my_mortality_df,
-  population = my_population_df
+  inci = my_incidence_df,
+  mort = my_mortality_df,
+  pop = my_population_df
 )
 }
 

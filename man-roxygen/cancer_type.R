@@ -5,6 +5,8 @@
 #'   categories, more specific categories), `"system"` (classify ICD-10
 #'   codes into organ system), and `"gco"` (classify ICD-10 code into
 #'   cancer categories same as classification published by the Global
-#'   Cancer Observatory). This parameter is only available when the
+#'   Cancer Observatory), and `"ci5"` (classify ICD-10 codes using the
+#'   63-category CI5-XII classification, with shared aggregate codes `60` and
+#'   `61`). This parameter is only available when the
 #'   input data is a vector of ICD-10 codes, or object with class of
 #'   `'canreg'` or `'canregs'`.

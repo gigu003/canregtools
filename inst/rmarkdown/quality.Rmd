@@ -41,8 +41,8 @@ stdd <- quality |>
 data <- params$report_data
 pop <- data$POP
 fbsw <- count_canreg(data)
-areacode <- data$areacode
-name <- tidy_var(areacode, var_name = "areacode", lang = "cn")
+regicode <- data$regicode
+name <- tidy_var(regicode, var_name = "regicode", lang = "cn")
 ```
 
 > 本质量控制报告用于对肿瘤登记数据进行年度质量评估。报告中所使用的数据为初步版本，尚未最终确认，因此不得对外公开发布，以免造成误导。
@@ -319,7 +319,7 @@ qua2 |>
 ```{r}
 qua2 |>
   filter(sex == "合计", year == params$year) |>
-  mutate(area_type = classify_areacode(areacode, attr = "area_type")[["area_type"]]) |>
+  mutate(area_type = classify_areacode(regicode, attr = "area_type")[["area_type"]]) |>
   select(area_type, cancer_cn, cancer, mv) |>
   left_join(stdd, by = c("area_type", "cancer")) |>
   arrange(desc(mv.y)) |>
@@ -364,7 +364,7 @@ qua2 |>
 ```{r}
 qua2 |>
   filter(sex == "合计", year == params$year) |>
-  mutate(area_type = classify_areacode(areacode, attr = "area_type")[["area_type"]]) |>
+  mutate(area_type = classify_areacode(regicode, attr = "area_type")[["area_type"]]) |>
   select(area_type, cancer_cn, cancer, mi) |>
   left_join(stdd, by = c("area_type", "cancer")) |>
   arrange(desc(mi.y)) |>

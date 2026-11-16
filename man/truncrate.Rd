@@ -22,7 +22,8 @@ truncrate(
 
 \item{stdpop}{The standard population.}
 
-\item{trunc_age}{The truncated age range.}
+\item{trunc_age}{Inclusive truncated age range. Both ends must align with
+complete age groups; the group starting after the upper end is excluded.}
 
 \item{agewidth}{Age groups width, default is 5.}
 

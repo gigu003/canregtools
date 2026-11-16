@@ -36,7 +36,11 @@ cr_filter(.data, ..., drop = c("none"), part = "all")
 
 \item{...}{Filtering conditions passed to \code{\link[dplyr:filter]{dplyr::filter()}}. These
 conditions are applied to selected components when all variables in the
-expressions are available in that component.}
+expressions are available in that component. Direct comparisons of \code{year}
+with numeric values (including \code{\%in\%}) temporarily interpret single-year
+labels as integers. Character comparisons retain character semantics.
+Period or invalid labels become missing with a warning in numeric
+comparisons. The stored \code{year} column is not changed.}
 
 \item{drop}{Drop specific cancer categories. Use \code{"total"} to remove total
 cancer categories and \code{"others"} to remove other/non-specific cancer

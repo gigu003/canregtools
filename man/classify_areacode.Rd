@@ -4,7 +4,7 @@
 \alias{classify_areacode}
 \title{Classify codes for the administrative divisions of China}
 \usage{
-classify_areacode(x, attr = area_code_vars())
+classify_areacode(x, attr = regicode_vars())
 }
 \arguments{
 \item{x}{A vector of six-digit Chinese administrative area codes, either as numeric
@@ -13,20 +13,20 @@ or character strings.}
 \item{attr}{A character vector of attributes to return. Defaults to all
 built-in area-code attributes. Options include:
 \itemize{
-\item \code{"areacode"}: Original area codes.
+\item \code{"regicode"}: Original area codes.
 \item \code{"registry"}: Cancer registry codes.
 \item \code{"province"}: Province-level codes.
 \item \code{"city"}: City-level codes.
 \item \code{"area_type"}: Urban/rural classification.
 \item \code{"region"}: Regional classification based on province.
 \item Any other string will be treated as a custom dictionary name written
-using \code{\link[=write_registry]{write_registry()}}.
+using \code{\link[=cr_map]{cr_map()}}.
 }}
 }
 \value{
 A list with the following named elements:
 \itemize{
-\item \code{areacode}: Validated area codes. Invalid entries are replaced with \code{NA}.
+\item \code{regicode}: Validated area codes. Invalid entries are replaced with \code{NA}.
 \item \code{registry}: Registry codes corresponding to each area, using a built-in
 or cached dictionary.
 \item \code{province}: Province-level codes formed by taking the first two digits and
@@ -34,8 +34,8 @@ appending \code{"0000"}.
 \item \code{city}: City-level codes formed by taking the first four digits and
 appending \code{"00"}.
 \item \code{area_type}: Urban-rural classification codes: \code{"910000"} for urban,
-\code{"920000"} for rural. This can be updated using \code{\link[=write_registry]{write_registry()}}
-function which stored the dictionary in (\code{area_type_dict.rds})
+\code{"920000"} for rural. This can be updated using \code{\link[=cr_map]{cr_map()}}
+with \code{attr = "area_type"}.
 \item \code{region}: Region classification codes derived from province codes,
 ending in \code{"0000"}.
 }
@@ -61,5 +61,5 @@ classify_areacode(c("110000", "320500", "440300"), attr = "registry")
 
 }
 \seealso{
-\code{\link[=write_registry]{write_registry()}}
+\code{\link[=cr_map]{cr_map()}}, \code{\link[=write_registry]{write_registry()}}
 }

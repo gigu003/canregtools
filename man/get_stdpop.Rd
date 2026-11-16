@@ -4,26 +4,55 @@
 \alias{get_stdpop}
 \title{Get standardized population data}
 \usage{
-get_stdpop(std = "wld85", sep_zero = TRUE)
+get_stdpop(
+  std = "wld85",
+  sep_zero = NULL,
+  age_breaks = NULL,
+  method = c("exact", "interpolate"),
+  interpolation_method = "linear"
+)
 }
 \arguments{
 \item{std}{Character string specifying the population standard.
-Supported values are "cn64", "cn82", "cn2000", "wld85", "wld2000".
-Defaults to "wld85".}
+Supported values are "cn64", "cn82", "cn2000", "wld85", "wld2000",
+"eur76", "eur2013", and "usa2000". Defaults to "wld85".}
 
 \item{sep_zero}{Logical value indicating whether age 0 should be treated
-as a separate group.}
+as a separate group. Retained for compatibility; it cannot be supplied
+together with \code{age_breaks}.}
+
+\item{age_breaks}{Numeric vector of lower bounds for the requested age
+groups. It must begin at 0 and end no later than 85; the final group is
+open-ended. Defaults to the original 19 groups, or to 18 five-year groups
+when \code{sep_zero = FALSE}.}
+
+\item{method}{Method for obtaining the requested grouping. With
+\code{"exact"} (the default), requested groups must only combine the original
+standard-population groups. \code{"interpolate"} expands the standard
+population to single-year ages before regrouping, and should be used only
+when a requested boundary splits an original group.}
+
+\item{interpolation_method}{Interpolation method passed to
+\code{\link[=expand_age_pop]{expand_age_pop()}} when \code{method = "interpolate"}. With \code{"sprague"},
+requested age groups cannot split 0--4 because the source 0 and 1--4
+groups are combined before interpolation.}
 }
 \value{
-A vector or data structure containing the standardized population data
-for the specified standard, or NULL if the standard is not supported.
+A numeric vector containing the standardized population weights for
+the requested age groups, or \code{NULL} if the standard is not supported.
 }
 \description{
 Retrieves standardized population data for a specified standard from dict_maps.
 }
+\details{
+\code{eur2013} follows the 2013 European Standard Population. Its
+source separates ages 85--89, 90--94, and 95 years and over; these are
+combined into the final \verb{85+} group to match the 19-group structure used
+by this package.
+}
 \examples{
 \dontrun{
-  get_std("cn64")
-  get_std("wld2000")
+  get_stdpop("cn64")
+  get_stdpop("wld2000", age_breaks = c(0, 1, 15, 45, 65, 85))
 }
 }

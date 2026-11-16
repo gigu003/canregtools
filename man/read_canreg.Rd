@@ -30,7 +30,7 @@ sheet. Must be either \code{"long"} (default) or \code{"wide"}.}
 be added. Default is \code{"death"}.}
 }
 \value{
-A \code{canreg} object (a list with components: \code{areacode}, \code{FBcases},
+A \code{canreg} object (a list with components: \code{regicode}, \code{FBcases},
 \code{SWcases}, \code{POP}) if a single file is read. A named list of such objects
 with class \code{"canregs"} if multiple files or a directory is provided.
 }

@@ -6,7 +6,7 @@
 \usage{
 add_labels(
   x,
-  vars = c("sex", "cancer", "areacode"),
+  vars = c("sex", "cancer", "regicode"),
   names = NULL,
   label_type = "full",
   lang = "zh",
@@ -19,7 +19,7 @@ add_labels(
 \item{x}{A data frame or tibble to be labeled.}
 
 \item{vars}{A character vector of variable names to label. Default includes
-\code{"sex"}, \code{"cancer"}, and \code{"areacode"}.}
+\code{"sex"}, \code{"cancer"}, and \code{"regicode"}.}
 
 \item{names}{A character vector contains the labels added.}
 
@@ -41,7 +41,7 @@ A data frame or tibble with labeled variables and reordered columns.
 }
 \description{
 \code{add_labels()} adds labels for selected variables such as \code{sex}, \code{cancer},
-and \code{areacode} in the dataset based on the specified language and label type.
+and \code{regicode} in the dataset based on the specified language and label type.
 }
 \examples{
 data("canregs")

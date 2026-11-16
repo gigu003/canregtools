@@ -4,7 +4,7 @@
       classify_icd10("C15.2", cancer_type = "invalid")
     Condition
       Error in `classify_icd10()`:
-      ! Invalid cancer_type. Valid options: small, big, system, gco
+      ! Invalid cancer_type. Valid options: small, big, system, gco, ci5
 
 # classify_areacode validates attr
 
@@ -22,5 +22,5 @@
       Error in `purrr::map()`:
       i In index: 1.
       Caused by error in `.f()`:
-      ! Custom dictionary not found. Use `write_registry(..., dict = 'test_classify_missing_custom')` to create one.
+      ! Custom dictionary not found. Use `cr_map(..., attr = 'test_classify_missing_custom')` to create one.
 

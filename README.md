@@ -29,56 +29,60 @@ development version of canregtools from
 install.packages('canregtools', repos = c('https://gigu003.r-universe.dev', 'https://cloud.r-project.org'))
 ```
 
+## View the vignette
+
+After installing `canregtools`, list the available vignettes or open the
+main user guide directly:
+
+``` r
+browseVignettes("canregtools")
+vignette("using-canregtools", package = "canregtools")
+```
+
+The vignette explains the `canreg` and `fbswicd` objects,
+data-management functions such as `cr_select()` and `cr_filter()`, and
+the workflow for calculating rates and quality indicators. It is also
+available in the package website at
+[`articles/using-canregtools.html`](https://gigu003.github.io/canregtools/articles/using-canregtools.html).
+
 ## Usage
 
 ``` r
-# Load sample data
 library(canregtools)
 data("canregs")
-data <- canregs[[1]]
+registry <- canregs[[1]]
+summary_object <- count_canreg(registry, cancer_type = "big")
 
-# Convert `canreg` to `fbswicd`
-fbsw <- count_canreg(data, cancer_type = "big")
-
-# 1. Age-standardized rate (ASR)
-create_asr(fbsw, year, sex, cancer) |>
-  add_labels(lang = "en")
-#> # A tibble: 84 × 14
-#>    year   sex sex_en cancer cancer_en        no_cases    cr asr_cn2000 asr_wld85
-#>   <int> <dbl> <fct>  <chr>  <fct>               <dbl> <dbl>      <dbl>     <dbl>
-#> 1  2021     0 Total  101    Oral Cavity & P…       38  5.53       3.74      3.79
-#> 2  2021     0 Total  102    Nasopharynx             5  0.73       0.71      0.71
-#> 3  2021     0 Total  103    Esophagus              59  8.58       4.53      4.85
-#> 4  2021     0 Total  104    Stomach               123 17.9       11.1      11.2 
-#> 5  2021     0 Total  105    Conlon, Rectum …      236 34.3       20.6      20.2 
-#> # ℹ 79 more rows
-#> # ℹ 5 more variables: truncr_cn2000 <dbl>, truncr_wld85 <dbl>, cumur <dbl>,
-#> #   prop <dbl>, rank <int>
-
-# 2. Quality indicators
-create_quality(fbsw, cancer) |>
-  add_labels(label_type = "abbr", lang = "en")
-#> # A tibble: 28 × 16
-#>    year   sex sex_en cancer cancer_en    rks   fbs  inci   sws  mort    mi    mv
-#>   <int> <dbl> <fct>  <chr>  <fct>      <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl>
-#> 1  9000     0 T      101    Oral Cav… 687356    38  5.53    20  2.91  0.53  73.7
-#> 2  9000     0 T      102    Nasophar… 687356     5  0.73     2  0.29  0.4   40  
-#> 3  9000     0 T      103    Esophagus 687356    59  8.58    58  8.44  0.98  74.6
-#> 4  9000     0 T      104    Stomach   687356   123 17.9     82 11.9   0.67  71.5
-#> 5  9000     0 T      105    Colorect… 687356   236 34.3    103 15.0   0.44  77.5
-#> # ℹ 23 more rows
-#> # ℹ 4 more variables: dco <dbl>, ub <dbl>, sub <dbl>, mvs <dbl>
-
-# 3. Age-specific rates
-create_age_rate(fbsw) |>
-  add_labels(lang = "en")
-#> # A tibble: 19 × 8
-#>    year   sex sex_en cancer cancer_en   agegrp   cases  rate
-#>   <int> <dbl> <fct>  <chr>  <fct>       <fct>    <dbl> <dbl>
-#> 1  9000     0 Total  60     All Cancers 0 岁         3  44.3
-#> 2  9000     0 Total  60     All Cancers 1-4 岁      12  31.4
-#> 3  9000     0 Total  60     All Cancers 5-9 岁       9  16.4
-#> 4  9000     0 Total  60     All Cancers 10-14 岁    13  32.5
-#> 5  9000     0 Total  60     All Cancers 15-19 岁     8  26.2
-#> # ℹ 14 more rows
+asr <- create_asr(summary_object, year, sex, cancer)
+quality <- create_quality(summary_object, cancer)
+age_rate <- create_age_rate(summary_object)
 ```
+
+Registry dictionaries can be isolated by project. User overrides are
+combined with built-in defaults and take effect immediately:
+
+``` r
+options(canregtools.dict_dir = file.path("config", "canregtools"))
+mapping <- data.frame(
+  regicode = c("410103", "410307"),
+  area_type = c("910000", "920000"),
+  hdi = c("high", "low")
+)
+cr_map(mapping, attr = c("area_type", "hdi"))
+ls_dict("hdi")
+```
+
+Use `write_regicode()` for multilingual registry labels and
+`reset_dict()` to clear overrides with a backup. Legacy files are backed
+up on their next update; see the vignette for migration details.
+
+The main workflow is:
+
+``` text
+Excel/data frames -> canreg(s) -> fbswicd(s)
+                  -> rates, quality indicators, and reports
+```
+
+For detailed input requirements, data-management functions, validation,
+and reproducible analysis options, see the [`using-canregtools`
+vignette](https://gigu003.github.io/canregtools/articles/using-canregtools.html).

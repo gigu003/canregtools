@@ -10,7 +10,9 @@ ls_dict(dict = "registry")
 \item{dict}{Character, name of dictionary.}
 }
 \value{
-A tibble of dictionary.
+The effective dictionary including defaults and user overrides.
+Mapping dictionaries have \code{regicode} and \code{value} columns; \code{regicode}
+labels have \code{regicode}, \code{cname}, \code{ename}, \code{abbr_cn}, and \code{abbr_en}.
 }
 \description{
 list dictionary used in package

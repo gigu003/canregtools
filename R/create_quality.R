@@ -24,6 +24,16 @@
 #'   grouped registry object, 'canregs' or 'fbswicds') with a class of either
 #'   `'quality'` or `'qualities'`.
 #'
+#' @details For summary input, existing `sex = "0"` rows are retained once.
+#'   Missing overall rows are computed from available male/female rows at each
+#'   original stratum before grouping. If an overall row and both sex-specific
+#'   rows are supplied, inconsistent totals cause an error. Overall-only input
+#'   is supported; sex-specific rows are not inferred from overall values.
+#'   Within each observed year/sex/cancer stratum, absent summary age rows
+#'   are interpreted as zero counts and completed from matching population
+#'   age groups. Entirely absent strata are not inferred. Supplied missing,
+#'   non-finite, or negative counts cause an error; population rows are never
+#'   invented or filled with zero.
 #' @export
 #'
 #' @examples
@@ -82,6 +92,7 @@ create_quality.fbswicds <- function(x, ..., decimal = 2, collapse = TRUE) {
     x,
     create_quality.fbswicd,
     ...,
+    decimal = decimal,
     .progress = "Calculating quality indicies #"
   )
   class(res) <- c("qualities", "list")
@@ -104,6 +115,16 @@ create_quality.fbswicds <- function(x, ..., decimal = 2, collapse = TRUE) {
 create_quality.fbswicd <- function(x, ..., decimal = 2) {
   sex <- rlang::sym("sex")
   stats <- c("fbs", "sws", "mv", "dco", "ub", "sub", "mvs")
+  missing_stats <- setdiff(stats, names(x$fbswicd))
+  if (length(missing_stats) > 0L) {
+    stop(
+      "`create_quality()` requires count column(s): ",
+      paste(stats, collapse = ", "),
+      ". Missing: ",
+      paste(missing_stats, collapse = ", "),
+      "."
+    )
+  }
   if ("ids" %in% names(x$fbswicd)) {
     stats <- c(stats, "ids")
   }
@@ -129,7 +150,7 @@ create_quality.fbswicd <- function(x, ..., decimal = 2) {
 
   # 预处理统计数据和人口数据
   pop_modi <- pre_deal_pop(x, ...)
-  data <- pre_deal_fbswicd(x, ...)
+  data <- pre_deal_fbswicd(x, ..., .arrange = FALSE)
 
   output <- data |>
     group_by(!!!rlang::syms(gvars), !!rlang::sym("agegrp")) |>
@@ -152,7 +173,6 @@ create_quality.fbswicd <- function(x, ..., decimal = 2) {
         .names = "{.col}"
       )
     ) |>
-    mutate(across(where(is.numeric), ~ cr_replace_na(.x))) |>
     select(!!!gvars, !!popu, !!fbs, !!inci, !!sws, !!mort, !!mi, !!!s_vars2)
   attr(output, "class") <- c("quality", "tbl_df", "tbl", "data.frame")
 
@@ -174,7 +194,7 @@ create_quality.fbswicd <- function(x, ..., decimal = 2) {
   # Deal with group vars
   output <- post_vars(output) |> post_sex_specific_cancer()
   if (sex_not_pass) {
-    output <- filter(output, !!sex == 0L)
+    output <- filter(output, !!sex == "0")
   }
 
   if (cancer_not_pass & "death" %in% names(pop_modi)) {

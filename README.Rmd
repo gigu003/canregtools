@@ -34,32 +34,63 @@ Currently, the package is not available on CRAN, but you can install the develop
 install.packages('canregtools', repos = c('https://gigu003.r-universe.dev', 'https://cloud.r-project.org'))
 ```
 
-## Usage
+## View the vignette
 
-```{r, message = FALSE}
-# Load sample data
-library(canregtools)
-data("canregs")
-data <- canregs[[1]]
+After installing `canregtools`, list the available vignettes or open the main
+user guide directly:
 
-# Convert `canreg` to `fbswicd`
-fbsw <- count_canreg(data, cancer_type = "big")
-
-# 1. Age-standardized rate (ASR)
-create_asr(fbsw, year, sex, cancer) |>
-  add_labels(lang = "en")
-
-# 2. Quality indicators
-create_quality(fbsw, cancer) |>
-  add_labels(label_type = "abbr", lang = "en")
-
-# 3. Age-specific rates
-create_age_rate(fbsw) |>
-  add_labels(lang = "en")
+```{r, eval = FALSE}
+browseVignettes("canregtools")
+vignette("using-canregtools", package = "canregtools")
 ```
 
+The vignette explains the `canreg` and `fbswicd` objects, data-management
+functions such as `cr_select()` and `cr_filter()`, and the workflow for
+calculating rates and quality indicators. It is also available in the package
+website at
+[`articles/using-canregtools.html`](https://gigu003.github.io/canregtools/articles/using-canregtools.html).
 
+## Usage
 
+```{r, eval = FALSE}
+library(canregtools)
+data("canregs")
+registry <- canregs[[1]]
+summary_object <- count_canreg(registry, cancer_type = "big")
+
+asr <- create_asr(summary_object, year, sex, cancer)
+quality <- create_quality(summary_object, cancer)
+age_rate <- create_age_rate(summary_object)
+```
+
+Registry dictionaries can be isolated by project. User overrides are combined
+with built-in defaults and take effect immediately:
+
+```{r, eval = FALSE}
+options(canregtools.dict_dir = file.path("config", "canregtools"))
+mapping <- data.frame(
+  regicode = c("410103", "410307"),
+  area_type = c("910000", "920000"),
+  hdi = c("high", "low")
+)
+cr_map(mapping, attr = c("area_type", "hdi"))
+ls_dict("hdi")
+```
+
+Use `write_regicode()` for multilingual registry labels and `reset_dict()` to
+clear overrides with a backup. Legacy files are backed up on their next update;
+see the vignette for migration details.
+
+The main workflow is:
+
+```text
+Excel/data frames -> canreg(s) -> fbswicd(s)
+                  -> rates, quality indicators, and reports
+```
+
+For detailed input requirements, data-management functions, validation, and
+reproducible analysis options, see the
+[`using-canregtools` vignette](https://gigu003.github.io/canregtools/articles/using-canregtools.html).
 
 
 

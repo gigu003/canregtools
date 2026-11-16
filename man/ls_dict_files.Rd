@@ -19,7 +19,8 @@ if \code{with_info = TRUE}.
 }
 \description{
 Lists all dictionary \code{.rds} files stored in the user's config directory
-for \code{canregtools}.
+for \code{canregtools}, or the project directory set by \code{canregtools.dict_dir}.
+Migration and reset backup files are excluded.
 }
 \examples{
 ls_dict_files()

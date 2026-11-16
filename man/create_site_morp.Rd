@@ -131,6 +131,11 @@ user-defined strata. It can be applied to objects with class \code{canreg},
 For \code{canreg} and \code{canregs} objects, the function first calls
 \code{\link[=count_canreg]{count_canreg()}} to create \code{fbswicd}/\code{fbswicds} objects, and then counts the
 \code{icd10} and/or \code{morp} frequency tables stored in the \code{sitemorp} element.
+
+For \code{fbswicd} and \code{fbswicds} objects, a \code{sitemorp} component must be
+present. If it was omitted when constructing the object, the function
+reports that site/morphology data are unavailable. An explicitly supplied
+zero-row component is treated as available and returns an empty result.
 }
 \examples{
 \dontrun{

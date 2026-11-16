@@ -1,14 +1,14 @@
-#' Rename registries in a `canregs` object
+#' Rename registries in a registry collection
 #'
-#' `cr_rename()` renames selected elements of a `canregs` object and updates
-#' the `areacode` stored inside each renamed `canreg` element.
+#' `cr_rename()` renames selected elements of a `canregs` or `fbswicds` object
+#' and updates the `regicode` stored inside each renamed registry element.
 #'
-#' @param x An object of class `canregs`.
+#' @param x An object of class `canregs` or `fbswicds`.
 #' @param mapping A named character vector. Names identify existing registry
 #'   names in `x`, and values provide their new names.
 #'
-#' @return A `canregs` object with selected element names and their internal
-#'   `areacode` values updated.
+#' @return An object with the same class as `x`, with selected element names
+#'   and their internal `regicode` values updated.
 #' @export
 #'
 #' @examples
@@ -18,7 +18,11 @@
 #'   c("410103" = "REG_A", "410307" = "REG_B")
 #' )
 #' names(renamed)
-#' renamed[["REG_A"]]$areacode
+#' renamed[["REG_A"]]$regicode
+#'
+#' summarized <- count_canreg(canregs)
+#' renamed_summaries <- cr_rename(summarized, c("410103" = "REG_A"))
+#' renamed_summaries[["REG_A"]]$regicode
 cr_rename <- function(x, mapping) {
   UseMethod("cr_rename", x)
 }
@@ -27,6 +31,17 @@ cr_rename <- function(x, mapping) {
 #' @method cr_rename canregs
 #' @export
 cr_rename.canregs <- function(x, mapping) {
+  rename_registry_collection(x, mapping)
+}
+
+#' @rdname cr_rename
+#' @method cr_rename fbswicds
+#' @export
+cr_rename.fbswicds <- function(x, mapping) {
+  rename_registry_collection(x, mapping)
+}
+
+rename_registry_collection <- function(x, mapping) {
   if (!is.character(mapping) || is.null(names(mapping))) {
     stop("`mapping` must be a named character vector.", call. = FALSE)
   }
@@ -69,7 +84,7 @@ cr_rename.canregs <- function(x, mapping) {
   }
 
   for (i in seq_along(locations)) {
-    x[[locations[[i]]]]$areacode <- new_names[[i]]
+    x[[locations[[i]]]]$regicode <- new_names[[i]]
   }
   names(x) <- result_names
 

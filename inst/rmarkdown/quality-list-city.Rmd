@@ -48,7 +48,7 @@ quality <- create_quality(fbsw, year)
 quality |>
   add_labels(label_type = "abbr") |>
   filter(year == params$year) |>
-  select(-cancer, -sex, -site, -icd10, -year, -areacode) |>
+  select(-cancer, -sex, -site, -icd10, -year, -regicode) |>
   mutate(id = row_number()) |>
   select(id, everything()) |>
   kableExtra::kable()

@@ -26,7 +26,9 @@ group.}
 supplied, it will be calculated as \code{count / pop}.}
 
 \item{eage}{Integer, the upper age limit (e.g., 70) up to which the cumulative
-rate is calculated.}
+rate is calculated. The upper bound is exclusive: \code{eage = 70} includes
+ages below 70, excluding the 70--74 age group. A bound within an age
+interval uses the corresponding fraction of that interval.}
 
 \item{agewidth}{Integer, width of the age intervals (e.g., 5 for 5-year
 bands).}

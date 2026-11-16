@@ -2,44 +2,71 @@
 % Please edit documentation in R/age.R
 \name{expand_age_pop}
 \alias{expand_age_pop}
-\title{Expand population data from 5-year age groups to single-year ages}
+\title{Expand grouped population to single-year ages while preserving an open group}
 \usage{
-expand_age_pop(x, method = "linear")
+expand_age_pop(
+  x,
+  source_breaks = c(0, 1, seq(5, 85, 5)),
+  method = "linear",
+  reference = NULL,
+  high_age = "keep",
+  pclm_control = list()
+)
 }
 \arguments{
-\item{x}{A numeric vector representing the population counts for each age
-group. The vector should have 19 elements corresponding to the following
-age groups: 0, 1–4, 5–9, ..., 85+.}
+\item{x}{Numeric population totals. Its length must equal
+\code{length(source_breaks)}; the last value is the open age group.}
 
-\item{method}{A character string specifying the interpolation method to use.
-Options include:
-\itemize{
-\item \code{"linear"}: Linear interpolation.
-\item \code{"constant"}: Constant interpolation.
-\item \code{"periodic"}: Periodic spline interpolation.
-\item \code{"natural"}: Natural spline interpolation.
-}
-The default is \code{"linear"}.}
+\item{source_breaks}{Integer lower bounds of the input age groups. The last
+bound starts the open group. The default is 0, 1--4, 5--9, ..., 85+.}
+
+\item{method}{Splitting method: \code{"linear"}, \code{"constant"}, \code{"fmm"},
+\code{"natural"}, \code{"monoh.fc"}, \code{"reference"}, \code{"sprague"}, or \code{"pclm"}.
+The spline options are retained for compatibility and apply only to closed
+groups. \code{"reference"} uses an external single-age schedule. \code{"sprague"}
+requires regular closed five-year groups; the default 0 and 1--4 groups
+are automatically combined to 0--4. \code{"pclm"} requires \code{ungroup}.}
+
+\item{reference}{An external single-age schedule for \code{method = "reference"}.
+Supply a named numeric vector (names are ages), or a data frame with
+\code{age}/\code{x} and \code{population}/\code{pop}/\code{y} columns. It must cover every closed
+age to be split. It should be independent of data evaluated in a blind
+validation.}
+
+\item{high_age}{A character method or list supplied to \code{\link[=expand_open_age_pop]{expand_open_age_pop()}}.
+The default, \code{"keep"}, retains the source open group. Use a list with
+\code{method = "reference"}, \code{reference}, and \code{max_age} only when an external
+high-age schedule is available.}
+
+\item{pclm_control}{A list passed to \code{ungroup::pclm(control = ...)}.}
 }
 \value{
-A data frame with two columns:
-\describe{
-\item{\code{x}}{Integer ages from 0 to 92.}
-\item{\code{y}}{Estimated population counts for each single-year age.}
-}
+A data frame with \code{x} (age lower bound), \code{y} (population), \code{age_end},
+\code{open}, \code{source_group}, \code{lower}, and \code{upper}. Closed rows have
+\code{age_end == x}; the final open row has \code{age_end = Inf}. PCLM uncertainty
+intervals are returned when supplied by \code{ungroup}; other methods report
+missing intervals. Attributes record the effective \code{source_breaks}, method,
+and uncertainty method.
 }
 \description{
-\code{expand_age_pop} transforms population data aggregated in age groups into
-estimates for single-year ages. It utilizes interpolation methods to
-distribute the grouped data across individual ages, ensuring consistency
-with the original totals.
+\code{expand_age_pop()} converts any set of closed age groups to single-year
+estimates and keeps the final source group as an actual open age group. It
+never represents an open group as a fabricated sequence of high ages. Every
+effective source-group total is constrained to its input total exactly, and
+estimates are non-negative.
 }
 \examples{
-# Example population data for 19 age groups: 0, 1–4, 5–9, ..., 85+
-ages <- c(
+population <- c(
   5053, 17743, 25541, 32509, 30530, 34806, 36846, 38691, 40056,
   39252, 37349, 30507, 26363, 21684, 15362, 11725, 7461, 3260, 915
 )
-eages <- expand_age_pop(ages)
-head(eages)
+expand_age_pop(population, method = "sprague")
+}
+\references{
+Sprague, T. B. (1880). Explanation of a new formula for interpolation.
+\emph{Journal of the Institute of Actuaries}, 22, 270--285.
+
+Rizzi, S., Gampe, J., and Eilers, P. H. C. (2015). Efficient ungrouping of
+coarse histograms and age heaping in demographic data. \emph{Statistical
+Methods in Medical Research}, 24(3), 291--313.
 }

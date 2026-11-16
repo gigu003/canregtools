@@ -6,8 +6,14 @@
 #'        `c(0, 1, seq(5, 85, 5))`.
 #' @param label_tail Tail of the labels.
 #' @template cancer_type
+#' @importFrom rlang .data
 #'
 #' @return Class 'canreg'.
+#' @details Population input must contain one complete standard 18- or
+#'   19-group schedule per year and sex, with numeric lower age bounds in
+#'   `agegrp`. Aligned groups are summed directly; finer groups use natural
+#'   interpolation with source-group totals preserved. The final open group
+#'   cannot be split. Empty population input remains empty.
 #' @export
 #' @examples
 #' data("canregs")
@@ -58,15 +64,15 @@ cr_clean.canreg <- function(
   label_tail = NULL,
   cancer_type = "big"
 ) {
-  areacode <- purrr::pluck(x, "areacode")
+  regicode <- purrr::pluck(x, "regicode")
   res <- purrr::map(
-    x[2:4],
+    x[c("FBcases", "SWcases", "POP")],
     cr_clean,
     age_breaks = age_breaks,
     label_tail = label_tail,
     cancer_type = cancer_type
   )
-  res["areacode"] <- areacode
+  res["regicode"] <- regicode
   class(res) <- c("canreg", "list")
   return(res)
 }
@@ -111,6 +117,10 @@ cr_clean.FBcases <- function(
     "morp",
     "topo"
   )
+  if (".canreg_index" %in% names(x)) {
+    sel_vars <- c(sel_vars, ".canreg_index")
+    stat_vars <- c(stat_vars, ".canreg_index")
+  }
   if ("id" %in% names(x)) {
     sel_vars <- c(sel_vars, "id")
     stat_vars <- c(stat_vars, "id")
@@ -124,7 +134,7 @@ cr_clean.FBcases <- function(
     select(!!!rlang::syms(sel_vars)) |>
     mutate(
       !!regi_num := row_number(),
-      !!year := as.integer(format(!!inciden, "%Y")),
+      !!year := as.character(format(!!inciden, "%Y")),
       !!sex := tidy_sex(!!sex),
       !!age := calc_age(!!birthda, !!inciden),
       !!basi := as.integer(!!basi),
@@ -167,10 +177,16 @@ cr_clean.SWcases <- function(
   agegrp <- rlang::sym("agegrp")
   regi_num <- rlang::sym("regi_num")
   res <- x |>
-    select(!!sex, !!birthda, !!deathda, !!icd10) |>
+    select(
+      !!sex,
+      !!birthda,
+      !!deathda,
+      !!icd10,
+      all_of(intersect(".canreg_index", names(x)))
+    ) |>
     mutate(
       !!regi_num := row_number(),
-      !!year := as.integer(format(!!deathda, "%Y")),
+      !!year := as.character(format(!!deathda, "%Y")),
       !!sex := tidy_sex(!!sex),
       !!age := calc_age(!!birthda, !!deathda),
       !!icd10 := toupper(!!icd10),
@@ -182,7 +198,15 @@ cr_clean.SWcases <- function(
         label_tail = label_tail
       )
     ) |>
-    select(!!regi_num, !!year, !!sex, !!cancer, !!agegrp, !!icd10)
+    select(
+      !!regi_num,
+      !!year,
+      !!sex,
+      !!cancer,
+      !!agegrp,
+      !!icd10,
+      all_of(intersect(".canreg_index", names(x)))
+    )
 
   class(res) <- c("SWcases", class(res))
   return(res)
@@ -202,57 +226,110 @@ cr_clean.POP <- function(
   label_tail = NULL,
   cancer_type = "big"
 ) {
-  year <- rlang::sym("year")
-  sex <- rlang::sym("sex")
-  agegrp <- rlang::sym("agegrp")
-
-  if ("death" %in% names(x)) {
-    sum_vars <- rlang::syms(c("rks", "death"))
-  } else {
-    sum_vars <- rlang::syms(c("rks"))
+  age_breaks <- validate_age_breaks(age_breaks)
+  if (age_breaks[1] != 0 || tail(age_breaks, 1) > 85) {
+    stop("Population target breaks must start at 0 and cannot split 85+.")
   }
-  reframe_agegrp <- cutage(
-    seq(0, 92),
-    method = "interval",
-    breaks = age_breaks,
-    label_tail = label_tail
-  )
-  if (nrow(x) == 0) {
-    res <- expand_grid(
-      year = c(2021L),
-      sex = c(1L, 2L),
-      agegrp = unique(reframe_agegrp)
-    ) |>
-      mutate(rks = 0L, death = 0L)
+  sum_vars <- intersect(c("rks", "death"), names(x))
+  if (!all(c("year", "sex", "agegrp", "rks") %in% names(x))) {
+    stop("Population requires year, sex, agegrp and rks columns.")
+  }
+  res <- as_tibble(x) |>
+    mutate(year = as.character(.data$year), sex = tidy_sex(.data$sex))
+  if (nrow(res) == 0L) {
+    res <- res[, c("year", "sex", "agegrp", sum_vars)]
+    res$agegrp <- cutage(
+      numeric(),
+      method = "interval",
+      breaks = age_breaks,
+      label_tail = label_tail
+    )
   } else {
-    res <- x |>
-      mutate(
-        !!sex := tidy_sex(!!sex),
-        !!year := as.integer(!!year)
-      ) |>
-      group_by(!!year, !!sex) |>
-      reframe(
-        !!agegrp := reframe_agegrp,
-        across(
-          c(!!!sum_vars),
-          ~ as.integer(
-            expand_age_pop(.x, method = "natural")$y
+    res <- res |>
+      group_by(.data$year, .data$sex) |>
+      dplyr::group_modify(function(.x, .y) {
+        source <- suppressWarnings(as.numeric(as.character(.x$agegrp)))
+        standard <- list(seq(0, 85, 5), c(0, 1, seq(5, 85, 5)))
+        if (
+          anyNA(source) ||
+            anyDuplicated(source) ||
+            !any(vapply(
+              standard,
+              function(b) identical(sort(source), b),
+              logical(1)
+            ))
+        ) {
+          stop(
+            "Population agegrp must contain a complete, unique standard 18- or 19-group schedule (numeric lower bounds)."
+          )
+        }
+        .x <- .x[order(source), ]
+        source <- sort(source)
+        aligned <- all(age_breaks %in% source)
+        ages <- if (aligned) source else 0:85
+        result <- tibble(
+          agegrp = cutage(
+            ages,
+            method = "interval",
+            breaks = age_breaks,
+            label_tail = label_tail
           )
         )
-      ) |>
-      group_by(!!year, !!sex, !!agegrp) |>
-      reframe(across(c(!!!sum_vars), sum))
-    uniyear <- as.integer(unique(pull(x, !!year)))
-    uniagegrp <- unique(pull(res, !!agegrp))
-    res <- expand_grid(
-      year = uniyear,
-      sex = c(1L, 2L),
-      agegrp = uniagegrp
-    ) |>
-      left_join(res, by = c("year", "sex", "agegrp")) |>
-      mutate(across(c(!!!sum_vars), ~ dplyr::coalesce(.x, 0)))
+        for (variable in sum_vars) {
+          raw_values <- .x[[variable]]
+          values <- if (is.numeric(raw_values)) {
+            raw_values
+          } else {
+            suppressWarnings(as.numeric(as.character(raw_values)))
+          }
+          raw_missing <- is.na(raw_values) |
+            trimws(as.character(raw_values)) == ""
+          invalid <- (!raw_missing & !is.finite(values)) |
+            is.nan(values) |
+            (!is.na(values) & values < 0) |
+            (variable == "rks" & raw_missing)
+          if (any(invalid)) {
+            invalid_age <- paste(source[invalid], collapse = ", ")
+            invalid_value <- paste(
+              as.character(raw_values[invalid]),
+              collapse = ", "
+            )
+            stop(
+              "Invalid `",
+              variable,
+              "` population count(s) for year ",
+              .y$year,
+              ", sex ",
+              .y$sex,
+              ", agegrp ",
+              invalid_age,
+              ": ",
+              invalid_value,
+              ". `rks` must be complete; counts must be finite, ",
+              "non-negative numbers. Missing optional `death` values are allowed."
+            )
+          }
+          result[[variable]] <- if (aligned) {
+            values
+          } else {
+            missing_source <- which(is.na(values))
+            expanded <- expand_age_pop(
+              replace(values, missing_source, 0),
+              source_breaks = source,
+              method = "natural"
+            )
+            if (length(missing_source) > 0L) {
+              expanded$y[expanded$source_group %in% missing_source] <- NA_real_
+            }
+            expanded$y
+          }
+        }
+        result |>
+          group_by(.data$agegrp) |>
+          summarise(across(all_of(sum_vars), sum), .groups = "drop")
+      }) |>
+      ungroup()
   }
-
-  class(res) <- c("POP", class(res))
+  class(res) <- unique(c("POP", class(res)))
   return(res)
 }

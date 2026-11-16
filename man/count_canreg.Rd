@@ -10,16 +10,18 @@ count_canreg(
   x,
   age_breaks = c(0, 1, seq(5, 85, 5)),
   label_tail = NULL,
-  cancer_type = "big"
+  cancer_type = "big",
+  strategy = c("batch", "registry")
 )
 
-\method{count_canreg}{canregs}(x, ...)
+\method{count_canreg}{canregs}(x, ..., strategy = c("batch", "registry"))
 
 \method{count_canreg}{canreg}(
   x,
   age_breaks = c(0, 1, seq(5, 85, 5)),
   label_tail = NULL,
-  cancer_type = "big"
+  cancer_type = "big",
+  strategy = c("batch", "registry")
 )
 }
 \arguments{
@@ -38,9 +40,15 @@ cancer categories), \code{"small"} (classify ICD-10 codes into 59 cancer
 categories, more specific categories), \code{"system"} (classify ICD-10
 codes into organ system), and \code{"gco"} (classify ICD-10 code into
 cancer categories same as classification published by the Global
-Cancer Observatory). This parameter is only available when the
+Cancer Observatory), and \code{"ci5"} (classify ICD-10 codes using the
+63-category CI5-XII classification, with shared aggregate codes \code{60} and
+\code{61}). This parameter is only available when the
 input data is a vector of ICD-10 codes, or object with class of
 \code{'canreg'} or \code{'canregs'}.}
+
+\item{strategy}{Counting strategy for a canregs object. The default,
+"batch", cleans and aggregates all registry case tables together.
+Use "registry" for the original one-registry-at-a-time path.}
 
 \item{...}{Additional arguments passed to the method for individual
 \code{canreg} objects.}
@@ -59,6 +67,7 @@ systems.
 data("canregs")
 fbsw <- count_canreg(canregs, age_breaks = c(0, 15, 65), cancer_type = "big")
 fbsw <- count_canreg(canregs, cancer_type = "gco")
+fbsw <- count_canreg(canregs, cancer_type = "ci5")
 
 # Count object with class of `canregs`
 fbsw <- count_canreg(canregs, cancer_type = "small")

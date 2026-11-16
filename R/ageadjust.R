@@ -21,6 +21,12 @@
 #' @param mp A multiplier used to scale the calculated rates. Default is 100000.
 #'
 #' @return Age standardized rate and its confidence interval.
+#' @details Inputs must have equal, non-zero lengths. Counts and standard
+#'   weights must be finite and non-negative; population must be strictly
+#'   positive. Standard weights must have a positive total. Zero-event rates
+#'   use Gamma bounds (zero lower bound) for all interval methods because the
+#'   normal and log-normal approximations are unsuitable at zero. Variances
+#'   remain on the unmultiplied rate scale.
 #' @export
 #'
 #' @examples
@@ -37,29 +43,78 @@ ageadjust <- function(
   conf_level = 0.95,
   mp = 100000
 ) {
+  check_vector <- function(x, name, positive = FALSE) {
+    if (
+      !is.numeric(x) ||
+        length(x) == 0L ||
+        any(!is.finite(x)) ||
+        any(if (positive) x <= 0 else x < 0)
+    ) {
+      stop(
+        "`",
+        name,
+        "` must be a non-empty finite numeric vector with ",
+        if (positive) "positive" else "non-negative",
+        " values."
+      )
+    }
+  }
+  method <- match.arg(method, c("gamma", "normal", "lognormal"))
   if (
-    missing(count) == TRUE &&
-      !missing(pop) == TRUE &&
-      is.null(rate) == TRUE
+    !is.numeric(conf_level) ||
+      length(conf_level) != 1L ||
+      !is.finite(conf_level) ||
+      conf_level <= 0 ||
+      conf_level >= 1
   ) {
+    stop("`conf_level` must be a finite number between 0 and 1.")
+  }
+  check_vector(mp, "mp", positive = TRUE)
+  if (length(mp) != 1L) {
+    stop("`mp` must have length one.")
+  }
+  if (missing(count) && missing(pop)) {
+    stop("Supply `count` or `pop` with `rate`.")
+  }
+  if (missing(count)) {
+    check_vector(pop, "pop", positive = TRUE)
+    check_vector(rate, "rate")
+    if (length(rate) != length(pop)) {
+      stop("`rate` and `pop` must have equal lengths.")
+    }
     count <- rate * pop
   }
-  if (
-    missing(pop) == TRUE &&
-      !missing(count) == TRUE &&
-      is.null(rate) == TRUE
-  ) {
+  if (missing(pop)) {
+    check_vector(count, "count")
+    check_vector(rate, "rate", positive = TRUE)
+    if (length(rate) != length(count)) {
+      stop("`rate` and `count` must have equal lengths.")
+    }
     pop <- count / rate
   }
-  if (
-    is.null(rate) == TRUE &&
-      !missing(count) == TRUE &&
-      !missing(pop) == TRUE
-  ) {
-    rate <- count / pop
+  check_vector(count, "count")
+  check_vector(pop, "pop", positive = TRUE)
+  if (length(count) != length(pop)) {
+    stop("`count` and `pop` must have equal lengths.")
+  }
+  if (!is.null(rate)) {
+    check_vector(rate, "rate")
+    if (
+      length(rate) != length(count) ||
+        !isTRUE(all.equal(as.numeric(rate), as.numeric(count / pop)))
+    ) {
+      stop("`rate` must equal `count / pop` for every age group.")
+    }
+  }
+  rate <- count / pop
+  if (!is.null(stdpop)) {
+    check_vector(stdpop, "stdpop")
+    if (length(stdpop) != length(count) || sum(stdpop) <= 0) {
+      stop("`stdpop` must match `count` in length and have a positive total.")
+    }
   }
   alpha <- 1 - conf_level
-  cases <- round(sum(count), 1)
+  cases <- sum(count)
   rks <- sum(pop)
   cr <- cases / rks
   crvar <- cases / rks^2
@@ -72,12 +127,15 @@ ageadjust <- function(
   }
 
   if (method == "gamma") {
-    cr_lci <- mp * (qgamma(alpha / 2, shape = cr^2 / crvar) / (cr / crvar))
-    cr_uci <- mp *
-      (qgamma(1 - alpha / 2, shape = 1 + cr^2 / crvar) / (cr / crvar))
+    cr_lci <- if (cases == 0) 0 else mp * qgamma(alpha / 2, shape = cases) / rks
+    cr_uci <- mp * qgamma(1 - alpha / 2, shape = cases + 1) / rks
     if (!is.null(stdpop)) {
-      asr_lci <- mp *
-        (qgamma(alpha / 2, shape = asr^2 / asrvar) / (asr / asrvar))
+      asr_lci <- if (asr == 0) {
+        0
+      } else {
+        mp *
+          (qgamma(alpha / 2, shape = asr^2 / asrvar) / (asr / asrvar))
+      }
       asr_uci <- mp *
         (qgamma(
           1 - alpha / 2,
@@ -94,11 +152,27 @@ ageadjust <- function(
       asr_uci <- mp * (asr - qnorm(alpha / 2) * sqrt(asrvar))
     }
   } else if (method == "lognormal") {
-    cr_lci <- mp * exp(log(cr) + qnorm(alpha / 2) * sqrt(crvar) / cr)
-    cr_uci <- mp * exp(log(cr) - qnorm(alpha / 2) * sqrt(crvar) / cr)
+    cr_lci <- if (cr == 0) {
+      0
+    } else {
+      mp * exp(log(cr) + qnorm(alpha / 2) * sqrt(crvar) / cr)
+    }
+    cr_uci <- if (cr == 0) {
+      0
+    } else {
+      mp * exp(log(cr) - qnorm(alpha / 2) * sqrt(crvar) / cr)
+    }
     if (!is.null(stdpop)) {
-      asr_lci <- mp * exp(log(asr) + qnorm(alpha / 2) * sqrt(asrvar) / asr)
-      asr_uci <- mp * exp(log(asr) - qnorm(alpha / 2) * sqrt(asrvar) / asr)
+      asr_lci <- if (asr == 0) {
+        0
+      } else {
+        mp * exp(log(asr) + qnorm(alpha / 2) * sqrt(asrvar) / asr)
+      }
+      asr_uci <- if (asr == 0) {
+        0
+      } else {
+        mp * exp(log(asr) - qnorm(alpha / 2) * sqrt(asrvar) / asr)
+      }
     }
   } else {
     stop(
@@ -107,6 +181,14 @@ ageadjust <- function(
     )
   }
 
+  if (cases == 0) {
+    cr_lci <- 0
+    cr_uci <- mp * qgamma(1 - alpha / 2, shape = 1) / rks
+  }
+  if (!is.null(stdpop) && asr == 0) {
+    asr_lci <- 0
+    asr_uci <- mp * qgamma(1 - alpha / 2, shape = 1) * wm
+  }
   cr <- mp * cr
 
   if (!is.null(stdpop)) {
@@ -145,7 +227,8 @@ ageadjust <- function(
 #' @param cases Number of cases.
 #' @param pop  Number of population at risk.
 #' @param stdpop The standard population.
-#' @param trunc_age The truncated age range.
+#' @param trunc_age Inclusive truncated age range. Both ends must align with
+#'   complete age groups; the group starting after the upper end is excluded.
 #' @param agewidth Age groups width, default is 5.
 #' @param sep_zero Logical value, if the 0 age group was a separate group.
 #' @param mp A multiplier used to scale the calculated rates. Default is 100.
@@ -180,6 +263,33 @@ truncrate <- function(
   }
 
   nn <- length(cases)
+  if (
+    length(sep_zero) != 1L ||
+      is.na(sep_zero) ||
+      !is.logical(sep_zero) ||
+      length(agewidth) != 1L ||
+      !is.numeric(agewidth) ||
+      !is.finite(agewidth) ||
+      agewidth < 1 ||
+      agewidth != floor(agewidth) ||
+      (sep_zero && agewidth <= 1) ||
+      nn < if (sep_zero) 3L else 2L
+  ) {
+    stop(
+      "Supply valid agewidth, sep_zero and at least two complete age groups."
+    )
+  }
+  if (
+    !is.numeric(trunc_age) ||
+      length(trunc_age) != 2L ||
+      any(!is.finite(trunc_age)) ||
+      trunc_age[1] > trunc_age[2]
+  ) {
+    stop("`trunc_age` must be an ordered pair of finite ages.")
+  }
+  if (!is.null(stdpop) && length(stdpop) != nn) {
+    stop("Length of 'stdpop' must match 'cases' and 'pop'.")
+  }
 
   if (sep_zero) {
     age <- c(0, 1, seq(agewidth, (nn - 2) * agewidth, agewidth))
@@ -190,7 +300,10 @@ truncrate <- function(
   }
 
   pos_start <- which(age == trunc_age[1])
-  pos_end <- which(age == (trunc_age[2] + 1))
+  pos_end <- which(age + agewidth == (trunc_age[2] + 1))
+  if (length(pos_start) != 1L || length(pos_end) != 1L || pos_start > pos_end) {
+    stop("`trunc_age` must align with complete age groups within the input.")
+  }
 
   cases <- cases[pos_start:pos_end]
   pop <- pop[pos_start:pos_end]

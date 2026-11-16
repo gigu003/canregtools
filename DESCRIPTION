@@ -35,8 +35,12 @@ Suggests:
     knitr,
     readxl,
     rmarkdown,
-    testthat (>= 3.0.0)
+    testthat (>= 3.0.0),
+    tibble,
+    ungroup,
+    withr
 Config/testthat/edition: 3
+VignetteBuilder: knitr
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)

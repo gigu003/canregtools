@@ -11,7 +11,9 @@
 #' @param rate Numeric vector, age-specific incidence or mortality rates. If not
 #'   supplied, it will be calculated as \code{count / pop}.
 #' @param eage Integer, the upper age limit (e.g., 70) up to which the cumulative
-#'   rate is calculated.
+#'   rate is calculated. The upper bound is exclusive: `eage = 70` includes
+#'   ages below 70, excluding the 70--74 age group. A bound within an age
+#'   interval uses the corresponding fraction of that interval.
 #' @param agewidth Integer, width of the age intervals (e.g., 5 for 5-year
 #'    bands).
 #' @param sep_zero Logical, whether the 0–1 age group is separated (i.e.,
@@ -57,15 +59,36 @@ cumrate <- function(
     }
   }
   nn <- length(rate)
-  if (sep_zero) {
-    age <- c(0, 1, seq(agewidth, (nn - 2) * agewidth, agewidth))
-    agewidth <- c(1, agewidth - 1, rep(agewidth, nn - 2))
-  } else {
-    age <- c(0, seq(agewidth, (nn - 1) * agewidth, agewidth))
-    agewidth <- rep(agewidth, nn)
+  if (!is.numeric(rate) || nn == 0L) {
+    stop("`rate` must be a non-empty numeric vector.", call. = FALSE)
   }
-  pos <- which(age == eage)
-  cr <- sum(agewidth[1:pos] * rate[1:pos])
+  if (
+    length(agewidth) != 1L ||
+      !is.finite(agewidth) ||
+      agewidth <= if (sep_zero) 1 else 0
+  ) {
+    stop(
+      "`agewidth` must be positive and greater than 1 when `sep_zero = TRUE`.",
+      call. = FALSE
+    )
+  }
+  widths <- if (sep_zero) {
+    c(1, agewidth - 1, rep(agewidth, max(0L, nn - 2L)))[seq_len(nn)]
+  } else {
+    rep(agewidth, nn)
+  }
+  if (
+    length(eage) != 1L || !is.finite(eage) || eage < 0 || eage > sum(widths)
+  ) {
+    stop(
+      "`eage` must be between 0 and the upper bound of the supplied age intervals.",
+      call. = FALSE
+    )
+  }
+  age <- cumsum(widths) - widths
+  included_widths <- pmin(widths, pmax(0, eage - age))
+  included <- included_widths > 0
+  cr <- sum(included_widths[included] * rate[included])
   cr <- round(cr * mp, decimal)
   names(cr) <- paste0("Cumulative Rate(1/", mp, ")")
   return(cr)

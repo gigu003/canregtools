@@ -15,7 +15,7 @@ or 'en', default is 'cn'.}
 \item{as_factor}{Logical, indicate whether output value as factor.}
 }
 \value{
-A numeric vector or a factor representing gender:
+A character vector or a factor representing gender:
 \describe{
 \item{0}{Total}
 \item{1}{Male}
@@ -25,7 +25,7 @@ If \code{as_factor = TRUE}, a factor is returned with labels in the specified
 language (\code{lang}).
 }
 \description{
-Standardizes gender-related values into consistent numeric codes or factors.
+Standardizes gender-related values into consistent character codes or factors.
 This function maps various gender-related character strings (e.g., "male",
 "female", "man", "woman", "1", "2", etc.) to standardized numeric values:
 \code{1} for male, \code{2} for female, and \code{0} for total. It supports both Chinese

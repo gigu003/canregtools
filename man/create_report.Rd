@@ -37,7 +37,8 @@ create_report(
 \item{data}{An object of class \code{canreg} or \code{canregs}.}
 
 \item{template}{Character string specifying the report template to use.
-Options include \code{"annual"}, \code{"quality"}, or \code{"CI5"}. Default is \code{"annual"}.}
+Options include \code{"annual"}, \code{"quality"}, or \code{"quality-list-city"}.
+Default is \code{"annual"}.}
 
 \item{title}{Character. Title of the generated report. Default is
 \code{"Cancer Registry Report"}.}

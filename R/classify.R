@@ -18,6 +18,7 @@
 #' classify_icd10(icd10, cancer_type = "small")
 #' classify_icd10(icd10, cancer_type = "system")
 #' classify_icd10(icd10, cancer_type = "gco")
+#' classify_icd10(icd10, cancer_type = "ci5")
 classify_icd10 <- function(
   x,
   cancer_type = "big",
@@ -26,7 +27,7 @@ classify_icd10 <- function(
   as_factor = FALSE
 ) {
   cancer_type <- tolower(cancer_type)
-  valid_types <- c("small", "big", "system", "gco")
+  valid_types <- c("small", "big", "system", "gco", "ci5")
   if (!cancer_type %in% valid_types) {
     stop(
       "Invalid cancer_type. Valid options: ",
@@ -36,8 +37,7 @@ classify_icd10 <- function(
   dict_icd10_code <- dict_maps[["icd10_code"]]
   clean_x <- toupper(substr(x, 1, 3))
   idx <- match(clean_x, dict_icd10_code[["icd10"]])
-  res <- dict_icd10_code[idx, cancer_type]
-  res <- unname(unlist(res))
+  res <- unname(dict_icd10_code[[cancer_type]][idx])
   res <- tidy_var(
     res,
     var_name = "cancer",
@@ -68,18 +68,18 @@ classify_icd10 <- function(
 #'   or character strings.
 #' @param attr A character vector of attributes to return. Defaults to all
 #'   built-in area-code attributes. Options include:
-#'   - `"areacode"`: Original area codes.
+#'   - `"regicode"`: Original area codes.
 #'   - `"registry"`: Cancer registry codes.
 #'   - `"province"`: Province-level codes.
 #'   - `"city"`: City-level codes.
 #'   - `"area_type"`: Urban/rural classification.
 #'   - `"region"`: Regional classification based on province.
 #'   - Any other string will be treated as a custom dictionary name written
-#'     using [write_registry()].
+#'     using [cr_map()].
 #'
 #' @return A list with the following named elements:
 #'
-#' * `areacode`: Validated area codes. Invalid entries are replaced with `NA`.
+#' * `regicode`: Validated area codes. Invalid entries are replaced with `NA`.
 #' * `registry`: Registry codes corresponding to each area, using a built-in
 #'    or cached dictionary.
 #' * `province`: Province-level codes formed by taking the first two digits and
@@ -87,19 +87,19 @@ classify_icd10 <- function(
 #' * `city`: City-level codes formed by taking the first four digits and
 #'    appending `"00"`.
 #' * `area_type`: Urban-rural classification codes: `"910000"` for urban,
-#'    `"920000"` for rural. This can be updated using [write_registry()]
-#'    function which stored the dictionary in (`area_type_dict.rds`)
+#'    `"920000"` for rural. This can be updated using [cr_map()]
+#'    with `attr = "area_type"`.
 #' * `region`: Region classification codes derived from province codes,
 #'    ending in `"0000"`.
 #'
 #' @export
 #'
-#' @seealso [write_registry()]
+#' @seealso [cr_map()], [write_registry()]
 #' @examples
 #' classify_areacode(c("110000", "320500", "440300"))
 #' classify_areacode(c("110000", "320500", "440300"), attr = "registry")
 #'
-classify_areacode <- function(x, attr = area_code_vars()) {
+classify_areacode <- function(x, attr = regicode_vars()) {
   if (
     !is.character(attr) ||
       length(attr) == 0 ||
@@ -135,8 +135,8 @@ classify_areacode <- function(x, attr = area_code_vars()) {
   x[!check] <- NA_character_
 
   get_codes <- function(f) {
-    if (f == "areacode") {
-      return(raw_x)
+    if (f == "regicode") {
+      return(ifelse(check, raw_x, NA_character_))
     } else if (f == "region") {
       pp <- ifelse(check, prov2, NA_character_)
       region_code <- unname(dict_maps[["prov_region"]][pp])
@@ -152,39 +152,20 @@ classify_areacode <- function(x, attr = area_code_vars()) {
       return(ifelse(check, paste0(city4, "00"), NA_character_))
     } else if (f == "registry") {
       registry_codes <- x
-      dict_registry_addr <- dict_addr("registry")
-      if (!file.exists(dict_registry_addr)) {
-        write_registry()
-      }
-      registry_dict_temp <- readRDS(dict_registry_addr)
+      registry_dict_temp <- read_registry_dictionary("registry")
       regi_logi <- x %in% names(registry_dict_temp)
       registry_codes[regi_logi] <- unlist(registry_dict_temp[x[regi_logi]])
       return(unlist(registry_codes))
     } else if (f == "area_type") {
       digit5 <- substr(x, 5, 5)
-      dict_file <- dict_addr(f)
       area_codes <- ifelse(
         check,
         ifelse(digit5 %in% c("0", "1"), "910000", "920000"),
         NA_character_
       )
-      if (file.exists(dict_file)) {
-        dict <- tryCatch(
-          readRDS(dict_file),
-          error = function(e) {
-            stop(
-              "Failed to read area_type dictionary at '",
-              dict_file,
-              "'. Reason: ",
-              conditionMessage(e),
-              call. = FALSE
-            )
-          }
-        )
-        type_logi <- x %in% names(dict)
-        codes_in_dict <- tolower(unlist(dict[x[type_logi]]))
-        area_codes[type_logi] <- codes_in_dict
-      }
+      dict <- read_registry_dictionary(f)
+      type_logi <- x %in% names(dict)
+      area_codes[type_logi] <- tolower(unname(dict[x[type_logi]]))
       return(area_codes)
     } else {
       custom_codes <- x
@@ -192,23 +173,12 @@ classify_areacode <- function(x, attr = area_code_vars()) {
       if (!file.exists(dict_file)) {
         stop(paste0(
           "Custom dictionary not found. ",
-          "Use `write_registry(..., dict = '",
+          "Use `cr_map(..., attr = '",
           f,
           "')` to create one."
         ))
       }
-      dict <- tryCatch(
-        readRDS(dict_file),
-        error = function(e) {
-          stop(
-            "Failed to read custom dictionary at '",
-            dict_file,
-            "'. Reason: ",
-            conditionMessage(e),
-            call. = FALSE
-          )
-        }
-      )
+      dict <- read_registry_dictionary(f)
       custom_logi <- x %in% names(dict)
       codes_in_dict <- unlist(dict[x[custom_logi]])
       custom_codes[custom_logi] <- codes_in_dict
@@ -221,8 +191,8 @@ classify_areacode <- function(x, attr = area_code_vars()) {
   return(res)
 }
 
-area_code_vars <- function() {
-  c("areacode", "registry", "province", "city", "area_type", "region")
+regicode_vars <- function() {
+  c("regicode", "registry", "province", "city", "area_type", "region")
 }
 
 
@@ -364,7 +334,10 @@ classify_topo <- function(x, cancer_type = "big") {
       )
     )
 
-    res <- ifelse(substr(topo, 1, 3) %in% single_topo, topo, substr(topo, 1, 3))
+    topo_prefix <- substr(topo, 1, 3)
+    res <- topo_prefix
+    keep_full_topo <- topo_prefix %in% single_topo
+    res[keep_full_topo] <- topo[keep_full_topo]
   } else {
     res <- substr(topo, 1, 3)
   }

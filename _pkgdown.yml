@@ -1,0 +1,104 @@
+url: https://gigu003.github.io/canregtools/
+
+template:
+  bootstrap: 5
+
+reference:
+- title: Registry objects and data preparation
+  contents:
+  - as_canreg
+  - read_canreg
+  - as_fbswicd
+  - count_canreg
+  - cr_clean
+  - cr_combine
+  - cr_filter
+  - cr_merge
+  - cr_map
+  - cr_reframe
+  - cr_rename
+  - cr_select
+  - esti_fbswicd
+  - esti_pop
+  - get_pop
+- title: Validation
+  contents:
+  - validate_cases
+  - validate_population
+  - validate_canreg
+  - validate_fbswicd
+  - is_valid_canreg
+  - validate_canreg_report
+- title: Age splitting and rates
+  contents:
+  - calc_age
+  - ageadjust
+  - benchmark_age_split
+  - create_age_rate
+  - create_asr
+  - cumrate
+  - cumrisk
+  - cutage
+  - expand_age_pop
+  - expand_open_age_pop
+  - expand_lx
+  - get_stdpop
+  - truncrate
+- title: Quality and statistical comparisons
+  contents:
+  - create_quality
+  - compare_mi
+  - compare_mv
+  - compare_rate
+  - cr_test
+  - detect_anomaly
+  - create_site_morp
+- title: Classification and labels
+  contents:
+  - add_labels
+  - add_var_labels
+  - calc_ax
+  - classify_areacode
+  - classify_childhood
+  - classify_icd10
+  - classify_morp
+  - classify_topo
+  - combine_tp
+  - drop_others
+  - drop_total
+  - tidy_age
+  - tidy_sex
+  - tidy_var
+- title: Reports and visualization
+  contents:
+  - create_canreg_report_data
+  - create_report
+  - new_canreg_report
+  - draw_barchart
+  - draw_dumbbell
+  - draw_linechart
+  - draw_pyramid
+- title: Dictionaries and utilities
+  contents:
+  - del_dict_files
+  - ls_attrs
+  - ls_dict
+  - ls_dict_files
+  - ls_vars
+  - reset_dict
+  - lt
+  - write_regicode
+  - write_registry
+- title: Data
+  contents:
+  - canregs
+  - ci5_xii_china
+  - quality
+- title: Summary methods
+  contents:
+  - summary.canreg
+
+articles:
+- title: Guides
+  contents:
+  - using-canregtools

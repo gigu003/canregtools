@@ -8,6 +8,11 @@
 #' [count_canreg()] to create `fbswicd`/`fbswicds` objects, and then counts the
 #' `icd10` and/or `morp` frequency tables stored in the `sitemorp` element.
 #'
+#' For `fbswicd` and `fbswicds` objects, a `sitemorp` component must be
+#' present. If it was omitted when constructing the object, the function
+#' reports that site/morphology data are unavailable. An explicitly supplied
+#' zero-row component is treated as available and returns an empty result.
+#'
 #' @param x An object with class `canreg`, `canregs`, `fbswicd`, or `fbswicds`.
 #' @param ... Variables used to define strata. For example, `year`, `sex`, and
 #'   `cancer` will return frequencies within each combination of year, sex, and
@@ -182,7 +187,13 @@ create_site_morp.fbswicd <- function(
   drop_nos = TRUE
 ) {
   type <- match.arg(type)
-  sitemorp <- purrr::pluck(x, "sitemorp")
+  if (!"sitemorp" %in% names(x)) {
+    stop(
+      "`x` does not contain a `sitemorp` component. Supply it when constructing the fbswicd object.",
+      call. = FALSE
+    )
+  }
+  sitemorp <- purrr::pluck(x, "sitemorp") |> standardize_year_sex()
   input_strat_vars <- get_expr_vars(...)
   strat_vars <- unique(c(input_strat_vars, "year", "sex", "cancer"))
 
@@ -245,13 +256,13 @@ create_site_morp.fbswicd <- function(
   if (!"year" %in% input_strat_vars) {
     sitemorp <- dplyr::bind_rows(
       sitemorp,
-      create_total_rows(sitemorp, "year", 9000L)
+      create_total_rows(sitemorp, "year", "9000")
     )
   }
 
   sitemorp <- dplyr::bind_rows(
     sitemorp,
-    create_total_rows(sitemorp, "sex", 0L)
+    create_total_rows(sitemorp, "sex", "0")
   )
 
   sitemorp <- dplyr::bind_rows(

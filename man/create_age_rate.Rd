@@ -65,7 +65,9 @@ cancer categories), \code{"small"} (classify ICD-10 codes into 59 cancer
 categories, more specific categories), \code{"system"} (classify ICD-10
 codes into organ system), and \code{"gco"} (classify ICD-10 code into
 cancer categories same as classification published by the Global
-Cancer Observatory). This parameter is only available when the
+Cancer Observatory), and \code{"ci5"} (classify ICD-10 codes using the
+63-category CI5-XII classification, with shared aggregate codes \code{60} and
+\code{61}). This parameter is only available when the
 input data is a vector of ICD-10 codes, or object with class of
 \code{'canreg'} or \code{'canregs'}.}
 
@@ -89,6 +91,18 @@ A data frame of age-specific rates.
 \code{canreg},\code{fbswicd}, or \code{canregs}, \code{fbswicds}. It calculates the rates for
 specified events (e.g., \code{fbs}) across age groups, stratified by variables
 such as year, sex, or cancer type.
+}
+\details{
+For summary input, existing \code{sex = "0"} rows are retained once.
+Missing overall rows are computed from available male/female rows at each
+original stratum before grouping. If an overall row and both sex-specific
+rows are supplied, inconsistent totals cause an error. Overall-only input
+is supported; sex-specific rows are not inferred from overall values.
+Within each observed year/sex/cancer stratum, absent summary age rows
+are interpreted as zero counts and completed from matching population
+age groups. Entirely absent strata are not inferred. Supplied missing,
+non-finite, or negative counts cause an error; population rows are never
+invented or filled with zero.
 }
 \examples{
 data("canregs")

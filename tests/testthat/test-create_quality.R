@@ -5,7 +5,7 @@ test_that("create_quality.canreg works with default parameters", {
   expect_contains(
     names(qua),
     c(
-      "areacode",
+      "regicode",
       "year",
       "sex",
       "cancer",
@@ -37,4 +37,35 @@ test_that("create_quality.fbswicds can return a list when collapse is FALSE", {
     unname(purrr::map_lgl(qua, inherits, "quality")),
     rep(TRUE, length(qua))
   )
+})
+
+test_that("create_quality preserves undefined values for zero denominators", {
+  fbsw <- fbsws[[1]]
+  fbsw$pop$rks <- 0L
+
+  qua <- create_quality(fbsw, year, sex)
+
+  expect_true(all(is.na(qua$inci)))
+  expect_true(all(is.na(qua$mort)))
+})
+
+test_that("intermediate fbswicd ordering can be skipped safely", {
+  fbsw <- fbsws[[1]]
+  arranged <- pre_deal_fbswicd(fbsw, year, sex, cancer, .arrange = TRUE)
+  unsorted <- pre_deal_fbswicd(fbsw, year, sex, cancer, .arrange = FALSE)
+
+  expect_equal(
+    dplyr::arrange(arranged, year, sex, cancer, agegrp),
+    dplyr::arrange(unsorted, year, sex, cancer, agegrp)
+  )
+})
+
+test_that("quality precision is consistent for single and multiple registries", {
+  expected <- create_quality(fbsws[[1]], year, sex, decimal = 6)
+  listed <- create_quality(fbsws, year, sex, decimal = 6, collapse = FALSE)
+  collapsed <- create_quality(fbsws, year, sex, decimal = 6)
+  raw <- create_quality(canregs, year, sex, decimal = 6, collapse = FALSE)
+  expect_equal(listed[[1]], expected)
+  expect_equal(raw[[1]], expected)
+  expect_equal(collapsed, cr_merge(listed))
 })

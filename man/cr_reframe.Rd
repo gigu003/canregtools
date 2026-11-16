@@ -16,7 +16,8 @@ cr_reframe(x, strat = "registry")
 \item{x}{Object with class of canregs or fbswicds.}
 
 \item{strat}{Stratification variables used to reframe 'canregs' or
-'fbswicds'.}
+'fbswicds'. Use \code{\link[=cr_map]{cr_map()}} to configure registry, area-type, or
+custom grouping mappings.}
 }
 \value{
 Reframed canregs or fbswicds.

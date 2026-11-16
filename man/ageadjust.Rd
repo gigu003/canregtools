@@ -45,6 +45,14 @@ function also supports computation of confidence intervals
 using gamma, normal, or log-normal methods, and returns both crude
 rate (CR) and ASR with associated variances and interval estimates.
 }
+\details{
+Inputs must have equal, non-zero lengths. Counts and standard
+weights must be finite and non-negative; population must be strictly
+positive. Standard weights must have a positive total. Zero-event rates
+use Gamma bounds (zero lower bound) for all interval methods because the
+normal and log-normal approximations are unsuitable at zero. Variances
+remain on the unmultiplied rate scale.
+}
 \examples{
 cases <- c(50, 60, 45, 70)
 pop <- c(1000, 1200, 1100, 900)

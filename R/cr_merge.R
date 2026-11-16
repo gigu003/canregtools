@@ -10,6 +10,10 @@
 #'        `qualities`, `age_rates`, or `summaries`.
 #'
 #' @return An object with merged elements.
+#' @details Merged `canreg` objects store original registry identifiers in
+#'   `source_regicodes`. For multiple sources, the scalar `regicode` is
+#'   `merged:` followed by URL-encoded source codes joined with `+`. A single
+#'   source retains its identifier. Case-level source identifiers are retained.
 #' @export
 #'
 cr_merge <- function(data) {
@@ -28,11 +32,42 @@ cr_merge.canregs <- function(data) {
   byvars <- rlang::syms(c("year", "sex", "agegrp"))
   sumvar <- get_sumvar(pluck(data, 1))
   sum_sym <- rlang::syms(sumvar)
-  areacode <- map_chr(data, "areacode") |> unique()
+  source_regicodes <- unique(unlist(
+    lapply(data, function(x) {
+      if (is.null(x$source_regicodes)) x$regicode else x$source_regicodes
+    }),
+    use.names = FALSE
+  ))
+  if (
+    length(source_regicodes) == 0L ||
+      anyNA(source_regicodes) ||
+      any(!nzchar(trimws(source_regicodes)))
+  ) {
+    stop("Merged registries must have non-empty source identifiers.")
+  }
+  source_regicodes <- as.character(source_regicodes)
+  regicode <- if (length(source_regicodes) == 1L) {
+    source_regicodes
+  } else {
+    paste0(
+      "merged:",
+      paste(
+        vapply(
+          source_regicodes,
+          utils::URLencode,
+          character(1),
+          reserved = TRUE,
+          repeated = TRUE
+        ),
+        collapse = "+"
+      )
+    )
+  }
   fb <- cmerge(data, "FBcases")
   sw <- cmerge(data, "SWcases")
-  if ("SFcases" %in% names(data[[1]])) {
-    sf <- cmerge(data, "SFcases")
+  has_sf <- vapply(data, function(x) is.data.frame(x$SFcases), logical(1))
+  if (any(has_sf)) {
+    sf <- cmerge(data[has_sf], "SFcases")
   }
 
   pop_raw <- cmerge(data, "POP")
@@ -51,15 +86,16 @@ cr_merge.canregs <- function(data) {
   class(pop) <- c("POP", class(pop))
 
   res <- structure(
-    list(areacode = areacode, FBcases = fb, SWcases = sw),
+    list(regicode = regicode, FBcases = fb, SWcases = sw),
     class = c("canreg", "list")
   )
 
-  if ("SFcases" %in% names(data[[1]])) {
+  if (any(has_sf)) {
     res <- append(res, list(SFcases = sf))
   }
 
   res <- append(res, list(POP = pop))
+  res$source_regicodes <- source_regicodes
   class(res) <- c("canreg", "list")
   return(res)
 }
@@ -75,24 +111,36 @@ cr_merge.canregs <- function(data) {
 cr_merge.fbswicds <- function(data) {
   site <- rlang::sym("icd10")
   morp <- rlang::sym("morp")
-  accept_vars <- area_code_vars()
-  areacode <- unique(unlist(map(data, pluck("areacode"))))
+  accept_vars <- regicode_vars()
+  regicode <- unique(unlist(map(data, pluck("regicode"))))
   gvars <- c("year", "sex", "agegrp", "cancer")
 
-  svars <- c("fbs", "sws", "mv", "ub", "sub", "mvs", "dco")
-
-  id_vars_exist <- all(unlist(lapply(data, function(x) {
-    "ids" %in% names(x$fbswicd)
-  })))
-  multi_vars_exist <- all(unlist(lapply(data, function(x) {
-    "mult" %in% names(x$fbswicd)
-  })))
-
-  if (id_vars_exist) {
-    svars <- c(svars, "ids")
+  supported_stats <- c(
+    "fbs",
+    "sws",
+    "mv",
+    "ub",
+    "sub",
+    "mvs",
+    "dco",
+    "ids",
+    "mult"
+  )
+  statistic_sets <- lapply(data, function(x) {
+    intersect(supported_stats, names(x$fbswicd))
+  })
+  same_schema <- vapply(
+    statistic_sets,
+    setequal,
+    logical(1),
+    y = statistic_sets[[1]]
+  )
+  if (!all(same_schema)) {
+    stop("All `fbswicd` objects must contain the same statistic columns.")
   }
-  if (multi_vars_exist) {
-    svars <- c(svars, "mult")
+  svars <- supported_stats[supported_stats %in% statistic_sets[[1]]]
+  if (!"fbs" %in% svars) {
+    stop("Each `fbswicd` object must contain the required `fbs` column.")
   }
 
   fbswicd <- cmerge(data, nested = "fbswicd")
@@ -110,27 +158,25 @@ cr_merge.fbswicds <- function(data) {
     group_by(!!!rlang::syms(dplyr::setdiff(gvars, "cancer"))) |>
     reframe(across(c(!!!sum_vars), \(x) sum(x, na.rm = TRUE))) |>
     standardize_year_sex()
-  sitemorp <- cmerge(data, nested = "sitemorp")
-  sitemorp <- sitemorp |>
-    group_by(!!!rlang::syms(dplyr::setdiff(gvars, "agegrp"))) |>
-    reframe(
-      !!site := list(combine_tp(!!site)),
-      !!morp := list(combine_tp(!!morp))
-    ) |>
-    standardize_year_sex()
-  exclude <- cmerge(data, nested = "exclude") |>
-    standardize_year_sex()
-
-  structure(
-    list(
-      areacode = areacode,
-      fbswicd = fbswicd,
-      sitemorp = sitemorp,
-      pop = pop,
-      exclude = exclude
-    ),
-    class = c("fbswicd", "list")
-  )
+  result <- list(regicode = regicode, fbswicd = fbswicd)
+  has_sitemorp <- vapply(data, function(x) "sitemorp" %in% names(x), logical(1))
+  if (any(has_sitemorp)) {
+    sitemorp <- cmerge(data[has_sitemorp], nested = "sitemorp")
+    result$sitemorp <- sitemorp |>
+      group_by(!!!rlang::syms(dplyr::setdiff(gvars, "agegrp"))) |>
+      reframe(
+        !!site := list(combine_tp(!!site)),
+        !!morp := list(combine_tp(!!morp))
+      ) |>
+      standardize_year_sex()
+  }
+  result$pop <- pop
+  has_exclude <- vapply(data, function(x) "exclude" %in% names(x), logical(1))
+  if (any(has_exclude)) {
+    result$exclude <- cmerge(data[has_exclude], nested = "exclude") |>
+      standardize_year_sex()
+  }
+  structure(result, class = c("fbswicd", "list"))
 }
 
 
@@ -226,23 +272,86 @@ cr_merge.summaries <- function(data) {
 #' @param data A list to be merged.
 #' @param nested A nested list element name, if applicable.
 #'
-#' @return A merged data frame with an `areacode` column as the first column.
+#' @return A merged data frame with an `regicode` column as the first column.
 #' @noRd
 cmerge <- function(data, nested = NULL) {
-  areacode <- rlang::sym("areacode")
-  purrr::map_dfr(
-    names(data),
-    function(f) {
-      code <- purrr::pluck(data, f, "areacode", .default = f) |>
-        as.character()
-      df <- if (is.null(nested)) {
-        purrr::pluck(data, f)
-      } else {
-        purrr::pluck(data, f, nested)
-      }
-      df |>
-        mutate(!!areacode := code, .before = everything()) |>
-        standardize_year_sex()
-    }
+  if (length(data) == 0L) {
+    return(dplyr::bind_rows(data))
+  }
+
+  data_names <- names(data)
+  if (is.null(data_names)) {
+    data_names <- as.character(seq_along(data))
+  }
+  index <- seq_along(data)
+  frames <- lapply(index, function(i) {
+    if (is.null(nested)) data[[i]] else data[[i]][[nested]]
+  })
+  has_source_codes <- vapply(
+    index,
+    function(i) {
+      ((inherits(data[[i]], "canreg") &&
+        "source_regicodes" %in% names(data[[i]])) ||
+        (inherits(data[[i]], "fbswicd") &&
+          length(data[[i]]$regicode) > 1L)) &&
+        "regicode" %in% names(frames[[i]])
+    },
+    logical(1)
   )
+
+  if (all(has_source_codes)) {
+    return(standardize_year_sex(dplyr::bind_rows(frames)))
+  }
+
+  codes <- vapply(
+    index,
+    function(i) {
+      code <- data[[i]][["regicode"]]
+      if (has_source_codes[[i]]) {
+        return("")
+      }
+      if (is.null(code)) {
+        data_names[[i]]
+      } else if (length(code) > 1L) {
+        paste0(
+          "merged:",
+          paste(
+            vapply(
+              code,
+              utils::URLencode,
+              character(1),
+              reserved = TRUE,
+              repeated = TRUE
+            ),
+            collapse = "+"
+          )
+        )
+      } else {
+        code
+      }
+    },
+    character(1)
+  )
+
+  if (any(has_source_codes)) {
+    frames <- lapply(index, function(i) {
+      if (has_source_codes[[i]]) {
+        frames[[i]]
+      } else {
+        df <- frames[[i]]
+        df[["regicode"]] <- rep(codes[[i]], nrow(df))
+        df[c("regicode", setdiff(names(df), "regicode"))]
+      }
+    })
+  } else {
+    merged <- dplyr::bind_rows(frames)
+    merged[["regicode"]] <- rep(
+      codes,
+      times = vapply(frames, nrow, integer(1))
+    )
+    merged <- merged[c("regicode", setdiff(names(merged), "regicode"))]
+    return(standardize_year_sex(merged))
+  }
+
+  standardize_year_sex(dplyr::bind_rows(frames))
 }

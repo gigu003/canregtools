@@ -16,7 +16,7 @@
 #'    `pop_type = "long"`). If not present in the sheet, a column with 0s will
 #'    be added. Default is `"death"`.
 #'
-#' @return A `canreg` object (a list with components: `areacode`, `FBcases`,
+#' @return A `canreg` object (a list with components: `regicode`, `FBcases`,
 #'   `SWcases`, `POP`) if a single file is read. A named list of such objects
 #'   with class `"canregs"` if multiple files or a directory is provided.
 #'
@@ -101,7 +101,7 @@ check_readxl <- function() {
 #'
 #' @return A list of class `"canreg"` containing:
 #'   \describe{
-#'     \item{areacode}{Character string extracted from the file name stem.}
+#'     \item{regicode}{Character string extracted from the file name stem.}
 #'     \item{FBcases}{A data frame of FB cases, with class `"FBcases"`.}
 #'     \item{SWcases}{A data frame of SW cases, with class `"SWcases"`.}
 #'     \item{POP}{A population data frame of class `"POP"` depending on the
@@ -135,11 +135,11 @@ read_file <- function(
       )
 
       bsname <- sub("\\.[^.]+$", "", basename(x))
-      areacode <- as.character(bsname)
+      regicode <- as.character(bsname)
 
       structure(
         list(
-          areacode = areacode,
+          regicode = regicode,
           FBcases = fb,
           SWcases = sw,
           POP = pop
@@ -208,8 +208,8 @@ read_sheet <- function(
 #' The function assumes a fixed range `B2:C20` with 19 age groups per sex.
 #'
 #' @param x A file path to an Excel file containing the "POP" sheet.
-#' @param year An integer or vector indicating the year associated with the
-#'    population data.
+#' @param year A four-digit calendar year, supplied as a numeric or character
+#'    scalar, associated with the population data.
 #'
 #' @return A tibble with columns: year, sex (1 = male, 2 = female),
 #'    agegrp (factor), rks (population count).
@@ -218,8 +218,8 @@ read_sheet <- function(
 #' @noRd
 read_single_pop <- function(x, year) {
   # Validate year input
-  if (!is.numeric(year) || length(year) != 1) {
-    stop("`year` must be a single numeric value.")
+  if (length(year) != 1 || !grepl("^[0-9]{4}$", as.character(year))) {
+    stop("`year` must be one four-digit calendar year.")
   }
 
   # Try reading the population sheet
@@ -257,8 +257,8 @@ read_single_pop <- function(x, year) {
 
   # Construct tibble with age groups and sex
   res <- dplyr::tibble(
-    year = rep(as.integer(year), 38),
-    sex = rep(c(1L, 2L), each = 19),
+    year = rep(as.character(year), 38),
+    sex = rep(c("1", "2"), each = 19),
     agegrp = factor(rep(1:19, 2)),
     rks = as.integer(c(pop$male, pop$female))
   )
@@ -319,10 +319,12 @@ read_long_pop <- function(
     )
   }
 
+  pop[["year"]] <- as.character(pop[["year"]])
+  pop[["sex"]] <- tidy_sex(pop[["sex"]])
+
   # Return the cleaned result
   res <- pop |>
     dplyr::mutate(
-      dplyr::across(c(!!!strat_vars), as.integer),
       !!rks := as.integer(round(!!pop_sym)),
       !!death := as.integer(round(!!death_sym)),
       !!agegrp := factor(as.numeric(gsub("\\D", "", !!age_sym)))

@@ -13,27 +13,67 @@ create_asr(
   ...,
   event = "fbs",
   std = c("cn2000", "wld85"),
+  age_breaks = NULL,
+  std_method = c("exact", "interpolate"),
+  interpolation_method = "linear",
   cancer_type = "big",
   mp = 1e+05,
   decimal = 2,
+  show_pop = FALSE,
   show_var = FALSE,
+  show_se = FALSE,
   show_ci = FALSE,
   collapse = TRUE
 )
 
-\method{create_asr}{canregs}(x, ..., cancer_type = "big", collapse = TRUE)
+\method{create_asr}{canregs}(
+  x,
+  ...,
+  event = "fbs",
+  std = c("cn2000", "wld85"),
+  age_breaks = NULL,
+  std_method = c("exact", "interpolate"),
+  interpolation_method = "linear",
+  cancer_type = "big",
+  mp = 1e+05,
+  decimal = 2,
+  show_pop = FALSE,
+  show_var = FALSE,
+  show_se = FALSE,
+  show_ci = FALSE,
+  collapse = TRUE
+)
 
-\method{create_asr}{canreg}(x, ..., cancer_type = "big")
+\method{create_asr}{canreg}(
+  x,
+  ...,
+  event = "fbs",
+  std = c("cn2000", "wld85"),
+  age_breaks = NULL,
+  std_method = c("exact", "interpolate"),
+  interpolation_method = "linear",
+  cancer_type = "big",
+  mp = 1e+05,
+  decimal = 2,
+  show_pop = FALSE,
+  show_var = FALSE,
+  show_se = FALSE,
+  show_ci = FALSE
+)
 
 \method{create_asr}{fbswicds}(
   x,
   ...,
   event = "fbs",
   std = c("cn2000", "wld85"),
+  age_breaks = NULL,
+  std_method = c("exact", "interpolate"),
+  interpolation_method = "linear",
   mp = 1e+05,
   decimal = 2,
   show_pop = FALSE,
   show_var = FALSE,
+  show_se = FALSE,
   show_ci = FALSE,
   collapse = TRUE
 )
@@ -43,10 +83,14 @@ create_asr(
   ...,
   event = "fbs",
   std = c("cn2000", "wld85"),
+  age_breaks = NULL,
+  std_method = c("exact", "interpolate"),
+  interpolation_method = "linear",
   mp = 1e+05,
   decimal = 2,
   show_pop = FALSE,
   show_var = FALSE,
+  show_se = FALSE,
   show_ci = FALSE
 )
 }
@@ -68,6 +112,17 @@ frame used for calculating standardized rates. When calculating
 standardized rates for multiple standard populations, specify std = c(segi,
 china).}
 
+\item{age_breaks}{Numeric vector of lower bounds for input age groups. It
+must begin at 0 and end no later than 85. The final group is open-ended.
+If omitted, the bounds are inferred from \code{agegrp}.}
+
+\item{std_method}{Method used to align standard-population weights with
+\code{age_breaks}: \code{"exact"} combines original groups, while
+\code{"interpolate"} estimates single-year weights before regrouping.}
+
+\item{interpolation_method}{Interpolation method used when
+\code{std_method = "interpolate"}.}
+
 \item{cancer_type}{A character string specifying the classification method
 used to categorize ICD-10 codes. This determines how ICD-10 codes are
 classified. Options include \code{"big"} (classify ICD-10 codes into 26
@@ -75,7 +130,9 @@ cancer categories), \code{"small"} (classify ICD-10 codes into 59 cancer
 categories, more specific categories), \code{"system"} (classify ICD-10
 codes into organ system), and \code{"gco"} (classify ICD-10 code into
 cancer categories same as classification published by the Global
-Cancer Observatory). This parameter is only available when the
+Cancer Observatory), and \code{"ci5"} (classify ICD-10 codes using the
+63-category CI5-XII classification, with shared aggregate codes \code{60} and
+\code{61}). This parameter is only available when the
 input data is a vector of ICD-10 codes, or object with class of
 \code{'canreg'} or \code{'canregs'}.}
 
@@ -85,14 +142,19 @@ input data is a vector of ICD-10 codes, or object with class of
 round the results. The default is 2, which means rates will
 be rounded to two decimal places.}
 
-\item{show_var}{Logical value whether output variance or not.}
+\item{show_pop}{Logical value whether output population or not.}
+
+\item{show_var}{Logical value indicating whether to output variances.
+Variances use the squared scale of the reported rates, so their square
+roots equal the corresponding standard errors before rounding.}
+
+\item{show_se}{Logical value indicating whether to output standard errors.
+Standard errors use the same scale as the reported rates.}
 
 \item{show_ci}{Logical value whether output confidence(lower or upper bound)
 or not.}
 
 \item{collapse}{Logical value whether output result as asr or asrs.}
-
-\item{show_pop}{Logical value whether output population or not.}
 }
 \value{
 A data frame or tibble contains the age standard rates and CIs.
@@ -102,7 +164,28 @@ A data frame or tibble contains the age standard rates and CIs.
 class of \code{canreg}, \code{canregs}, \code{fbswicd}, or \code{fbswicds}. It supports
 stratification by multiple variables, allows the specification of different
 standard population structures, and provides flexibility in the inclusion
-of variance, confidence intervals, and population data.
+of variance, standard errors, confidence intervals, and population data.
+}
+\details{
+Standard populations use 19 age groups by default: age 0, 1--4, 5--9,
+..., and 85+. When the input uses 18 five-year age groups beginning with
+0--4, \code{create_asr()} automatically combines the age-0 and age-1--4
+standard-population weights before calculating the ASR.
+
+Supply \code{age_breaks} to use another compatible grouping. By default, groups
+must only combine the original standard-population groups; set
+\code{std_method = "interpolate"} when a requested boundary splits one.
+
+For summary input, existing \code{sex = "0"} rows are retained once.
+Missing overall rows are computed from available male/female rows at each
+original stratum before grouping. If an overall row and both sex-specific
+rows are supplied, inconsistent totals cause an error. Overall-only input
+is supported; sex-specific rows are not inferred from overall values.
+Within each observed year/sex/cancer stratum, absent summary age rows
+are interpreted as zero counts and completed from matching population
+age groups. Entirely absent strata are not inferred. Supplied missing,
+non-finite, or negative counts cause an error; population rows are never
+invented or filled with zero.
 }
 \examples{
 data("canregs")
@@ -128,9 +211,9 @@ head(asr_with_ci)
 # calculate ASR with population at risk
 asr_with_pop <- create_asr(data, year, sex, cancer, show_pop = TRUE)
 head((asr_with_pop))
-# calculate ASR with variance
-asr_with_var <- create_asr(data, year, sex, cancer, show_var = TRUE)
-head(asr_with_var)
+# calculate ASR with standard errors
+asr_with_se <- create_asr(data, year, sex, cancer, show_se = TRUE)
+head(asr_with_se)
 
 # calculate ASR based on object with class of `fbswicds`
 # convert object with class of `canregs` to object with class of `fbswicds`

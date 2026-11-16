@@ -3,10 +3,18 @@
 #' @noRd
 #' @keywords internal
 dict_addr <- function(dict = "registry") {
-  stopifnot(is.character(dict), length(dict) == 1)
-  cache_dir <- tools::R_user_dir("canregtools", "config")
-  if (!dir.exists(cache_dir)) {
-    dir.create(cache_dir, recursive = TRUE)
+  validate_registry_dict_name(dict)
+  cache_dir <- getOption(
+    "canregtools.dict_dir",
+    tools::R_user_dir("canregtools", "config")
+  )
+  if (
+    !is.character(cache_dir) ||
+      length(cache_dir) != 1L ||
+      is.na(cache_dir) ||
+      !nzchar(cache_dir)
+  ) {
+    stop("`canregtools.dict_dir` must be one non-empty directory path.")
   }
   file.path(cache_dir, paste0(dict, "_dict.rds"))
 }
@@ -34,7 +42,14 @@ cr_replace_na <- function(x) {
 #' @noRd
 #' @keywords internal
 prop <- function(x, fmu, mp = 100, decimal = 2) {
-  round(sum(x) / sum(fmu) * mp, decimal)
+  numerator <- sum(x, na.rm = TRUE)
+  denominator <- sum(fmu, na.rm = TRUE)
+
+  if (!is.finite(denominator) || denominator <= 0) {
+    return(NA_real_)
+  }
+
+  round(numerator / denominator * mp, decimal)
 }
 
 #' @method c canregs
@@ -212,7 +227,7 @@ check_reframe_expr <- function(data, ...) {
 
 #' Get cancer codes
 #'
-#' @param cancer_type Cancer category: "small", "big", "system", "gco", or "all".
+#' @param cancer_type Cancer category: "small", "big", "system", "gco", "ci5", or "all".
 #' @param sex A character string: "all", "male" or "female".
 #' @return A character vector of cancer codes.
 #' @noRd
@@ -225,9 +240,10 @@ get_cancer <- function(cancer_type = "all", sex = "all") {
     "big" = as.character(101:126),
     "system" = as.character(201:211),
     "gco" = as.character(301:338),
-    "all" = as.character(c(1:59, 101:126, 201:211, 301:338)),
+    "ci5" = as.character(401:461),
+    "all" = as.character(c(1:59, 101:126, 201:211, 301:338, 401:461)),
     stop(
-      "Invalid cancer_type. Choose from 'small', 'big', 'system', 'gco', or 'all'."
+      "Invalid cancer_type. Choose from 'small', 'big', 'system', 'gco', 'ci5', or 'all'."
     )
   )
 
@@ -263,8 +279,8 @@ drop_sex_cancer <- function(data, drop_na = NULL) {
   cancer <- rlang::sym("cancer")
   res <- data |>
     filter(
-      !(!!sex == 1 & !!cancer %in% get_cancer(sex = "female")) |
-        !(!!sex == 2 & !!cancer %in% get_cancer(sex = "male"))
+      !(!!sex == "1" & !!cancer %in% get_cancer(sex = "female")) |
+        !(!!sex == "2" & !!cancer %in% get_cancer(sex = "male"))
     )
   if (!is.null(drop_na)) {
     res |>

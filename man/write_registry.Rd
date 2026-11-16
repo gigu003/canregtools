@@ -2,6 +2,7 @@
 % Please edit documentation in R/write_registry.R
 \name{write_registry}
 \alias{write_registry}
+\alias{write_registry.default}
 \alias{write_registry.data.frame}
 \alias{write_registry.list}
 \alias{write_registry.NULL}
@@ -9,6 +10,13 @@
 \title{Write registry attributes to a user-defined dictionary}
 \usage{
 write_registry(
+  x = NULL,
+  dict = "registry",
+  cache_refresh = FALSE,
+  quiet = TRUE
+)
+
+\method{write_registry}{default}(
   x = NULL,
   dict = "registry",
   cache_refresh = FALSE,
@@ -45,43 +53,63 @@ write_registry(
 }
 \arguments{
 \item{x}{A named list, a named character vector or a data frame that
-includes the columns \code{areacode} and the target attribute
+includes the columns \code{regicode} and the target attribute
 e.g., \code{registry}, \code{area_type}.}
 
 \item{dict}{A character string specifying the dictionary to update.
 Built-in defaults are available for "registry" and "area_type"; any other
-single string is treated as a user-defined dictionary name.}
+name is treated as a user-defined dictionary name. The name \code{regicode} is
+reserved for \code{\link[=write_regicode]{write_regicode()}}.}
 
 \item{cache_refresh}{If TRUE, refresh the dictionary to default values before
-updating.}
+updating. User-supplied mappings are then applied on top of those defaults.}
 
-\item{quiet}{If TRUE, message will be supressed.}
+\item{quiet}{If TRUE, suppresses update and backup messages and returns
+the updated dictionary invisibly.}
 }
 \value{
-A tibble with two columns: \code{areacode} and the corresponding
-attribute values.
+A tibble with two columns: \code{regicode} and the corresponding
+attribute values. The result is returned invisibly when \code{quiet = TRUE}.
 }
 \description{
-Stores the mapping between six-digit administrative division codes
-areacode and their corresponding attributes e.g.,
-registry names or area types into a dictionary file. This supports
-consistent labeling and downstream processing in cancer registry data.
+Compatibility interface for \code{\link[=cr_map]{cr_map()}}, using \code{dict} instead of \code{attr}.
+New grouping workflows can use \code{cr_map()} directly.
 }
 \details{
+Stores mappings from registry identifiers to their attributes, e.g.,
+China-specific registry names or area types, in a dictionary file. This supports
+consistent labeling and downstream processing in cancer registry data.
+
 This function allows users to build or update local mapping dictionaries for
-area-level attributes. It supports multiple input formats and updates
-internal files saved in the user-specific R cache directory.
+registry-level attributes. It supports multiple input formats and updates
+files saved in the user-specific R configuration directory. Registry
+identifiers must be non-empty and unique within one update.
+Set \code{options(canregtools.dict_dir = "path/to/dictionaries")} to isolate
+dictionaries for a project. By default the user configuration directory is
+used. Only user overrides are stored; current built-in defaults are merged
+when reading. Legacy dictionaries are backed up and migrated on their next
+update, retaining all legacy entries as overrides because their origin is
+unknown. Corrupt files stop the update and are retained. Writes use a
+verified temporary file and replacement, with a lock against concurrent
+writers. Use \code{\link[=reset_dict]{reset_dict()}} to clear overrides (with a backup).
+\code{cache_refresh = TRUE} retains its reset-before-update behavior.
 }
 \examples{
-write_registry(list('410302' = '410301'))
+withr::with_options(
+  list(canregtools.dict_dir = tempfile("canregtools-example-")),
+  write_registry(list("410302" = "410301"))
+)
 
 # Registry attributes stored in data frame
 registry_dict <- data.frame(
-areacode = c("410302", "410303", "410304", "410305", "410306", "410307"),
+regicode = c("410302", "410303", "410304", "410305", "410306", "410307"),
 registry = c(rep("410301", 5), "410300"),
 area_type = rep("urban", 6)
 )
-write_registry(registry_dict)
+withr::with_options(
+  list(canregtools.dict_dir = tempfile("canregtools-example-")),
+  write_registry(registry_dict)
+)
 
 # Registry attributes stored in list
 dict <- list(
@@ -92,16 +120,25 @@ dict <- list(
 '410306' = '410301',
 '410307' = '410301'
 )
-write_registry(dict)
+withr::with_options(
+  list(canregtools.dict_dir = tempfile("canregtools-example-")),
+  write_registry(dict)
+)
 
 # Registry attributes using built-in information
 dict <- NULL
-write_registry(dict)
+withr::with_options(
+  list(canregtools.dict_dir = tempfile("canregtools-example-")),
+  write_registry(dict)
+)
 
-# Registry attributes stored in named character vector with areacode as
+# Registry attributes stored in named character vector with regicode as
 # name and attributes as values
 dict <- rep("410301", 5)
 names(dict) <- c("410302", "410303", "410304", "410305", "410306")
-write_registry(dict)
+withr::with_options(
+  list(canregtools.dict_dir = tempfile("canregtools-example-")),
+  write_registry(dict)
+)
 
 }

@@ -27,7 +27,18 @@ elements will be selected.}
 
 \item{...}{Optional conditions or expressions used to filter elements within
 the list or data frame. Conditions are evaluated for each element of
-the input object.}
+the input object. For \code{canregs} and \code{fbswicds}, population-year
+expressions can refer to \code{POP} or \code{pop}, respectively. The aliases
+\code{pop_years}, \code{pop_n_years}, \code{pop_year_min}, \code{pop_year_max}, and
+\code{pop_year_range} are also available. They mean:
+\code{pop_years} is the sorted unique non-missing population year labels;
+\code{pop_n_years} is the number of those years; \code{pop_year_min} and
+\code{pop_year_max} are the minimum and maximum calendar-year bounds; and
+\code{pop_year_range} is a length-two vector containing those bounds.
+Period labels such as \code{"2003-2007"} contribute 2003 and 2007 to the
+respective bounds. For example, use
+\code{all(pop_years \%in\% as.character(2018:2022))} to require all population years to
+fall within 2018--2022.}
 
 \item{index}{A vector of indices specifying the elements to
 select. This can be a character vector (matching element names), a
@@ -44,10 +55,28 @@ This function allows you to select specific elements from objects of class
 conditions, or expressions. The selected elements are returned while
 preserving the class of the input object.
 }
+\details{
+Each comma-separated condition must be satisfied by at least one
+non-missing value within an element. The conditions may be satisfied by
+different rows. To require conditions on the same row, combine them with
+\code{&} in a single expression. Missing condition values do not count as matches.
+}
 \examples{
 data("canregs")
 # Select elements which mi greather than 0.5 from `canregs`
 canregs_mi <- cr_select(canregs, mi > 0.5)
+# Select registries with population data for exactly three years
+canregs_three_years <- cr_select(canregs, pop_n_years == 3)
+# Select registries whose population years are all within 2018--2022
+canregs_period <- cr_select(
+  canregs,
+  all(pop_years \%in\% as.character(2018:2022))
+)
+# The original population data can also be used directly
+canregs_three_years <- cr_select(
+  canregs,
+  length(unique(POP$year)) == 3
+)
 
 # Select elements from obejct with class of `fbswicds`
 fbsws <- count_canreg(canregs)

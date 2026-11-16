@@ -7,7 +7,11 @@
 
 #' @param ... Filtering conditions passed to [dplyr::filter()]. These
 #'   conditions are applied to selected components when all variables in the
-#'   expressions are available in that component.
+#'   expressions are available in that component. Direct comparisons of `year`
+#'   with numeric values (including `%in%`) temporarily interpret single-year
+#'   labels as integers. Character comparisons retain character semantics.
+#'   Period or invalid labels become missing with a warning in numeric
+#'   comparisons. The stored `year` column is not changed.
 #' @param drop Drop specific cancer categories. Use `"total"` to remove total
 #'   cancer categories and `"others"` to remove other/non-specific cancer
 #'   categories when a selected component has a `cancer` column.
@@ -55,34 +59,34 @@ cr_filter.canregs <- function(.data, ..., drop = c("none"), part = "all") {
 #' @export
 #'
 cr_filter.canreg <- function(.data, ..., drop = c("none"), part = "all") {
-  valid_parts <- dplyr::setdiff(names(.data), "areacode")
+  valid_parts <- dplyr::setdiff(names(.data), "regicode")
   part <- normalize_cr_filter_part(part, valid_parts)
   conds <- rlang::enquos(...)
   res <- .data
   expr_vars <- get_expr_vars(...)
   for (type in part) {
     added_year <- FALSE
-    if (type == "POP") {
-      updated_part <- pluck(res, type)
-    } else if (type == "FBcases") {
-      updated_part <- pluck(res, type)
+    updated_part <- pluck(res, type)
+    if (!is.data.frame(updated_part)) {
+      next
+    }
+    if (type == "FBcases") {
       if ("year" %in% expr_vars && "year" %nin% names(updated_part)) {
         updated_part <- updated_part |>
-          mutate(year = as.integer(format(!!rlang::sym("inciden"), "%Y")))
+          mutate(year = as.character(format(!!rlang::sym("inciden"), "%Y")))
         added_year <- TRUE
       }
     } else if (type == "SWcases") {
-      updated_part <- pluck(res, type)
       if ("year" %in% expr_vars && "year" %nin% names(updated_part)) {
         updated_part <- updated_part |>
-          mutate(year = as.integer(format(!!rlang::sym("deathda"), "%Y")))
+          mutate(year = as.character(format(!!rlang::sym("deathda"), "%Y")))
         added_year <- TRUE
       }
     }
 
-    if (all(expr_vars %in% colnames(updated_part))) {
+    if (cr_filter_has_vars(updated_part, conds)) {
       res[[type]] <- updated_part |>
-        filter(!!!conds) |>
+        filter_cr_year(conds) |>
         apply_cr_filter_drop(drop) |>
         remove_cr_filter_year(added_year)
     }
@@ -125,7 +129,7 @@ cr_filter.fbswicds <- function(.data, ..., drop = c("none"), part = "all") {
 #' @export
 #'
 cr_filter.fbswicd <- function(.data, ..., drop = c("none"), part = "all") {
-  valid_parts <- dplyr::setdiff(names(.data), "areacode")
+  valid_parts <- dplyr::setdiff(names(.data), "regicode")
   part <- normalize_cr_filter_part(part, valid_parts)
   conds <- rlang::enquos(...)
   expr_vars <- get_expr_vars(...)
@@ -136,9 +140,9 @@ cr_filter.fbswicd <- function(.data, ..., drop = c("none"), part = "all") {
     if (!is.data.frame(updated_part)) {
       next
     }
-    if (all(expr_vars %in% colnames(updated_part))) {
+    if (cr_filter_has_vars(updated_part, conds)) {
       res[[type]] <- updated_part |>
-        filter(!!!conds) |>
+        filter_cr_year(conds) |>
         apply_cr_filter_drop(drop)
     } else if (length(expr_vars) == 0) {
       res[[type]] <- updated_part |>
@@ -200,7 +204,7 @@ cr_filter.default <- function(
   drop = c("none")
 ) {
   conds <- rlang::enquos(...)
-  res <- filter(.data, !!!conds)
+  res <- filter_cr_year(.data, conds)
   if ("total" %in% drop & "cancer" %in% colnames(.data)) {
     res <- drop_total(res)
   }
@@ -260,4 +264,85 @@ remove_cr_filter_year <- function(x, added_year = FALSE) {
     x <- dplyr::select(x, -dplyr::any_of("year"))
   }
   x
+}
+
+# Rewrite only direct year comparisons, preserving each condition's environment.
+filter_cr_year <- function(data, conds) {
+  conds <- lapply(conds, function(cond) {
+    rlang::quo_set_expr(cond, rewrite_cr_year(rlang::quo_get_expr(cond)))
+  })
+  dplyr::filter(data, !!!conds)
+}
+
+is_cr_year <- function(expr) {
+  identical(expr, quote(year)) ||
+    identical(expr, quote(.data$year)) ||
+    identical(expr, quote(.data[["year"]]))
+}
+
+rewrite_cr_year <- function(expr) {
+  if (!is.call(expr)) {
+    return(expr)
+  }
+  if (!is.symbol(expr[[1]])) {
+    return(expr)
+  }
+  op <- as.character(expr[[1]])
+  if (
+    length(op) != 1L ||
+      op %in% c("quote", "substitute", "expression", "function", "~")
+  ) {
+    return(expr)
+  }
+  if (
+    length(expr) == 3L && op %in% c(">", ">=", "<", "<=", "==", "!=", "%in%")
+  ) {
+    left <- is_cr_year(expr[[2]])
+    right <- is_cr_year(expr[[3]])
+    if (xor(left, right)) {
+      return(rlang::call2(compare_cr_year, expr[[2]], expr[[3]], op, left))
+    }
+  }
+  for (i in seq_along(expr)[-1L]) {
+    if (!rlang::is_missing(expr[[i]])) {
+      expr[[i]] <- rewrite_cr_year(expr[[i]])
+    }
+  }
+  expr
+}
+
+compare_cr_year <- function(left, right, op, year_left) {
+  years <- if (year_left) left else right
+  other <- if (year_left) right else left
+  if (is.numeric(other) && (is.character(years) || is.factor(years))) {
+    labels <- trimws(as.character(years))
+    invalid <- !is.na(labels) & !grepl("^[0-9]{4}$", labels)
+    if (any(invalid)) {
+      warning(
+        "Numeric year comparison: period or invalid year labels treated as NA: ",
+        paste(unique(labels[invalid]), collapse = ", "),
+        call. = FALSE
+      )
+    }
+    labels[invalid] <- NA_character_
+    years <- as.integer(labels)
+    if (year_left) left <- years else right <- years
+  }
+  do.call(op, list(left, right))
+}
+
+
+cr_filter_has_vars <- function(data, conds) {
+  all(vapply(
+    conds,
+    function(cond) {
+      vars <- setdiff(all.vars(rlang::quo_get_expr(cond)), c(".data", ".env"))
+      missing <- setdiff(vars, names(data))
+      if ("year" %in% missing) {
+        return(FALSE)
+      }
+      all(rlang::env_has(rlang::quo_get_env(cond), missing, inherit = TRUE))
+    },
+    logical(1)
+  ))
 }

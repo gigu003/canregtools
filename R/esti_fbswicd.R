@@ -32,11 +32,11 @@ esti_fbswicd <- function(obj, pop = NULL) {
   sex <- rlang::sym("sex")
   agegrp <- rlang::sym("agegrp")
   inci <- create_age_rate(obj, event = "fbs", !!!strat) |>
-    cr_filter(!!!sex == 0) |>
+    cr_filter(!!!sex == "0") |>
     select(-!!rlang::sym("cases")) |>
     rename(inci = !!rlang::sym("rate"))
   mort <- create_age_rate(obj, event = "sws", !!!strat) |>
-    cr_filter(!!!sex == 0) |>
+    cr_filter(!!!sex == "0") |>
     select(-!!rlang::sym("cases")) |>
     rename(mort = !!rlang::sym("rate"))
 
@@ -60,7 +60,7 @@ esti_fbswicd <- function(obj, pop = NULL) {
     select(-!!rlang::sym("inci"), -!!rlang::sym("mort"), -!!rks)
   structure(
     list(
-      areacode = obj$areacode,
+      regicode = obj$regicode,
       fbswicd = esti,
       sitemorp = pluck(obj, "sitemorp"),
       pop = pop_modi

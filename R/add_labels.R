@@ -1,11 +1,11 @@
 #' Add variable labels for data set.
 #'
 #' `add_labels()` adds labels for selected variables such as `sex`, `cancer`,
-#' and `areacode` in the dataset based on the specified language and label type.
+#' and `regicode` in the dataset based on the specified language and label type.
 #'
 #' @param x A data frame or tibble to be labeled.
 #' @param vars A character vector of variable names to label. Default includes
-#'   `"sex"`, `"cancer"`, and `"areacode"`.
+#'   `"sex"`, `"cancer"`, and `"regicode"`.
 #' @param names A character vector contains the labels added.
 #' @template label_type
 #' @template lang
@@ -25,7 +25,7 @@
 #' asr <- add_labels(asr, label_type = "full", lang = "en")
 add_labels <- function(
   x,
-  vars = c("sex", "cancer", "areacode"),
+  vars = c("sex", "cancer", "regicode"),
   names = NULL,
   label_type = "full",
   lang = "zh",

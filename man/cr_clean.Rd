@@ -66,7 +66,9 @@ cancer categories), \code{"small"} (classify ICD-10 codes into 59 cancer
 categories, more specific categories), \code{"system"} (classify ICD-10
 codes into organ system), and \code{"gco"} (classify ICD-10 code into
 cancer categories same as classification published by the Global
-Cancer Observatory). This parameter is only available when the
+Cancer Observatory), and \code{"ci5"} (classify ICD-10 codes using the
+63-category CI5-XII classification, with shared aggregate codes \code{60} and
+\code{61}). This parameter is only available when the
 input data is a vector of ICD-10 codes, or object with class of
 \code{'canreg'} or \code{'canregs'}.}
 }
@@ -75,6 +77,13 @@ Class 'canreg'.
 }
 \description{
 Clean canreg data.
+}
+\details{
+Population input must contain one complete standard 18- or
+19-group schedule per year and sex, with numeric lower age bounds in
+\code{agegrp}. Aligned groups are summed directly; finer groups use natural
+interpolation with source-group totals preserved. The final open group
+cannot be split. Empty population input remains empty.
 }
 \examples{
 data("canregs")

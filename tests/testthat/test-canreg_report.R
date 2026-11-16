@@ -22,7 +22,7 @@ test_that("create_canreg_report_data builds a report object", {
     event_components
   )
 
-  required_cols <- c("areacode_cn", "areacode", "year", "sex", "cancer")
+  required_cols <- c("regicode_cn", "regicode", "year", "sex", "cancer")
   expect_setequal(
     intersect(required_cols, names(report$inci$summary)),
     required_cols
@@ -36,7 +36,7 @@ test_that("create_canreg_report_data builds a report object", {
   expect_setequal(
     intersect(
       summary_labels,
-      unique(as.character(report$inci$summary$areacode_cn))
+      unique(as.character(report$inci$summary$regicode_cn))
     ),
     summary_labels
   )

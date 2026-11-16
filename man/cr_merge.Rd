@@ -42,6 +42,12 @@ Merge elements from object with class of \code{canregs}, \code{fbswicds}, \code{
 \code{qualities}, \code{age_rates}, or \code{summaries} into object with class of \code{canreg},
 \code{fbswicd}, \code{asr}, \code{quality}, \code{age_rate}, or \code{summary}.
 }
+\details{
+Merged \code{canreg} objects store original registry identifiers in
+\code{source_regicodes}. For multiple sources, the scalar \code{regicode} is
+\verb{merged:} followed by URL-encoded source codes joined with \code{+}. A single
+source retains its identifier. Case-level source identifiers are retained.
+}
 \examples{
 data("canregs")
 canreg <- cr_merge(canregs)

@@ -21,27 +21,27 @@ post_sex_specific_cancer <- function(x) {
         !!cancer %in% female_cancer |
         as.numeric(!!sex) == 1 & !!cancer %in% male_cancer
     ) |>
-    mutate(!!sex := 0L)
+    mutate(!!sex := "0")
 
   res <- x |>
     dplyr::filter(
-      !(!!sex == 0 & !!cancer %in% c(male_cancer, female_cancer))
+      !(!!sex == "0" & !!cancer %in% c(male_cancer, female_cancer))
     ) |>
     bind_rows(sex_specific_cancer) |>
     dplyr::filter(
-      (!!sex == 1 & !!cancer %nin% female_cancer) |
-        (!!sex == 2 & !!cancer %nin% male_cancer) |
-        !!sex == 0
+      (!!sex == "1" & !!cancer %nin% female_cancer) |
+        (!!sex == "2" & !!cancer %nin% male_cancer) |
+        !!sex == "0"
     )
 
   sex_not_cancer <- x |>
     dplyr::filter(
-      (!!sex == 1 & !!cancer %in% female_cancer) |
-        (!!sex == 2 & !!cancer %in% male_cancer)
+      (!!sex == "1" & !!cancer %in% female_cancer) |
+        (!!sex == "2" & !!cancer %in% male_cancer)
     ) |>
     mutate(across(
       !starts_with(c(
-        "areacode",
+        "regicode",
         "name",
         "year",
         "sex",
@@ -67,10 +67,10 @@ standardize_year_sex <- function(data) {
     return(data)
   }
   if ("year" %in% names(data)) {
-    data[["year"]] <- as.integer(data[["year"]])
+    data[["year"]] <- as.character(data[["year"]])
   }
   if ("sex" %in% names(data)) {
-    data[["sex"]] <- as.integer(data[["sex"]])
+    data[["sex"]] <- as.character(data[["sex"]])
   }
   data
 }
@@ -82,8 +82,8 @@ post_vars <- function(data) {
   stopifnot(is.data.frame(data))
 
   defaults <- list(
-    year = 9000L,
-    sex = 0L,
+    year = "9000",
+    sex = "0",
     cancer = "60"
   )
 

@@ -24,7 +24,11 @@ A tibble with five columns:
 }
 \description{
 This function returns a \code{tibble} containing variable names and their
-descriptions based on the specified category.
+descriptions based on the specified category. For \code{type = "reframe"},
+valid custom grouping dictionaries from the active dictionary directory are
+appended to the built-in attributes, using their names as default labels.
+Registry label files and backup files are excluded; invalid grouping files
+are skipped with a warning.
 }
 \examples{
 ls_vars("std")

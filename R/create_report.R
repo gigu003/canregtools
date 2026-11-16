@@ -6,7 +6,8 @@
 #' @rdname create_report
 #' @param data An object of class `canreg` or `canregs`.
 #' @param template Character string specifying the report template to use.
-#'   Options include `"annual"`, `"quality"`, or `"CI5"`. Default is `"annual"`.
+#'   Options include `"annual"`, `"quality"`, or `"quality-list-city"`.
+#'   Default is `"annual"`.
 #' @param title Character. Title of the generated report. Default is
 #'   `"Cancer Registry Report"`.
 #' @param output_format Character. Format of the rendered report.
@@ -74,7 +75,8 @@ create_report.canregs <- function(
       template = template,
       title = title,
       output_format = output_format,
-      output_dir = output_dir
+      output_dir = output_dir,
+      ...
     )
   }
 }
@@ -102,12 +104,12 @@ create_report.canreg <- function(
   if (is.null(tempath) || !file.exists(tempath)) {
     stop("Template not found: ", template)
   }
-  areacode <- purrr::pluck(data, "areacode")
-  output_file <- paste0(areacode)
+  regicode <- purrr::pluck(data, "regicode")
+  output_file <- paste0(regicode)
   if (is.null(output_dir)) {
     output_dir <- getwd()
   }
-  author <- tidy_var(areacode, var_name = "areacode", lang = "cn")
+  author <- tidy_var(regicode, var_name = "regicode", lang = "cn")
   # render report using rmarkdown
   rmarkdown::render(
     input = tempath,

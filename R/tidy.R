@@ -1,6 +1,6 @@
 #' Tidy gender variable
 #'
-#' Standardizes gender-related values into consistent numeric codes or factors.
+#' Standardizes gender-related values into consistent character codes or factors.
 #' This function maps various gender-related character strings (e.g., "male",
 #' "female", "man", "woman", "1", "2", etc.) to standardized numeric values:
 #' `1` for male, `2` for female, and `0` for total. It supports both Chinese
@@ -10,7 +10,7 @@
 #' @param x A character or numeric vector containing gender information.
 #' @template lang
 #' @template as_factor
-#' @return A numeric vector or a factor representing gender:
+#' @return A character vector or a factor representing gender:
 #' \describe{
 #'   \item{0}{Total}
 #'   \item{1}{Male}
@@ -26,12 +26,14 @@
 #' tidy_sex(gender)
 tidy_sex <- function(x, lang = "cn", as_factor = FALSE) {
   x <- tolower(x)
-  m_des <- c("\u7537", "male", "man", "men")
-  f_des <- c("\u5973", "female", "women", "woman")
-  t_des <- c("\u5408", "total", "\u5408\u8ba1")
-  x[grepl(paste(f_des, collapse = "|"), x)] <- 2
-  x[grepl(paste(m_des, collapse = "|"), x)] <- 1
-  x[grepl(paste(t_des, collapse = "|"), x)] <- 0
+  if (!all(is.na(x) | x %in% c("0", "1", "2"))) {
+    m_des <- c("\u7537", "male", "man", "men")
+    f_des <- c("\u5973", "female", "women", "woman")
+    t_des <- c("\u5408", "total", "\u5408\u8ba1")
+    x[grepl(paste(f_des, collapse = "|"), x)] <- 2
+    x[grepl(paste(m_des, collapse = "|"), x)] <- 1
+    x[grepl(paste(t_des, collapse = "|"), x)] <- 0
+  }
   x[!(x %in% c(0, 1, 2))] <- NA
   if (std_lang(lang) == "cn") {
     labels <- c("\u5408\u8ba1", "\u7537\u6027", "\u5973\u6027")
@@ -49,7 +51,7 @@ tidy_sex <- function(x, lang = "cn", as_factor = FALSE) {
       labels = labels[valid_values + 1]
     )
   } else {
-    return(as.integer(x))
+    return(as.character(as.integer(x)))
   }
 }
 
@@ -174,8 +176,14 @@ tidy_var <- function(
   if (!var_name %in% supported_vars) {
     stop("The variable name is not supported.")
   }
-  var_map <- tidy_var_maps[[var_name]]
-  x_trans <- tolower(x)
+  var_map <- if (var_name == "regicode") {
+    labels <- read_registry_dictionary("regicode")
+    names(labels)[names(labels) == "regicode"] <- "code"
+    labels
+  } else {
+    tidy_var_maps[[var_name]]
+  }
+  x_trans <- if (var_name == "regicode") as.character(x) else tolower(x)
   if (var_name %in% c("icd10", "topo")) {
     x_trans <- toupper(x)
   }
@@ -203,6 +211,9 @@ tidy_var <- function(
       52:58,
       60,
       61,
+      424,
+      427,
+      452:461,
       113,
       124:126,
       316:319,

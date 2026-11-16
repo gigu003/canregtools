@@ -14,6 +14,16 @@
 #' @param show_pop Logical value whether output population or not.
 #' @param collapse Logical value whether output result as age_rate or age_rates.
 #' @return A data frame of age-specific rates.
+#' @details For summary input, existing `sex = "0"` rows are retained once.
+#'   Missing overall rows are computed from available male/female rows at each
+#'   original stratum before grouping. If an overall row and both sex-specific
+#'   rows are supplied, inconsistent totals cause an error. Overall-only input
+#'   is supported; sex-specific rows are not inferred from overall values.
+#'   Within each observed year/sex/cancer stratum, absent summary age rows
+#'   are interpreted as zero counts and completed from matching population
+#'   age groups. Entirely absent strata are not inferred. Supplied missing,
+#'   non-finite, or negative counts cause an error; population rows are never
+#'   invented or filled with zero.
 #' @export
 #' @examples
 #' data("canregs")
@@ -169,16 +179,14 @@ create_age_rate.fbswicd <- function(
       )
 
     output <- output |>
-      rowwise() |>
       mutate(
-        !!rlang::sym("f0") := sum(c_across(starts_with("f"))),
-        !!rlang::sym("p0") := sum(c_across(starts_with("p"))),
+        !!rlang::sym("f0") := rowSums(dplyr::pick(starts_with("f"))),
+        !!rlang::sym("p0") := rowSums(dplyr::pick(starts_with("p"))),
         !!rlang::sym("r0") := round(
           !!rlang::sym("f0") / !!rlang::sym("p0") * mp,
           decimal
         )
       ) |>
-      ungroup() |>
       select(
         starts_with(c("year", "sex", "cancer")),
         starts_with("f0"),
@@ -199,7 +207,7 @@ create_age_rate.fbswicd <- function(
     post_vars() |>
     post_sex_specific_cancer()
   if (sex_not_pass) {
-    output <- filter(output, !!sex == 0L)
+    output <- filter(output, !!sex == "0")
   }
   attr(output, "class") <- c("age_rate", "tbl_df", "tbl", "data.frame")
 

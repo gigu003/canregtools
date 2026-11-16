@@ -3,7 +3,8 @@
 #' @rdname cr_reframe
 #' @param x Object with class of canregs or fbswicds.
 #' @param strat Stratification variables used to reframe 'canregs' or
-#'        'fbswicds'.
+#'        'fbswicds'. Use [cr_map()] to configure registry, area-type, or
+#'        custom grouping mappings.
 #'
 #' @return Reframed canregs or fbswicds.
 #' @export
@@ -30,21 +31,16 @@ cr_reframe <- function(x, strat = "registry") {
 #' names(province)
 #'
 cr_reframe.canregs <- function(x, strat = "registry") {
-  areacodes <- unique(unlist(map(x, pluck("areacode"))))
-  new <- map(strat, function(a) {
-    pluck(classify_areacode(areacodes, attr = a), a)
-  })
-  nnew <- map(new, unique)
-  res <- map(seq_along(nnew), function(b) {
-    rr <- map(pluck(nnew, b), function(i) {
-      loc <- which(pluck(new, b) == i)
-      res <- cr_merge(cr_select(x, index = loc))
-      res$areacode <- i
-      res
-    })
-    names(rr) <- pluck(nnew, b)
-    rr
-  })
+  regicodes <- vapply(
+    x,
+    function(object) {
+      as.character(object[["regicode"]])
+    },
+    character(1)
+  ) |>
+    unname()
+  new <- reframe_group_codes(strat, regicodes)
+  res <- unname(map(new, reframe_groups, x = x))
   res1 <- do.call(c, res)
   if (length(res1) == 1) {
     res1 <- pluck(res1, 1)
@@ -68,21 +64,16 @@ cr_reframe.canregs <- function(x, strat = "registry") {
 #' city <- cr_reframe(fbsw, strat = "city")
 #'
 cr_reframe.fbswicds <- function(x, strat = "registry") {
-  areacodes <- unique(unlist(map(x, pluck("areacode"))))
-  new_code <- map(strat, function(a) {
-    pluck(classify_areacode(areacodes, attr = a), a)
-  })
-  tran_code <- map(new_code, unique)
-  res <- map(seq_along(tran_code), function(b) {
-    rr <- map(pluck(tran_code, b), function(i) {
-      loc <- which(pluck(new_code, b) == i)
-      res <- cr_merge(cr_select(x, index = loc))
-      res$areacode <- i
-      res
-    })
-    names(rr) <- pluck(tran_code, b)
-    rr
-  })
+  regicodes <- vapply(
+    x,
+    function(object) {
+      as.character(object[["regicode"]])
+    },
+    character(1)
+  ) |>
+    unname()
+  new_code <- reframe_group_codes(strat, regicodes)
+  res <- unname(map(new_code, reframe_groups, x = x))
 
   output <- do.call(c, res)
   if (length(output) == 1) {
@@ -94,6 +85,57 @@ cr_reframe.fbswicds <- function(x, strat = "registry") {
 }
 
 
+reframe_codes <- function(strat, regicodes) {
+  if (identical(strat, "regicode")) {
+    return(regicodes)
+  }
+
+  grouped_codes <- pluck(classify_areacode(regicodes, attr = strat), strat)
+  ifelse(is.na(grouped_codes), regicodes, grouped_codes)
+}
+
+
+reframe_group_codes <- function(strat, regicodes) {
+  custom_strat <- setdiff(strat, "regicode")
+  classified <- if (length(custom_strat) > 0L) {
+    classify_areacode(regicodes, attr = custom_strat)
+  } else {
+    list()
+  }
+
+  setNames(
+    lapply(strat, function(variable) {
+      if (identical(variable, "regicode")) {
+        regicodes
+      } else {
+        grouped_codes <- classified[[variable]]
+        ifelse(is.na(grouped_codes), regicodes, grouped_codes)
+      }
+    }),
+    strat
+  )
+}
+
+
+reframe_groups <- function(group_codes, x) {
+  group_codes <- unname(group_codes)
+  group_names <- unique(group_codes)
+  groups <- lapply(group_names, function(group) {
+    loc <- if (is.na(group)) {
+      which(is.na(group_codes))
+    } else {
+      which(group_codes == group)
+    }
+    selected <- structure(x[loc], class = class(x))
+    result <- cr_merge(selected)
+    result$regicode <- group
+    result
+  })
+  names(groups) <- group_names
+  groups
+}
+
+
 #' Merge registry attributes into an `fbswicd` object
 #'
 #' @param x An object with class of `fbswicd`
@@ -101,13 +143,14 @@ cr_reframe.fbswicds <- function(x, strat = "registry") {
 #' @returns A `fbswicd` object is augmented with registry metadata
 #' @noRd
 full_fbswicd <- function(x) {
-  areacode_info <- as.data.frame(classify_areacode(x[["areacode"]]))
-  fbswicd <- bind_cols(areacode_info, x[["fbswicd"]])
-  sitemorp <- bind_cols(areacode_info, x[["sitemorp"]])
-  pop <- bind_cols(areacode_info, x[["pop"]])
+  regicode_info <- as.data.frame(classify_areacode(x[["regicode"]]))
+  regicode_info$regicode <- as.character(x[["regicode"]])
+  fbswicd <- bind_cols(regicode_info, x[["fbswicd"]])
+  sitemorp <- bind_cols(regicode_info, x[["sitemorp"]])
+  pop <- bind_cols(regicode_info, x[["pop"]])
   structure(
     list(
-      areacode = x[["areacode"]],
+      regicode = x[["regicode"]],
       fbswicd = fbswicd,
       sitemorp = sitemorp,
       pop = pop
@@ -128,6 +171,9 @@ full_fbswicd <- function(x) {
 combine_tp <- function(object) {
   if (!is.list(object)) {
     stop("input object must be a list.")
+  }
+  if (length(object) == 0L) {
+    return(stats::setNames(integer(), character()))
   }
   if (
     !all(sapply(object, function(x) {

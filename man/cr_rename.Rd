@@ -3,25 +3,28 @@
 \name{cr_rename}
 \alias{cr_rename}
 \alias{cr_rename.canregs}
-\title{Rename registries in a \code{canregs} object}
+\alias{cr_rename.fbswicds}
+\title{Rename registries in a registry collection}
 \usage{
 cr_rename(x, mapping)
 
 \method{cr_rename}{canregs}(x, mapping)
+
+\method{cr_rename}{fbswicds}(x, mapping)
 }
 \arguments{
-\item{x}{An object of class \code{canregs}.}
+\item{x}{An object of class \code{canregs} or \code{fbswicds}.}
 
 \item{mapping}{A named character vector. Names identify existing registry
 names in \code{x}, and values provide their new names.}
 }
 \value{
-A \code{canregs} object with selected element names and their internal
-\code{areacode} values updated.
+An object with the same class as \code{x}, with selected element names
+and their internal \code{regicode} values updated.
 }
 \description{
-\code{cr_rename()} renames selected elements of a \code{canregs} object and updates
-the \code{areacode} stored inside each renamed \code{canreg} element.
+\code{cr_rename()} renames selected elements of a \code{canregs} or \code{fbswicds} object
+and updates the \code{regicode} stored inside each renamed registry element.
 }
 \examples{
 data("canregs")
@@ -30,5 +33,9 @@ renamed <- cr_rename(
   c("410103" = "REG_A", "410307" = "REG_B")
 )
 names(renamed)
-renamed[["REG_A"]]$areacode
+renamed[["REG_A"]]$regicode
+
+summarized <- count_canreg(canregs)
+renamed_summaries <- cr_rename(summarized, c("410103" = "REG_A"))
+renamed_summaries[["REG_A"]]$regicode
 }

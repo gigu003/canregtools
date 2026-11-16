@@ -1,24 +1,24 @@
-expect_year_sex_integer <- function(data) {
+expect_year_sex_character <- function(data) {
   if (!is.data.frame(data)) {
     return(invisible(NULL))
   }
   if ("year" %in% names(data)) {
-    expect_type(data$year, "integer")
+    expect_type(data$year, "character")
   }
   if ("sex" %in% names(data)) {
-    expect_type(data$sex, "integer")
+    expect_type(data$sex, "character")
   }
   invisible(NULL)
 }
 
-expect_fbswicd_year_sex_integer <- function(x) {
-  expect_year_sex_integer(x$fbswicd)
-  expect_year_sex_integer(x$sitemorp)
-  expect_year_sex_integer(x$pop)
-  expect_year_sex_integer(x$exclude)
+expect_fbswicd_year_sex_character <- function(x) {
+  expect_year_sex_character(x$fbswicd)
+  expect_year_sex_character(x$sitemorp)
+  expect_year_sex_character(x$pop)
+  expect_year_sex_character(x$exclude)
 }
 
-test_that("as_canreg standardizes population year and sex as integer", {
+test_that("as_canreg standardizes population year and sex as character", {
   data("canregs")
   src <- canregs[[1]]
   pop <- src$POP
@@ -26,54 +26,54 @@ test_that("as_canreg standardizes population year and sex as integer", {
   pop$sex <- as.numeric(pop$sex)
 
   obj <- as_canreg(
-    incidence = src$FBcases,
-    mortality = src$SWcases,
-    population = pop,
-    areacode = src$areacode
+    inci = src$FBcases,
+    mort = src$SWcases,
+    pop = pop,
+    regicode = src$regicode
   )
 
-  expect_year_sex_integer(obj$POP)
+  expect_year_sex_character(obj$POP)
 })
 
-test_that("cr_clean outputs integer year and sex columns", {
+test_that("cr_clean outputs character year and sex columns", {
   data("canregs")
   cleaned <- cr_clean(canregs[[1]])
 
-  expect_year_sex_integer(cleaned$FBcases)
-  expect_year_sex_integer(cleaned$SWcases)
-  expect_year_sex_integer(cleaned$POP)
+  expect_year_sex_character(cleaned$FBcases)
+  expect_year_sex_character(cleaned$SWcases)
+  expect_year_sex_character(cleaned$POP)
 })
 
-test_that("count_canreg outputs integer year and sex columns", {
+test_that("count_canreg outputs character year and sex columns", {
   data("canregs")
   fbsw <- count_canreg(canregs[[1]])
 
-  expect_fbswicd_year_sex_integer(fbsw)
+  expect_fbswicd_year_sex_character(fbsw)
 })
 
-test_that("cr_merge outputs integer year and sex columns", {
+test_that("cr_merge outputs character year and sex columns", {
   data("canregs")
   merged <- cr_merge(canregs)
 
-  expect_year_sex_integer(merged$FBcases)
-  expect_year_sex_integer(merged$SWcases)
-  expect_year_sex_integer(merged$POP)
+  expect_year_sex_character(merged$FBcases)
+  expect_year_sex_character(merged$SWcases)
+  expect_year_sex_character(merged$POP)
 
   merged_fbsw <- cr_merge(count_canreg(canregs))
-  expect_fbswicd_year_sex_integer(merged_fbsw)
+  expect_fbswicd_year_sex_character(merged_fbsw)
 })
 
-test_that("derived workflows output integer year and sex columns", {
+test_that("derived workflows output character year and sex columns", {
   data("canregs")
   fbsw <- count_canreg(canregs[[1]])
 
-  expect_year_sex_integer(create_asr(fbsw, year, sex, cancer))
-  expect_year_sex_integer(create_age_rate(fbsw, year, sex, cancer))
-  expect_year_sex_integer(create_quality(fbsw, year, sex, cancer))
-  expect_year_sex_integer(create_site_morp(fbsw, year, sex, cancer))
+  expect_year_sex_character(create_asr(fbsw, year, sex, cancer))
+  expect_year_sex_character(create_age_rate(fbsw, year, sex, cancer))
+  expect_year_sex_character(create_quality(fbsw, year, sex, cancer))
+  expect_year_sex_character(create_site_morp(fbsw, year, sex, cancer))
 })
 
-test_that("canreg report data outputs integer year and sex columns", {
+test_that("canreg report data outputs character year and sex columns", {
   data("canregs")
   report <- create_canreg_report_data(
     canregs,
@@ -82,8 +82,27 @@ test_that("canreg report data outputs integer year and sex columns", {
     include_age_registry = FALSE
   )
 
-  purrr::walk(report$pop, expect_year_sex_integer)
-  purrr::walk(report$quality, expect_year_sex_integer)
-  purrr::walk(report$inci, expect_year_sex_integer)
-  purrr::walk(report$mort, expect_year_sex_integer)
+  purrr::walk(report$pop, expect_year_sex_character)
+  purrr::walk(report$quality, expect_year_sex_character)
+  purrr::walk(report$inci, expect_year_sex_character)
+  purrr::walk(report$mort, expect_year_sex_character)
+})
+
+test_that("population periods remain intact through registry workflows", {
+  data("canregs")
+  src <- canregs[[1]]
+  pop <- src$POP
+  pop$year <- "2003-2007"
+
+  obj <- as_canreg(
+    inci = src$FBcases,
+    mort = src$SWcases,
+    pop = pop,
+    regicode = src$regicode
+  )
+  fbsw <- count_canreg(obj)
+
+  expect_setequal(unique(obj$POP$year), "2003-2007")
+  expect_setequal(unique(fbsw$pop$year), "2003-2007")
+  expect_equal(nrow(validate_population(obj$POP)), 0L)
 })

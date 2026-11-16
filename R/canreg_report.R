@@ -330,7 +330,7 @@ validate_canreg_report <- function(x) {
     }
   }
 
-  required_cols <- c("areacode_cn", "areacode", "year", "sex", "cancer")
+  required_cols <- c("regicode_cn", "regicode", "year", "sex", "cancer")
   for (event in c("inci", "mort")) {
     missing_cols <- setdiff(required_cols, names(x[[event]][["summary"]]))
     if (length(missing_cols) > 0) {
